@@ -20,17 +20,31 @@ private slots:
     void on_extBtn_clicked(void);
 
 private:
-    enum {HEAD = 0, FREQ, DBU, SNR, REL, SPRB, HOUR_LINES};
+    enum {FREQ = 0, DBU, SNR, REL, SPRB, HOUR_LINES};
     /*! @brief 读出FREQ/DBU/SNR/REL/SPRB行 */
     int read_valid_lines(void);
+
     /*!
-     * @brief 判断content中从id行开始的n行是否为有效的hour结构
-     * @param [IN] id hour结构的第1行索引号
+     * @brief 判断content中从i行开始的n行是否为有效的hour结构
+     * @param [IN] i hour结构的第1行索引号
      * @return int 返回是否有效
      */
-    bool is_valid_hour(int id);
-    /*! @brief 转换从id行开始的hour结构 */
-    void trans_one_hour(int id);
+    bool is_valid_hour(int i);
+
+    /*! @brief 转换从i行开始的hour结构 */
+    int trans_one_hour(int i,
+                           QList<int>& freq,
+                           QList<int>& dbu,
+                           QList<int>& snr,
+                           QList<int>& rel,
+                           QList<int>& sprb);
+
+    /*! @brief 转换第i行的head结构 */
+    void trans_head(int i, int& year, int& month, int& ssn);
+    /*! @brief 转换第i行的data结构 */
+    void trans_data(int i, QList<int>& list);
+    /*! @brief 转换第i行的freq结构 */
+    void trans_freq(int i, int& hour, QList<int>& list);
 
 private:
     Ui::dbCreator *ui;
