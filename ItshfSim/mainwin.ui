@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWin</class>
+ <widget class="QMainWindow" name="MainWin">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>ItshfSim</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWin{border-image:url(:/png/muchuan-202307.png);}</string>
+  </property>
+  <widget class="QWidget" name="central">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QChartView" name="chartView">
+      <property name="styleSheet">
+       <string notr="true">backgroud:transparent</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuEnv">
+    <property name="title">
+     <string>&amp;Env</string>
+    </property>
+    <addaction name="actModel"/>
+    <addaction name="actDatabase"/>
+   </widget>
+   <widget class="QMenu" name="menuLink">
+    <property name="title">
+     <string>&amp;Link</string>
+    </property>
+    <addaction name="actTime"/>
+    <addaction name="actRequest"/>
+   </widget>
+   <widget class="QMenu" name="menuAuto">
+    <property name="title">
+     <string>&amp;Auto</string>
+    </property>
+    <addaction name="actStrategy"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actContent"/>
+    <addaction name="actCopyright"/>
+   </widget>
+   <addaction name="menuLink"/>
+   <addaction name="menuAuto"/>
+   <addaction name="menuEnv"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>true</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actTime"/>
+   <addaction name="actRequest"/>
+   <addaction name="actStrategy"/>
+   <addaction name="actModel"/>
+   <addaction name="actDatabase"/>
+   <addaction name="actContent"/>
+  </widget>
+  <action name="actTime">
+   <property name="text">
+    <string>&amp;Time</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
+  </action>
+  <action name="actModel">
+   <property name="text">
+    <string>&amp;Model</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
+   </property>
+  </action>
+  <action name="actRequest">
+   <property name="text">
+    <string>&amp;Request</string>
+   </property>
+   <property name="toolTip">
+    <string>Link Request</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+R</string>
+   </property>
+  </action>
+  <action name="actStrategy">
+   <property name="text">
+    <string>&amp;Strategy</string>
+   </property>
+   <property name="toolTip">
+    <string>Algorithm Strategy</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
+  </action>
+  <action name="actContent">
+   <property name="text">
+    <string>&amp;Content</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actCopyright">
+   <property name="text">
+    <string>Copyrights</string>
+   </property>
+  </action>
+  <action name="actDatabase">
+   <property name="text">
+    <string>&amp;Database</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Database</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+D</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">qchartview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
