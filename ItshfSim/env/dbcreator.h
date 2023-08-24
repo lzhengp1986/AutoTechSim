@@ -1,6 +1,7 @@
 #ifndef DBCREATOR_H
 #define DBCREATOR_H
 
+#include "sqlite3.h"
 #include <QDialog>
 
 namespace Ui {
@@ -33,11 +34,11 @@ private:
 
     /*! @brief 转换从i行开始的hour结构 */
     int trans_one_hour(int i,
-                           QList<int>& freq,
-                           QList<int>& dbu,
-                           QList<int>& snr,
-                           QList<int>& rel,
-                           QList<int>& sprb);
+                       QList<int>& freq,
+                       QList<int>& dbu,
+                       QList<int>& snr,
+                       QList<int>& rel,
+                       QList<int>& sprb);
 
     /*! @brief 转换第i行的head结构 */
     void trans_head(int i, int& year, int& month, int& ssn);
@@ -45,6 +46,14 @@ private:
     void trans_data(int i, QList<int>& list);
     /*! @brief 转换第i行的freq结构 */
     void trans_freq(int i, int& hour, QList<int>& list);
+    /*! @brief 将line按字符拆分 */
+    void split(const QString& line, QList<int>& list);
+    void split(const QString& line, QList<float>& list);
+
+private:
+    void db_open(sqlite3** db);
+    void db_insert(sqlite3* db, int year, int month, int ssn, int freq, int dbu, int snr, int rel, int sprb);
+    void db_close(sqlite3* db);
 
 private:
     Ui::dbCreator *ui;
