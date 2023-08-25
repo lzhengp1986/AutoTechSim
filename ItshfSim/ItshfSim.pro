@@ -21,6 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     env/dbcreator.cpp \
+    env/model.cpp \
     env/sqlite3.c \
     main.cpp \
     mainwin.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
 
 HEADERS += \
     env/dbcreator.h \
+    env/model.h \
     env/sqlite3.h \
     mainwin.h \
     win/wchart.h \
@@ -36,6 +38,7 @@ HEADERS += \
 
 FORMS += \
     env/dbcreator.ui \
+    env/model.ui \
     mainwin.ui
 
 # 界面图标

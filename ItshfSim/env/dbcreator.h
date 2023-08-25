@@ -50,6 +50,8 @@ private:
     /*! @brief 将line按字符拆分 */
     void split(const QString& line, QList<int>& list);
     void split(const QString& line, QList<float>& list);
+    /*! @brief 月份转换 */
+    int trans_month(const QString& month);
 
 private:
     void db_open(sqlite3** db);
