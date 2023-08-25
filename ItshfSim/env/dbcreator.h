@@ -35,6 +35,7 @@ private:
     /*! @brief 转换从i行开始的hour结构 */
     int trans_one_hour(int i,
                        QList<int>& freq,
+                       QList<int>& mufDay,
                        QList<int>& dbu,
                        QList<int>& snr,
                        QList<int>& rel,
@@ -52,7 +53,7 @@ private:
 
 private:
     void db_open(sqlite3** db);
-    void db_insert(sqlite3* db, int year, int month, int ssn, int freq, int dbu, int snr, int rel, int sprb);
+    void db_insert(sqlite3* db, int year, int month, int ssn, int hour, int freq, int mufday, int dbu, int snr, int rel, int sprb);
     void db_close(sqlite3* db);
 
 private:

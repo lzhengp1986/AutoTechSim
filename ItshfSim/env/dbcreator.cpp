@@ -56,8 +56,8 @@ void dbCreator::on_extBtn_clicked(void)
     int i = 0;
     bool isHead = false;
     int year, month, hour, ssn;
-    QList<int> freq, dbu, snr, rel, sprb;
-    int iFreq, iDbu, iSnr, iRel, iSprb;
+    QList<int> freq, mufday, dbu, snr, rel, sprb;
+    int iFreq, iMufday, iDbu, iSnr, iRel, iSprb;
 
     /* step3.解析文本 */
     while (i < n) {
@@ -73,18 +73,19 @@ void dbCreator::on_extBtn_clicked(void)
         } else {
             if (is_valid_hour(i)) {
                 /* 数据转换 */
-                hour = trans_one_hour(i, freq, dbu, snr, rel, sprb);
+                hour = trans_one_hour(i, freq, mufday, dbu, snr, rel, sprb);
                 isHead = (hour < 24);
                 i += HOUR_LINES;
 
                 /* 保存到db */
                 for (int j = 0; j < FREQ_NUM; j++) {
                     iFreq = freq.at(j);
+                    iMufday = mufday.at(j);
                     iDbu = dbu.at(j);
                     iSnr = snr.at(j);
                     iRel = rel.at(j);
                     iSprb = sprb.at(j);
-                    db_insert(db, year, month, ssn, iFreq, iDbu, iSnr, iRel, iSprb);
+                    db_insert(db, year, month, ssn, hour, iFreq, iMufday, iDbu, iSnr, iRel, iSprb);
                 }
             } else {
                 i++;
@@ -125,6 +126,7 @@ int dbCreator::read_valid_lines(void)
         QString text = line.left(line.size() - 1);
         if (text.endsWith("degrees")
             || text.endsWith("FREQ")
+            || text.endsWith("MUFday")
             || text.endsWith("DBU")
             || text.endsWith("SNR")
             || text.endsWith("REL")
@@ -141,22 +143,24 @@ int dbCreator::read_valid_lines(void)
 bool dbCreator::is_valid_hour(int i)
 {
     bool isFrq = m_content.at(i).endsWith("FREQ");
-    bool isDbu = m_content.at(i + 1).endsWith("DBU");
-    bool isSnr = m_content.at(i + 2).endsWith("SNR");
-    bool isRel = m_content.at(i + 3).endsWith("REL");
-    bool isPrb = m_content.at(i + 4).endsWith("S PRB");
-    return (isFrq && isDbu && isSnr && isRel && isPrb);
+    bool isDay = m_content.at(i + 1).endsWith("MUFday");
+    bool isDbu = m_content.at(i + 2).endsWith("DBU");
+    bool isSnr = m_content.at(i + 3).endsWith("SNR");
+    bool isRel = m_content.at(i + 4).endsWith("REL");
+    bool isPrb = m_content.at(i + 5).endsWith("S PRB");
+    return (isFrq && isDay && isDbu && isSnr && isRel && isPrb);
 }
 
 /* 转换从i行开始的hour结构 */
-int dbCreator::trans_one_hour(int i, QList<int>& freq, QList<int>& dbu, QList<int>& snr, QList<int>& rel, QList<int>& sprb)
+int dbCreator::trans_one_hour(int i, QList<int>& freq, QList<int>& mufDay, QList<int>& dbu, QList<int>& snr, QList<int>& rel, QList<int>& sprb)
 {
     int hour = 0;
     trans_freq(i, hour, freq);
-    trans_data(i + 1, dbu);
-    trans_data(i + 2, snr);
-    trans_data(i + 3, rel);
-    trans_data(i + 4, sprb);
+    trans_data(i + 1, mufDay);
+    trans_data(i + 2, dbu);
+    trans_data(i + 3, snr);
+    trans_data(i + 4, rel);
+    trans_data(i + 5, sprb);
     return hour;
 }
 
@@ -240,21 +244,13 @@ void dbCreator::trans_freq(int i, int& hour, QList<int>& list)
 /* 字符串拆分int */
 void dbCreator::split(const QString& line, QList<int>& list)
 {
-    int i, j, k;
+    int i, j;
 
     list.clear();
     for (i = 0; i < FREQ_NUM; i++) {
         j = CHAR_OFF + i * DATA_WID;
         QString text = line.mid(j, DATA_WID).trimmed();
-        if (text.contains('E')) {
-            k = text.left(1).toInt();
-        } else if (text.contains("F1")) {
-            k = text.left(1).toInt() * 10;
-        } else if (text.contains("F2")) {
-            k = text.left(1).toInt() * 20;
-        } else {
-            k = text.toInt();
-        }
+        int k = text.toInt();
         list.append(k);
     }
 }
@@ -291,35 +287,45 @@ void dbCreator::db_open(sqlite3** db)
     int ret = sqlite3_open_v2(file, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
     if (ret) {
         QMessageBox::warning(this, "Warning", "Can not open database file.");
+        return;
     }
 
-    /* 删除内容 */
+    /* 删除表格 */
     char* errMsg = nullptr;
     const char *sql1 = "DROP TABLE IF EXISTS ITU";
     int rc1 = sqlite3_exec(*db, sql1, 0, 0, &errMsg);
     if (rc1 != SQLITE_OK) {
-        QMessageBox::warning(this, "Warning", errMsg);
+        QString info = QString(QLatin1String(errMsg));
+        QMessageBox::warning(this, "Warning", info);
         sqlite3_free(errMsg);
+        return;
     }
 
     /* 创建表格 */
-    const char *sql2 = "CREATE TABLE  IF NOT EXISTS ITU(year INTEGER, month INTEGER, ssn INTEGER,"
-                       "freq INTEGER, dbu INTEGER, snr INTEGER, rel INTEGER, sprb INTEGER,"
-                       "UNIQUE(year, month, ssn, freq) ON CONFLICT IGNORE)";
+    const char *sql2 = "CREATE TABLE  IF NOT EXISTS ITU(year INTEGER, month INTEGER, ssn INTEGER, hour INTEGER,"
+                       "freq INTEGER, mufday INTEGER, dbu INTEGER, snr INTEGER, rel INTEGER, sprb INTEGER,"
+                       "UNIQUE(year, month, ssn, hour, freq) ON CONFLICT IGNORE)";
     int rc2 = sqlite3_exec(*db, sql2, 0, 0, &errMsg);
     if (rc2 != SQLITE_OK) {
-        QMessageBox::warning(this, "Warning", errMsg);
+        QString info = QString(QLatin1String(errMsg));
+        QMessageBox::warning(this, "Warning", info);
         sqlite3_free(errMsg);
     }
+
+    /* transaction */
+    sqlite3_exec(*db, "BEGIN TRANSACTION", 0, 0, NULL);
 }
 
-void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int freq, int dbu, int snr, int rel, int sprb)
+void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int hour,
+                          int freq, int mufday, int dbu, int snr, int rel, int sprb)
 {
     char* errMsg = nullptr;
-    char* sql = sqlite3_mprintf("INSERT INTO ITU VALUES(%d,%d,%d,%d, %d,%d,%d,%d)", year, month, ssn, freq, dbu, snr, rel, sprb);
+    char* sql = sqlite3_mprintf("INSERT INTO ITU VALUES(%d,%d,%d,%d,%d, %d,%d,%d,%d,%d)",
+                                year, month, ssn, hour, freq, mufday, dbu, snr, rel, sprb);
     int rc = sqlite3_exec(db, sql, 0, 0, &errMsg);
     if (rc != SQLITE_OK) {
-        QMessageBox::warning(this, "Warning", errMsg);
+        QString info = QString(QLatin1String(errMsg));
+        QMessageBox::warning(this, "Warning", info);
         sqlite3_free(errMsg);
     }
     sqlite3_free(sql);
@@ -327,5 +333,6 @@ void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int freq, i
 
 void dbCreator::db_close(sqlite3* db)
 {
+    sqlite3_exec(db, "END TRANSACTION", 0, 0, NULL);
     sqlite3_close(db);
 }
