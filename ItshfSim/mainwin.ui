@@ -25,9 +25,6 @@
   <property name="windowTitle">
    <string>ItshfSim</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">#MainWin{border-image:url(:/png/muchuan-202307.png);}</string>
-  </property>
   <widget class="QWidget" name="central">
    <property name="styleSheet">
     <string notr="true"/>

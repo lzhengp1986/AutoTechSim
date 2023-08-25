@@ -1,5 +1,6 @@
 #include "mainwin.h"
 #include "ui_mainwin.h"
+#include "env/model.h"
 #include "env/dbcreator.h"
 
 MainWin::MainWin(QWidget *parent)
@@ -8,6 +9,7 @@ MainWin::MainWin(QWidget *parent)
 {
     ui->setupUi(this);
     setup_win();
+    setup_db();
 }
 
 MainWin::~MainWin()
@@ -39,6 +41,12 @@ void MainWin::free_win(void)
     delete m_chart;
 }
 
+// 数据库列表
+void MainWin::setup_db(void)
+{
+    m_dbList << "Chengdu-Muchuan" << "Chengdu-Xian" << "Chengdu-Saya";
+}
+
 void MainWin::on_actTime_triggered(void)
 {
 
@@ -46,7 +54,26 @@ void MainWin::on_actTime_triggered(void)
 
 void MainWin::on_actModel_triggered(void)
 {
+    Model* model = new Model;
+    model->set_list(m_dbList);
+    int ret = model->exec();
+    if (ret == QDialog::Accepted) {
+        /* 获取索引/月份 */
+        int index = model->get_index();
+        int month = model->get_month();
 
+        /* 转换成文件名 */
+        QString fn = m_dbList.at(index);
+        QString m = QString("-%1").arg(month, 2, 10, QLatin1Char('0'));
+
+        /* 更新背景图片 */
+        this->setObjectName("MainWin");
+        QString pic = ":/png/" + fn + m + ".png";
+        this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
+
+        /* 更新数据库 */
+        QString db = "./png/" + fn + ".db";
+    }
 }
 
 void MainWin::on_actRequest_triggered(void)

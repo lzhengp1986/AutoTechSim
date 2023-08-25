@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>png/muchuan-202307.png</file>
         <file>icon/app.ico</file>
+        <file>png/Chengdu-Muchuan-07.png</file>
     </qresource>
 </RCC>

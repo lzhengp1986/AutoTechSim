@@ -29,10 +29,12 @@ private slots:
 private:
     void setup_win(void);
     void free_win(void);
+    void setup_db(void);
 
 private:
     Ui::MainWin *ui;
     WLabel *m_label;
     WChart *m_chart;
+    QStringList m_dbList;
 };
 #endif // MAINWIN_H

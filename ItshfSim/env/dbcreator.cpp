@@ -180,6 +180,38 @@ void dbCreator::trans_head(int i, int& year, int& month, int& ssn)
     month = trans_month(m);
 }
 
+int dbCreator::trans_month(const QString& month)
+{
+    int m = 0;
+    if (month == "Jan") {
+        m = 1;
+    } else if (month == "Feb") {
+        m = 2;
+    } else if (month == "Mar") {
+        m = 3;
+    } else if (month == "Apr") {
+        m = 4;
+    } else if (month == "May") {
+        m = 5;
+    } else if (month == "Jun") {
+        m = 6;
+    } else if (month == "Jul") {
+        m = 7;
+    } else if (month == "Aug") {
+        m = 8;
+    } else if (month == "Sep") {
+        m = 9;
+    } else if (month == "Oct") {
+        m = 10;
+    } else if (month == "Nov") {
+        m = 11;
+    } else {
+        m = 12;
+    }
+
+    return m;
+}
+
 /* 转换第i行的data结构 */
 void dbCreator::trans_data(int i, QList<int>& list)
 {
@@ -245,38 +277,6 @@ void dbCreator::split(const QString& line, QList<float>& list)
         float k = text.toFloat();
         list.append(k);
     }
-}
-
-int trans_month(const QString& month)
-{
-    int m = 0;
-    if (month == "Jan") {
-        m = 1;
-    } else if (month == "Feb") {
-        m = 2;
-    } else if (month == "Mar") {
-        m = 3;
-    } else if (month == "Apr") {
-        m = 4;
-    } else if (month == "May") {
-        m = 5;
-    } else if (month == "Jun") {
-        m = 6;
-    } else if (month == "Jul") {
-        m = 7;
-    } else if (month == "Aug") {
-        m = 8;
-    } else if (month == "Sep") {
-        m = 9;
-    } else if (month == "Oct") {
-        m = 10;
-    } else if (month == "Nov") {
-        m = 11;
-    } else {
-        m = 12;
-    }
-
-    return m;
 }
 
 void dbCreator::db_open(sqlite3** db)

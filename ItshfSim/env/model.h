@@ -15,6 +15,11 @@ public:
     explicit Model(QWidget *parent = nullptr);
     ~Model();
 
+    /* api */
+    void set_list(const QStringList& list);
+    int get_index(void);
+    int get_month(void);
+
 private:
     Ui::Model *ui;
 };
