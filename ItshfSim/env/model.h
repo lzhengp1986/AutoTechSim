@@ -16,7 +16,7 @@ public:
     ~Model();
 
     /* api */
-    void set_list(const QStringList& list);
+    void setup(int index, int month, const QStringList& list);
     int get_index(void);
     int get_month(void);
 

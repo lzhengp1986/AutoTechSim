@@ -1,6 +1,7 @@
 #ifndef MAINWIN_H
 #define MAINWIN_H
 
+#include "env/wenv.h"
 #include "win/wlabel.h"
 #include "win/wchart.h"
 #include <QMainWindow>
@@ -29,12 +30,16 @@ private slots:
 private:
     void setup_win(void);
     void free_win(void);
-    void setup_db(void);
+    void setup_env(void);
+    void free_env(void);
 
 private:
+    /* 主窗口 */
     Ui::MainWin *ui;
     WLabel *m_label;
     WChart *m_chart;
-    QStringList m_dbList;
+
+    /* ITS模型 */
+    WEnv *m_env;
 };
 #endif // MAINWIN_H

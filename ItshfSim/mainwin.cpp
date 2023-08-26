@@ -9,11 +9,12 @@ MainWin::MainWin(QWidget *parent)
 {
     ui->setupUi(this);
     setup_win();
-    setup_db();
+    setup_env();
 }
 
 MainWin::~MainWin()
 {
+    free_env();
     free_win();
     delete ui;
 }
@@ -41,10 +42,16 @@ void MainWin::free_win(void)
     delete m_chart;
 }
 
-// 数据库列表
-void MainWin::setup_db(void)
+// 设置env
+void MainWin::setup_env(void)
 {
-    m_dbList << "Chengdu-Muchuan" << "Chengdu-Xian" << "Chengdu-Saya";
+    m_env = new WEnv;
+}
+
+// 释放env
+void MainWin::free_env(void)
+{
+    delete m_env;
 }
 
 void MainWin::on_actTime_triggered(void)
@@ -54,26 +61,33 @@ void MainWin::on_actTime_triggered(void)
 
 void MainWin::on_actModel_triggered(void)
 {
-    Model* model = new Model;
-    model->set_list(m_dbList);
+    int index = m_env->get_index();
+    int month = m_env->get_month();
+    const QStringList& list = m_env->get_list();
+    Model* model = new Model(this);
+    model->setup(index, month, list);
+
     int ret = model->exec();
     if (ret == QDialog::Accepted) {
         /* 获取索引/月份 */
-        int index = model->get_index();
-        int month = model->get_month();
+        index = model->get_index();
+        month = model->get_month();
 
         /* 转换成文件名 */
-        QString fn = m_dbList.at(index);
-        QString m = QString("-%1").arg(month, 2, 10, QLatin1Char('0'));
+        QString pre = QString("%1").arg(index, 2, 10, QLatin1Char('0'));
+        QString pos = QString("%1").arg(month, 2, 10, QLatin1Char('0'));
 
         /* 更新背景图片 */
         this->setObjectName("MainWin");
-        QString pic = ":/png/" + fn + m + ".png";
+        QString pic = ":/png/" + pre + '/' + pos + ".png";
         this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
 
         /* 更新数据库 */
-        QString db = "./png/" + fn + ".db";
+        QString db = "./png/" + pre + "/its.db";
+        m_env->setup(index, month, db);
     }
+
+    delete model;
 }
 
 void MainWin::on_actRequest_triggered(void)

@@ -13,12 +13,15 @@ Model::~Model()
     delete ui;
 }
 
-void Model::set_list(const QStringList& list)
+void Model::setup(int index, int month, const QStringList& list)
 {
     int n = list.size();
     for (int i = 0; i < n; i++) {
         ui->list->addItem(list.at(i));
     }
+
+    ui->list->setCurrentIndex(index);
+    ui->month->setValue(month);
 }
 
 int Model::get_index(void)

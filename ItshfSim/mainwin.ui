@@ -33,7 +33,7 @@
     <item row="0" column="0">
      <widget class="QChartView" name="chartView">
       <property name="styleSheet">
-       <string notr="true">backgroud:transparent</string>
+       <string notr="true"/>
       </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
