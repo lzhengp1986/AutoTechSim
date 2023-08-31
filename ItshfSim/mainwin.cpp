@@ -83,7 +83,7 @@ void MainWin::on_actModel_triggered(void)
         this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
 
         /* 更新数据库 */
-        QString db = "./png/" + pre + "/its.db";
+        QString db = "./png/" + pre + "/voacapx.db";
         m_env->setup(index, month, db);
     }
 

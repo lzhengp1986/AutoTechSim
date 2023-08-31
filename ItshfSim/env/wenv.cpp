@@ -26,6 +26,8 @@ void WEnv::setup(int index, int month, const QString& db)
     m_month = month;
 
     /* 打开db */
-    m_db = nullptr;
+    if (m_db != nullptr) {
+        sqlite3_close(m_db);
+    }
 
 }
