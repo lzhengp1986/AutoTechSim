@@ -1,7 +1,7 @@
 #ifndef WENV_H
 #define WENV_H
 
-#include "sqlite3.h"
+#include <QList>
 #include <QStringList>
 
 class WEnv
@@ -14,12 +14,11 @@ public:
     int get_index(void) const;
     int get_month(void) const;
     const QStringList& get_list(void) const;
-    void setup(int index, int month, const QString& db);
+    int setup(int index, int month, const QString& db);
 
 private:
     int m_index;
     int m_month;
-    sqlite3* m_db;
     QStringList m_dbList;
 };
 
