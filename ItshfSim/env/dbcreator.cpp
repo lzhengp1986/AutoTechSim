@@ -48,7 +48,11 @@ void dbCreator::on_extBtn_clicked(void)
 
     /* step1.创建db */
     sqlite3* db = nullptr;
-    db_open(&db);
+    bool flag = db_open(&db);
+    if (flag == false) {
+        db_close(db);
+        return;
+    }
 
     /* step2.读出内容 */
     int n = read_valid_lines();
@@ -279,7 +283,7 @@ void dbCreator::split(const QString& line, QList<float>& list)
     }
 }
 
-void dbCreator::db_open(sqlite3** db)
+bool dbCreator::db_open(sqlite3** db)
 {
     /* 截取db路径 */
     int i = m_fileName.size() - 1;
@@ -298,7 +302,7 @@ void dbCreator::db_open(sqlite3** db)
     int ret = sqlite3_open_v2(file, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
     if (ret) {
         QMessageBox::warning(this, "Warning", "Can not open database file.");
-        return;
+        return false;
     }
 
     /* 删除表格 */
@@ -309,7 +313,7 @@ void dbCreator::db_open(sqlite3** db)
         QString info = QString(QLatin1String(errMsg));
         QMessageBox::warning(this, "Warning", info);
         sqlite3_free(errMsg);
-        return;
+        return false;
     }
 
     /* 创建表格 */
@@ -325,6 +329,7 @@ void dbCreator::db_open(sqlite3** db)
 
     /* transaction */
     sqlite3_exec(*db, "BEGIN TRANSACTION", 0, 0, NULL);
+    return true;
 }
 
 void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int hour,

@@ -54,7 +54,7 @@ private:
     int trans_month(const QString& month);
 
 private:
-    void db_open(sqlite3** db);
+    bool db_open(sqlite3** db);
     void db_insert(sqlite3* db, int year, int month, int ssn, int hour, int freq, int mufday, int dbu, int snr, int rel, int sprb);
     void db_close(sqlite3* db);
 
