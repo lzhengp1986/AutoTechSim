@@ -2,6 +2,8 @@
 #include "ui_mainwin.h"
 #include "env/model.h"
 #include "env/dbcreator.h"
+#include <QMessageBox>
+#include <QDir>
 
 MainWin::MainWin(QWidget *parent)
     : QMainWindow(parent)
@@ -79,12 +81,15 @@ void MainWin::on_actModel_triggered(void)
 
         /* 更新背景图片 */
         this->setObjectName("MainWin");
-        QString pic = ":/png/" + pre + '/' + pos + ".png";
+        QString pic = "./png/" + pre + '/' + pos + ".png";
         this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
 
         /* 更新数据库 */
         QString db = "./png/" + pre + "/voacapx.db";
-        m_env->setup(index, month, db);
+        int rc = m_env->setup(index, month, db);
+        if (rc != 0) {
+            QMessageBox::warning(this, "Warning", "Fail to setup database!");
+        }
     }
 
     delete model;

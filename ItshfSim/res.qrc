@@ -1,41 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>icon/app.ico</file>
-        <file>png/00/07.png</file>
-        <file>png/00/01.png</file>
-        <file>png/00/02.png</file>
-        <file>png/00/03.png</file>
-        <file>png/00/04.png</file>
-        <file>png/00/05.png</file>
-        <file>png/00/06.png</file>
-        <file>png/00/08.png</file>
-        <file>png/00/09.png</file>
-        <file>png/00/10.png</file>
-        <file>png/00/11.png</file>
-        <file>png/00/12.png</file>
-        <file>png/01/01.png</file>
-        <file>png/01/02.png</file>
-        <file>png/01/03.png</file>
-        <file>png/01/04.png</file>
-        <file>png/01/05.png</file>
-        <file>png/01/06.png</file>
-        <file>png/01/07.png</file>
-        <file>png/01/08.png</file>
-        <file>png/01/09.png</file>
-        <file>png/01/10.png</file>
-        <file>png/01/11.png</file>
-        <file>png/01/12.png</file>
-        <file>png/02/01.png</file>
-        <file>png/02/02.png</file>
-        <file>png/02/03.png</file>
-        <file>png/02/04.png</file>
-        <file>png/02/05.png</file>
-        <file>png/02/06.png</file>
-        <file>png/02/07.png</file>
-        <file>png/02/08.png</file>
-        <file>png/02/09.png</file>
-        <file>png/02/10.png</file>
-        <file>png/02/11.png</file>
-        <file>png/02/12.png</file>
     </qresource>
 </RCC>
