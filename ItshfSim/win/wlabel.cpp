@@ -16,7 +16,7 @@ WLabel::WLabel(void)
     /* 时戳 */
     QDateTime ts = QDateTime::currentDateTime();
     QString stamp = ts.toString("yyyy-MM-dd hh:mm:ss");
-    m_label.at(STAMP)->setMinimumWidth(160);
+    m_label.at(STAMP)->setMinimumWidth(120);
     m_label.at(STAMP)->setText(stamp);
 
     /* 信道 */
