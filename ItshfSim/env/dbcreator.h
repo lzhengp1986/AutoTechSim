@@ -23,7 +23,7 @@ private slots:
 private:
     enum {FREQ = 0, DBU, SNR, REL, SPRB, HOUR_LINES};
     /*! @brief 读出FREQ/DBU/SNR/REL/SPRB行 */
-    int read_valid_lines(void);
+    int read_valid_lines(const QString& fn);
 
     /*!
      * @brief 判断content中从i行开始的n行是否为有效的hour结构

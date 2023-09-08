@@ -29,24 +29,27 @@ void dbCreator::on_brsBtn_clicked(void)
     QString fn = QFileDialog::getOpenFileName(this, "Open VOACAP file", path, filter);
     ui->input->setText(fn);
 
-    /* 文件不存在 */
-    if (fn.isEmpty()) {
-        QMessageBox::warning(this, "Warning",
-            "voacap.out dose not specified.");
-        return;
-    }
-
     /* 保存文件名 */
     m_fileName = fn;
 }
 
 void dbCreator::on_extBtn_clicked(void)
 {
-    /* step0.复位进度条 */
+    /* step0.文件不存在 */
+    if (m_fileName.isEmpty()) {
+        QMessageBox::warning(this, "Warning",
+            "voacap.out dose not specified.");
+        return;
+    }
+
+    /* step1.读出内容 */
+    int n = read_valid_lines(m_fileName);
+
+    /* step2.复位进度条 */
     int rate = 0;
     ui->prgBar->setValue(0);
 
-    /* step1.创建db */
+    /* step3.创建db */
     sqlite3* db = nullptr;
     bool flag = db_open(&db);
     if (flag == false) {
@@ -54,16 +57,13 @@ void dbCreator::on_extBtn_clicked(void)
         return;
     }
 
-    /* step2.读出内容 */
-    int n = read_valid_lines();
-
     int i = 0;
     bool isHead = false;
     int year, month, hour, ssn;
     QList<int> freq, mufday, dbu, snr, rel, sprb;
     int iFreq, iMufday, iDbu, iSnr, iRel, iSprb;
 
-    /* step3.解析文本 */
+    /* step4.解析文本 */
     while (i < n) {
         /* 拼接page */
         if (isHead == false) {
@@ -101,14 +101,14 @@ void dbCreator::on_extBtn_clicked(void)
         ui->prgBar->setValue(rate);
     }
 
-    /* step4.关闭db */
+    /* step5.关闭db */
     db_close(db);
 }
 
-int dbCreator::read_valid_lines(void)
+int dbCreator::read_valid_lines(const QString& fn)
 {
     m_content.clear();
-    QFile file(m_fileName);
+    QFile file(fn);
 
     /* 判断文件是否存在 */
     if (! file.exists()) {
