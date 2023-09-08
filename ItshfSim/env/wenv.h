@@ -7,9 +7,9 @@
 /* DB频点信息 */
 typedef struct {
     int freq; /* KHz */
-    int snr; /* 整数 */
-    float mufday;
-    float rel;
+    int mufday;
+    int snr;
+    int rel;
 } DbFreq;
 
 /* 频点数固定 */
@@ -18,7 +18,9 @@ typedef struct {
 
 /* DB月信息 */
 typedef struct {
-    DbFreq item[MAX_HOUR_NUM][MAX_FREQ_NUM];
+    struct {
+        DbFreq fc[MAX_FREQ_NUM];
+    } hr[MAX_HOUR_NUM];
 } DbMonth;
 
 class WEnv

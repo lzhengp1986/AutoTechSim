@@ -66,11 +66,11 @@ int WEnv::setup(int index, int month, const QString& fn)
 
         /* 保存数据 */
         if ((hour <= MAX_HOUR_NUM) && (hour > 0)) {
-            DbFreq* df = &m_dbMonth.item[hour][fid];
-            df->mufday = mufday * 1.0f / 100;
-            df->rel = rel * 1.0f / 100;
+            DbFreq* df = &m_dbMonth.hr[hour - 1].fc[fid];
+            df->mufday = mufday;
             df->freq = freq;
             df->snr = snr;
+            df->rel = rel;
         }
     }
 
