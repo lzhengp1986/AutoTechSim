@@ -4,6 +4,23 @@
 #include <QList>
 #include <QStringList>
 
+/* DB频点信息 */
+typedef struct {
+    int freq; /* KHz */
+    int snr; /* 整数 */
+    float mufday;
+    float rel;
+} DbFreq;
+
+/* 频点数固定 */
+#define MAX_FREQ_NUM 12
+#define MAX_HOUR_NUM 24
+
+/* DB月信息 */
+typedef struct {
+    DbFreq item[MAX_HOUR_NUM][MAX_FREQ_NUM];
+} DbMonth;
+
 class WEnv
 {
 public:
@@ -19,6 +36,7 @@ public:
 private:
     int m_index;
     int m_month;
+    DbMonth m_dbMonth;
     QStringList m_dbList;
 };
 
