@@ -13,7 +13,7 @@ Model::~Model()
     delete ui;
 }
 
-void Model::setup(int year, int index, int month, const QStringList& list)
+void Model::setup(int index, int year, int month, const QStringList& list)
 {
     int n = list.size();
     for (int i = 0; i < n; i++) {

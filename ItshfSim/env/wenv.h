@@ -34,7 +34,7 @@ public:
     int get_month(void) const;
     int get_year(void) const;
     const QStringList& get_list(void) const;
-    int setup(int year, int index, int month, const QString& db);
+    int setup(int index, int year, int month, const QString& db);
 
     /* 信道api */
     bool env(int year, int month, int hour, int glbChId, bool& flag, int& snr);

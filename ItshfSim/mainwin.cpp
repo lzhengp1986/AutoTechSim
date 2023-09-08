@@ -68,7 +68,7 @@ void MainWin::on_actModel_triggered(void)
     int year = m_env->get_year();
     const QStringList& list = m_env->get_list();
     Model* model = new Model(this);
-    model->setup(year, index, month, list);
+    model->setup(index, year, month, list);
 
     int ret = model->exec();
     if (ret == QDialog::Accepted) {
@@ -89,7 +89,7 @@ void MainWin::on_actModel_triggered(void)
 
         /* 更新数据库 */
         QString db = prefix + "/voacapx.db";
-        int rc = m_env->setup(year, index, month, db);
+        int rc = m_env->setup(index, year, month, db);
         if (rc != 0) {
             QMessageBox::warning(this, "Warning", "Fail to setup database!");
         }

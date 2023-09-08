@@ -21,7 +21,7 @@ WEnv::~WEnv(void)
 }
 
 // 数据库
-int WEnv::setup(int year, int index, int month, const QString& fn)
+int WEnv::setup(int index, int year, int month, const QString& fn)
 {
     m_index = index;
     m_month = month;
