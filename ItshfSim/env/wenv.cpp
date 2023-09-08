@@ -7,9 +7,10 @@ WEnv::WEnv(void)
 {
     m_index = 0;
     m_month = 1;
-    m_dbList << "2023-成都市区-乐山沐川"
-             << "2023-成都市区-陕西西安"
-             << "2023-成都市区-海南三亚";
+    m_year = 2023;
+    m_dbList << "成都市区-乐山沐川"
+             << "成都市区-陕西西安"
+             << "成都市区-海南三亚";
 
     memset(&m_dbMonth, 0, sizeof(DbMonth));
 }
@@ -20,10 +21,11 @@ WEnv::~WEnv(void)
 }
 
 // 数据库
-int WEnv::setup(int index, int month, const QString& fn)
+int WEnv::setup(int year, int index, int month, const QString& fn)
 {
     m_index = index;
     m_month = month;
+    m_year = year;
 
     /* 打开db */
     sqlite3* db = nullptr;

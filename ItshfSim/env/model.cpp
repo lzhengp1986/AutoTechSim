@@ -13,7 +13,7 @@ Model::~Model()
     delete ui;
 }
 
-void Model::setup(int index, int month, const QStringList& list)
+void Model::setup(int year, int index, int month, const QStringList& list)
 {
     int n = list.size();
     for (int i = 0; i < n; i++) {
@@ -22,6 +22,7 @@ void Model::setup(int index, int month, const QStringList& list)
 
     ui->list->setCurrentIndex(index);
     ui->month->setValue(month);
+    ui->year->setValue(year);
 }
 
 int Model::get_index(void)
@@ -32,4 +33,9 @@ int Model::get_index(void)
 int Model::get_month(void)
 {
     return ui->month->value();
+}
+
+int Model::get_year(void)
+{
+    return ui->year->value();
 }
