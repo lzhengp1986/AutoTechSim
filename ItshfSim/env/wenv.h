@@ -1,8 +1,8 @@
 #ifndef WENV_H
 #define WENV_H
 
-//#include "wrand.h"
 #include "model.h"
+#include "randmng.h"
 #include <QStringList>
 
 /* 入参 */
@@ -63,10 +63,9 @@ private:
     bool calc(const EnvIn& in, EnvOut& out);
 
 private:
-    ModelCfg m_model;
-
-    //WRand m_rand;
-    DbMonth m_dbMonth;
+    ModelCfg m_model; /* 模型参数 */
+    DbMonth m_dbMonth; /* 月DB模型 */
+    RandMng m_rand; /* 随机数发生器 */
 };
 
 /* inline */
