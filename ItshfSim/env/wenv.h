@@ -49,7 +49,6 @@ public:
     ~WEnv(void);
 
     /* api */
-    int get_maxband(void) const;
     const ModelCfg& get_model(void) const;
 
     /*! @brief 根据dialog选择的Model读出DB月份数据 */
@@ -61,6 +60,8 @@ public:
 private:
     int check(const EnvIn& in);
     bool calc(const EnvIn& in, EnvOut& out);
+    static int get_maxband(int bandIndex);
+    static int glb2freq(int glbChId);
 
 private:
     ModelCfg m_model; /* 模型参数 */
@@ -74,10 +75,10 @@ inline const ModelCfg& WEnv::get_model(void) const
     return m_model;
 }
 
-inline int WEnv::get_maxband(void) const
+inline int WEnv::get_maxband(int bandIndex)
 {
     int maxband = 0;
-    switch (m_model.bandIndex) {
+    switch (bandIndex) {
     case 1: maxband = 1000; break;
     case 2: maxband = 2000; break;
     case 3: maxband = 4000; break;
@@ -86,6 +87,11 @@ inline int WEnv::get_maxband(void) const
     }
 
     return maxband;
+}
+
+inline int WEnv::glb2freq(int glbChId)
+{
+    return (glbChId * ONE_CHN_BW + MIN_CHN_FREQ);
 }
 
 #endif // WENV_H
