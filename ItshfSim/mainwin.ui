@@ -61,17 +61,11 @@
     <addaction name="actModel"/>
     <addaction name="actDatabase"/>
    </widget>
-   <widget class="QMenu" name="menuLink">
+   <widget class="QMenu" name="menuSim">
     <property name="title">
-     <string>&amp;Link</string>
+     <string>&amp;Sim</string>
     </property>
-    <addaction name="actTime"/>
     <addaction name="actRequest"/>
-   </widget>
-   <widget class="QMenu" name="menuAuto">
-    <property name="title">
-     <string>&amp;Auto</string>
-    </property>
     <addaction name="actStrategy"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -81,9 +75,8 @@
     <addaction name="actContent"/>
     <addaction name="actCopyright"/>
    </widget>
-   <addaction name="menuLink"/>
-   <addaction name="menuAuto"/>
    <addaction name="menuEnv"/>
+   <addaction name="menuSim"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -118,21 +111,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actTime"/>
    <addaction name="actRequest"/>
    <addaction name="actStrategy"/>
    <addaction name="actModel"/>
    <addaction name="actDatabase"/>
    <addaction name="actContent"/>
   </widget>
-  <action name="actTime">
-   <property name="text">
-    <string>&amp;Time</string>
-   </property>
-   <property name="shortcut">
-    <string>Alt+T</string>
-   </property>
-  </action>
   <action name="actModel">
    <property name="text">
     <string>&amp;Model</string>

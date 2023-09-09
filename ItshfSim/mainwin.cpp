@@ -1,6 +1,5 @@
 #include "mainwin.h"
 #include "ui_mainwin.h"
-#include "env/wenv.h"
 #include "env/dbcreator.h"
 #include <QMessageBox>
 #include <QDir>
@@ -54,11 +53,6 @@ void MainWin::setup_env(void)
 void MainWin::free_env(void)
 {
     delete m_env;
-}
-
-void MainWin::on_actTime_triggered(void)
-{
-
 }
 
 void MainWin::on_actModel_triggered(void)

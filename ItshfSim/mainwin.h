@@ -19,7 +19,6 @@ public:
     ~MainWin();
 
 private slots:
-    void on_actTime_triggered(void);
     void on_actModel_triggered(void);
     void on_actRequest_triggered(void);
     void on_actStrategy_triggered(void);
