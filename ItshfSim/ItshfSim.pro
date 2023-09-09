@@ -24,12 +24,14 @@ SOURCES += \
     env/model.cpp \
     env/sqlite3.c \
     env/wenv.cpp \
-    main.cpp \
-    mainwin.cpp \
     win/wchart.cpp \
-    win/wlabel.cpp
+    win/wlabel.cpp \
+    main.cpp \
+    mainwin.cpp
 
 HEADERS += \
+    macro.h \
+    type.h \
     env/dbcreator.h \
     env/model.h \
     env/sqlite3.h \
@@ -37,6 +39,7 @@ HEADERS += \
     mainwin.h \
     win/wchart.h \
     win/wlabel.h
+    mainwin.h
 
 FORMS += \
     env/dbcreator.ui \

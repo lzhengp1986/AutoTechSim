@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
+    <width>300</width>
     <height>85</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>250</width>
+    <width>300</width>
     <height>85</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>250</width>
+    <width>300</width>
     <height>85</height>
    </size>
   </property>
@@ -26,10 +26,19 @@
    <string>Circuit Model</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1" colspan="3">
-    <widget class="QLabel" name="dbLabel">
-     <property name="text">
-      <string>Database List</string>
+   <item row="1" column="4">
+    <widget class="QSpinBox" name="year">
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
+     <property name="minimum">
+      <number>2020</number>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+     <property name="value">
+      <number>2023</number>
      </property>
     </widget>
    </item>
@@ -56,7 +65,28 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="5">
+   <item row="0" column="4">
+    <widget class="QLabel" name="yearLabel">
+     <property name="text">
+      <string>Year</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="3">
+    <widget class="QLabel" name="dbLabel">
+     <property name="text">
+      <string>Database List</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="6">
+    <widget class="QLabel" name="bandLabel">
+     <property name="text">
+      <string>Max-Band</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="6">
     <widget class="QDialogButtonBox" name="btnBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -66,27 +96,42 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="yearLabel">
-     <property name="text">
-      <string>Year</string>
+   <item row="1" column="6">
+    <widget class="QComboBox" name="bandBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="4">
-    <widget class="QSpinBox" name="year">
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::NoButtons</enum>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="minimum">
-      <number>2020</number>
-     </property>
-     <property name="maximum">
-      <number>9999</number>
-     </property>
-     <property name="value">
-      <number>2023</number>
-     </property>
+     <item>
+      <property name="text">
+       <string>Unlimit</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>4MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>8MHz</string>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>

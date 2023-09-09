@@ -16,10 +16,11 @@ public:
     ~Model();
 
     /* api */
-    void setup(int index, int year, int month, const QStringList& list);
-    int get_index(void);
-    int get_month(void);
+    void setup(int year, int month, const QStringList& list, int dbIndex, int bandIndex);
     int get_year(void);
+    int get_month(void);
+    int get_dbIndex(void);
+    int get_bandIndex(void);
 
 private:
     Ui::Model *ui;
