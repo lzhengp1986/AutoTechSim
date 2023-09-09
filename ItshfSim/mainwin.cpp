@@ -1,6 +1,6 @@
 #include "mainwin.h"
 #include "ui_mainwin.h"
-#include "env/model.h"
+#include "env/wenv.h"
 #include "env/dbcreator.h"
 #include <QMessageBox>
 #include <QDir>
@@ -63,22 +63,19 @@ void MainWin::on_actTime_triggered(void)
 
 void MainWin::on_actModel_triggered(void)
 {
-    int year = m_env->get_year();
-    int month = m_env->get_month();
-    int dbIndex = m_env->get_dbIndex();
-    int bandIndex = m_env->get_bandIndex();
-    const QStringList& list = m_env->get_list();
-
     Model* model = new Model(this);
-    model->setup(year, month, list, dbIndex, bandIndex);
+    const ModelCfg& cfg = m_env->get_model();
+    model->setup(cfg);
 
     int ret = model->exec();
     if (ret == QDialog::Accepted) {
         /* 获取索引/月份 */
-        year = model->get_year();
-        month = model->get_month();
-        dbIndex = model->get_dbIndex();
-        bandIndex = model->get_bandIndex();
+        ModelCfg newCfg;
+        int year = newCfg.year = model->get_year();
+        int month = newCfg.month = model->get_month();
+        int dbIndex = newCfg.dbIndex = model->get_dbIndex();
+        newCfg.bandIndex = model->get_bandIndex();
+        newCfg.dbDesc = cfg.dbDesc;
 
         /* 转换成文件名 */
         QString pre = QString("%1").arg(dbIndex, 2, 10, QLatin1Char('0'));
@@ -91,8 +88,8 @@ void MainWin::on_actModel_triggered(void)
         this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
 
         /* 更新数据库 */
-        QString db = prefix + "/voacapx.db";
-        int rc = m_env->setup(year, month, db, dbIndex, bandIndex);
+        QString dbFile = prefix + "/voacapx.db";
+         int rc = m_env->setup(newCfg, dbFile);
         if (rc != 0) {
             QMessageBox::warning(this, "Warning", "Fail to setup database!");
         }

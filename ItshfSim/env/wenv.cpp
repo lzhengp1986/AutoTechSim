@@ -6,14 +6,15 @@
 // 构造
 WEnv::WEnv(void)
 {
-    m_month = 1;
-    m_year = 2023;
-    m_dbList << "成都市区-乐山沐川"
-             << "成都市区-陕西西安"
-             << "成都市区-海南三亚";
+    m_model.month = 1;
+    m_model.year = 2023;
+    m_model.dbDesc
+            << "成都市区-乐山沐川"
+            << "成都市区-陕西西安"
+            << "成都市区-海南三亚";
 
-    m_dbIndex = 0;
-    m_bandIndex = 0;
+    m_model.dbIndex = 0;
+    m_model.bandIndex = 0;
     memset(&m_dbMonth, 0, sizeof(DbMonth));
 }
 
@@ -23,12 +24,9 @@ WEnv::~WEnv(void)
 }
 
 // 根据dialog选择的Model读出DB月份数据
-int WEnv::setup(int year, int month, const QString& fn, int dbIndex, int bandIndex)
+int WEnv::setup(const ModelCfg& in, const QString& fn)
 {
-    m_year = year;
-    m_month = month;
-    m_dbIndex = dbIndex;
-    m_bandIndex = bandIndex;
+    m_model = in;
 
     /* 打开db */
     sqlite3* db = nullptr;
@@ -41,7 +39,7 @@ int WEnv::setup(int year, int month, const QString& fn, int dbIndex, int bandInd
 
     /* 参数准备 */
     sqlite3_stmt* stmt;
-    QString sql = "SELECT * FROM ITU WHERE month=" + QString::number(month - 1);
+    QString sql = "SELECT * FROM ITU WHERE month=" + QString::number(in.month - 1);
     std::string stdsql = sql.toStdString();
     const char* cmd = stdsql.c_str();
     rc = sqlite3_prepare_v2(db, cmd, -1, &stmt, NULL);
@@ -108,7 +106,8 @@ int WEnv::setup(int year, int month, const QString& fn, int dbIndex, int bandInd
 int WEnv::check(const EnvIn& in)
 {
     /* 时间检查 */
-    if ((in.year != m_year) || (in.month != m_month)) {
+    if ((in.year != m_model.year)
+        || (in.month != m_model.month)) {
         return -1;
     }
 

@@ -2,6 +2,7 @@
 #define WENV_H
 
 //#include "wrand.h"
+#include "model.h"
 #include <QStringList>
 
 /* 入参 */
@@ -48,17 +49,11 @@ public:
     ~WEnv(void);
 
     /* api */
-    int get_year(void) const;
-    int get_month(void) const;
-    int get_dbIndex(void) const;
-    int get_bandIndex(void) const;
     int get_maxband(void) const;
-
-    /*! @brief 向dialog提供可用的DB Model列表 */
-    const QStringList& get_list(void) const;
+    const ModelCfg& get_model(void) const;
 
     /*! @brief 根据dialog选择的Model读出DB月份数据 */
-    int setup(int year, int month, const QString& db, int dbIndex, int bandIndex);
+    int setup(const ModelCfg& in, const QString& fn);
 
     /*! @brief 根据时戳和信道号结合Model计算可用标志和SNR估计值 */
     int env(const EnvIn& in, EnvOut& out);
@@ -68,26 +63,22 @@ private:
     bool calc(const EnvIn& in, EnvOut& out);
 
 private:
-    int m_year;
-    int m_month;
-    int m_dbIndex;
-    int m_bandIndex;
+    ModelCfg m_model;
 
     //WRand m_rand;
     DbMonth m_dbMonth;
-    QStringList m_dbList;
 };
 
 /* inline */
-inline int WEnv::get_bandIndex(void) const
+inline const ModelCfg& WEnv::get_model(void) const
 {
-    return m_bandIndex;
+    return m_model;
 }
 
 inline int WEnv::get_maxband(void) const
 {
     int maxband = 0;
-    switch (m_bandIndex) {
+    switch (m_model.bandIndex) {
     case 1: maxband = 1000; break;
     case 2: maxband = 2000; break;
     case 3: maxband = 4000; break;
@@ -96,26 +87,6 @@ inline int WEnv::get_maxband(void) const
     }
 
     return maxband;
-}
-
-inline int WEnv::get_dbIndex(void) const
-{
-    return m_dbIndex;
-}
-
-inline int WEnv::get_month(void) const
-{
-    return m_month;
-}
-
-inline int WEnv::get_year(void) const
-{
-    return m_year;
-}
-
-inline const QStringList& WEnv::get_list(void) const
-{
-    return m_dbList;
 }
 
 #endif // WENV_H

@@ -7,6 +7,15 @@ namespace Ui {
 class Model;
 }
 
+/* 模型参数 */
+typedef struct {
+    int year; /* 年 */
+    int month; /* 月 */
+    int dbIndex; /* DB索引号 */
+    int bandIndex; /* 最大可用带宽 */
+    QStringList dbDesc; /* DB名称列表 */
+} ModelCfg;
+
 class Model : public QDialog
 {
     Q_OBJECT
@@ -16,7 +25,7 @@ public:
     ~Model();
 
     /* api */
-    void setup(int year, int month, const QStringList& list, int dbIndex, int bandIndex);
+    void setup(const ModelCfg& in);
     int get_year(void);
     int get_month(void);
     int get_dbIndex(void);
