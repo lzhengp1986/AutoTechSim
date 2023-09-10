@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Model</class>
- <widget class="QDialog" name="Model">
+ <author/>
+ <comment/>
+ <exportmacro/>
+ <class>ModelDlg</class>
+ <widget class="QDialog" name="ModelDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -141,7 +144,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>accepted()</signal>
-   <receiver>Model</receiver>
+   <receiver>ModelDlg</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -157,7 +160,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>rejected()</signal>
-   <receiver>Model</receiver>
+   <receiver>ModelDlg</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

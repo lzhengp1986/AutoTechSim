@@ -1,20 +1,20 @@
-#ifndef DBCREATOR_H
-#define DBCREATOR_H
+#ifndef DBDLG_H
+#define DBDLG_H
 
 #include "sqlite3.h"
 #include <QDialog>
 
 namespace Ui {
-class dbCreator;
+class DbDlg;
 }
 
-class dbCreator : public QDialog
+class DbDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit dbCreator(QWidget *parent = nullptr);
-    ~dbCreator();
+    explicit DbDlg(QWidget *parent = nullptr);
+    ~DbDlg();
 
 private slots:
     void on_brsBtn_clicked(void);
@@ -58,10 +58,9 @@ private:
     void db_insert(sqlite3* db, int year, int month, int ssn, int hour, int freq, int mufday, int dbu, int snr, int rel, int sprb);
     void db_close(sqlite3* db);
 
-private:
-    Ui::dbCreator *ui;
+    Ui::DbDlg *ui;
     QString m_fileName;
     QStringList m_content;
 };
 
-#endif // DBCREATOR_H
+#endif // DBDLG_H

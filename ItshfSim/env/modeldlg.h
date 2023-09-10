@@ -1,10 +1,10 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef MODELDLG_H
+#define MODELDLG_H
 
 #include <QDialog>
 
 namespace Ui {
-class Model;
+class ModelDlg;
 }
 
 /* 模型参数 */
@@ -16,13 +16,13 @@ typedef struct {
     QStringList dbDesc; /* DB名称列表 */
 } ModelCfg;
 
-class Model : public QDialog
+class ModelDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Model(QWidget *parent = nullptr);
-    ~Model();
+    explicit ModelDlg(QWidget *parent = nullptr);
+    ~ModelDlg();
 
     /* api */
     void win2para(ModelCfg* cfg);
@@ -30,11 +30,11 @@ public:
     static int get_maxband(int bandIndex);
 
 private:
-    Ui::Model *ui;
+    Ui::ModelDlg *ui;
 };
 
 // inline
-inline int Model::get_maxband(int bandIndex)
+inline int ModelDlg::get_maxband(int bandIndex)
 {
     int maxband = 0;
     switch (bandIndex) {
@@ -48,4 +48,4 @@ inline int Model::get_maxband(int bandIndex)
     return maxband;
 }
 
-#endif // MODEL_H
+#endif // MODELDLG_H

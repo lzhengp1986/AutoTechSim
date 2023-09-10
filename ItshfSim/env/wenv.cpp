@@ -122,7 +122,7 @@ bool WEnv::calc(const ModelCfg* cfg, const EnvIn& in, EnvOut& out)
 
     /* 获取Hour信息 */
     DbHour* dh = &m_dbMonth.hr[in.hour - 1];
-    int maxband = Model::get_maxband(cfg->bandIndex);
+    int maxband = ModelDlg::get_maxband(cfg->bandIndex);
 
     /* 计算可通频率范围 */
     int muf = dh->fc[0].freq;

@@ -1,7 +1,7 @@
 #ifndef WENV_H
 #define WENV_H
 
-#include "model.h"
+#include "modeldlg.h"
 #include "randmng.h"
 #include <QStringList>
 

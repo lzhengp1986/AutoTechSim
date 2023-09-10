@@ -1,5 +1,5 @@
-#include "dbcreator.h"
-#include "ui_dbcreator.h"
+#include "dbdlg.h"
+#include "ui_dbdlg.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
@@ -9,20 +9,20 @@
 #define DATA_WID 5 /* 数据宽 */
 #define FREQ_NUM 12 /* 频点数 */
 
-dbCreator::dbCreator(QWidget *parent) :
+DbDlg::DbDlg(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::dbCreator)
+    ui(new Ui::DbDlg)
 {
     ui->setupUi(this);
     ui->prgBar->setValue(0);
 }
 
-dbCreator::~dbCreator()
+DbDlg::~DbDlg()
 {
     delete ui;
 }
 
-void dbCreator::on_brsBtn_clicked(void)
+void DbDlg::on_brsBtn_clicked(void)
 {
     QString path = QDir::currentPath();
     QString filter = "VOACAP Output(*.out);;所有文件(*.*)";
@@ -33,7 +33,7 @@ void dbCreator::on_brsBtn_clicked(void)
     m_fileName = fn;
 }
 
-void dbCreator::on_extBtn_clicked(void)
+void DbDlg::on_extBtn_clicked(void)
 {
     /* step0.文件不存在 */
     if (m_fileName.isEmpty()) {
@@ -105,7 +105,7 @@ void dbCreator::on_extBtn_clicked(void)
     db_close(db);
 }
 
-int dbCreator::read_valid_lines(const QString& fn)
+int DbDlg::read_valid_lines(const QString& fn)
 {
     m_content.clear();
     QFile file(fn);
@@ -144,7 +144,7 @@ int dbCreator::read_valid_lines(const QString& fn)
 }
 
 /* 判断content中从id行开始的n行是否为有效的hour结构 */
-bool dbCreator::is_valid_hour(int i)
+bool DbDlg::is_valid_hour(int i)
 {
     bool isFrq = m_content.at(i).endsWith("FREQ");
     bool isDay = m_content.at(i + 1).endsWith("MUFday");
@@ -156,7 +156,7 @@ bool dbCreator::is_valid_hour(int i)
 }
 
 /* 转换从i行开始的hour结构 */
-int dbCreator::trans_one_hour(int i, QList<int>& freq, QList<int>& mufDay, QList<int>& dbu, QList<int>& snr, QList<int>& rel, QList<int>& sprb)
+int DbDlg::trans_one_hour(int i, QList<int>& freq, QList<int>& mufDay, QList<int>& dbu, QList<int>& snr, QList<int>& rel, QList<int>& sprb)
 {
     int hour = 0;
     trans_freq(i, hour, freq);
@@ -169,7 +169,7 @@ int dbCreator::trans_one_hour(int i, QList<int>& freq, QList<int>& mufDay, QList
 }
 
 /* 转换第i行的head结构 */
-void dbCreator::trans_head(int i, int& year, int& month, int& ssn)
+void DbDlg::trans_head(int i, int& year, int& month, int& ssn)
 {
     /* year */
     QString line = m_content.at(i);
@@ -184,7 +184,7 @@ void dbCreator::trans_head(int i, int& year, int& month, int& ssn)
     month = trans_month(m);
 }
 
-int dbCreator::trans_month(const QString& month)
+int DbDlg::trans_month(const QString& month)
 {
     int m = 0;
     if (month == "Jan") {
@@ -217,7 +217,7 @@ int dbCreator::trans_month(const QString& month)
 }
 
 /* 转换第i行的data结构 */
-void dbCreator::trans_data(int i, QList<int>& list)
+void DbDlg::trans_data(int i, QList<int>& list)
 {
     list.clear();
     QString line = m_content.at(i);
@@ -235,7 +235,7 @@ void dbCreator::trans_data(int i, QList<int>& list)
 }
 
 /* 转换第i行的freq结构 */
-void dbCreator::trans_freq(int i, int& hour, QList<int>& list)
+void DbDlg::trans_freq(int i, int& hour, QList<int>& list)
 {
     QString line = m_content.at(i);
 
@@ -257,7 +257,7 @@ void dbCreator::trans_freq(int i, int& hour, QList<int>& list)
 }
 
 /* 字符串拆分int */
-void dbCreator::split(const QString& line, QList<int>& list)
+void DbDlg::split(const QString& line, QList<int>& list)
 {
     int i, j;
 
@@ -271,7 +271,7 @@ void dbCreator::split(const QString& line, QList<int>& list)
 }
 
 /* 字符串拆分float */
-void dbCreator::split(const QString& line, QList<float>& list)
+void DbDlg::split(const QString& line, QList<float>& list)
 {
     int i, j;
     list.clear();
@@ -283,7 +283,7 @@ void dbCreator::split(const QString& line, QList<float>& list)
     }
 }
 
-bool dbCreator::db_open(sqlite3** db)
+bool DbDlg::db_open(sqlite3** db)
 {
     /* 截取db路径 */
     int i = m_fileName.size() - 1;
@@ -332,8 +332,8 @@ bool dbCreator::db_open(sqlite3** db)
     return true;
 }
 
-void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int hour,
-                          int freq, int mufday, int dbu, int snr, int rel, int sprb)
+void DbDlg::db_insert(sqlite3* db, int year, int month, int ssn, int hour,
+                      int freq, int mufday, int dbu, int snr, int rel, int sprb)
 {
     char* errMsg = nullptr;
     char* sql = sqlite3_mprintf("INSERT INTO ITU VALUES(%d,%d,%d,%d,%d, %d,%d,%d,%d,%d)",
@@ -347,7 +347,7 @@ void dbCreator::db_insert(sqlite3* db, int year, int month, int ssn, int hour,
     sqlite3_free(sql);
 }
 
-void dbCreator::db_close(sqlite3* db)
+void DbDlg::db_close(sqlite3* db)
 {
     sqlite3_exec(db, "END TRANSACTION", 0, 0, NULL);
     sqlite3_close(db);

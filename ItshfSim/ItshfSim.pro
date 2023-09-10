@@ -20,9 +20,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    env/model.cpp \
     env/sqlite3.c \
-    env/dbcreator.cpp \
+    env/dbdlg.cpp \
+    env/modeldlg.cpp \
     env/randmng.cpp \
     env/wenv.cpp \
     link/linkwin.cpp \
@@ -37,9 +37,9 @@ SOURCES += \
 HEADERS += \
     macro.h \
     type.h \
-    env/model.h \
     env/sqlite3.h \
-    env/dbcreator.h \
+    env/dbdlg.h \
+    env/modeldlg.h \
     env/randmng.h \
     env/wenv.h \
     auto/autowin.h \
@@ -52,8 +52,8 @@ HEADERS += \
     mainwin.h
 
 FORMS += \
-    env/dbcreator.ui \
-    env/model.ui \
+    env/dbdlg.ui \
+    env/modeldlg.ui \
     auto/autowin.ui \
     link/linkwin.ui \
     mainwin.ui

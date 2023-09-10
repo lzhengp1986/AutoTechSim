@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dbCreator</class>
- <widget class="QDialog" name="dbCreator">
+ <author/>
+ <comment/>
+ <exportmacro/>
+ <class>DbDlg</class>
+ <widget class="QDialog" name="DbDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -78,7 +81,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>accepted()</signal>
-   <receiver>dbCreator</receiver>
+   <receiver>DbDlg</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -94,7 +97,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>rejected()</signal>
-   <receiver>dbCreator</receiver>
+   <receiver>DbDlg</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -2,7 +2,7 @@
 #define MAINWIN_H
 
 #include "env/wenv.h"
-#include "env/model.h"
+#include "env/modeldlg.h"
 #include "win/wlabel.h"
 #include "win/wchart.h"
 #include <QMainWindow>

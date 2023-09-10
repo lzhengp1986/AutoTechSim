@@ -1,6 +1,6 @@
 #include "mainwin.h"
 #include "ui_mainwin.h"
-#include "env/dbcreator.h"
+#include "env/dbdlg.h"
 #include <QMessageBox>
 #include <QDir>
 
@@ -109,14 +109,14 @@ void MainWin::free_model(void)
 
 void MainWin::on_actModel_triggered(void)
 {
-    Model* model = new Model(this);
-    model->para2win(m_cfg);
+    ModelDlg* dlg = new ModelDlg(this);
+    dlg->para2win(m_cfg);
 
-    int ret = model->exec();
+    int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
         /* 获取模型参数 */
         ModelCfg cfg = *m_cfg;
-        model->win2para(&cfg);
+        dlg->win2para(&cfg);
 
         /* 更新数据库 */
         int flag = update_model(&cfg);
@@ -128,7 +128,7 @@ void MainWin::on_actModel_triggered(void)
         *m_cfg = cfg;
     }
 
-    delete model;
+    delete dlg;
 }
 
 void MainWin::on_actRequest_triggered(void)
@@ -143,8 +143,8 @@ void MainWin::on_actStrategy_triggered(void)
 
 void MainWin::on_actDatabase_triggered(void)
 {
-    QDialog* db = new dbCreator;
-    int ret = db->exec();
+    QDialog* dlg = new DbDlg(this);
+    int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
         /* nothing to do */
     }

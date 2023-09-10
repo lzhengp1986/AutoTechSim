@@ -1,19 +1,19 @@
-#include "model.h"
-#include "ui_model.h"
+#include "modeldlg.h"
+#include "ui_modeldlg.h"
 
-Model::Model(QWidget *parent) :
+ModelDlg::ModelDlg(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Model)
+    ui(new Ui::ModelDlg)
 {
     ui->setupUi(this);
 }
 
-Model::~Model()
+ModelDlg::~ModelDlg()
 {
     delete ui;
 }
 
-void Model::para2win(const ModelCfg* cfg)
+void ModelDlg::para2win(const ModelCfg* cfg)
 {
     int n = cfg->dbDesc.size();
     for (int i = 0; i < n; i++) {
@@ -26,7 +26,7 @@ void Model::para2win(const ModelCfg* cfg)
     ui->bandBox->setCurrentIndex(cfg->bandIndex);
 }
 
-void Model::win2para(ModelCfg *cfg)
+void ModelDlg::win2para(ModelCfg *cfg)
 {
     cfg->year = ui->year->value();
     cfg->month = ui->month->value();
