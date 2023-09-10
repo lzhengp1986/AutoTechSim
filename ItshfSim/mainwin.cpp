@@ -86,18 +86,18 @@ int MainWin::update_model(const ModelCfg* cfg)
     QString pos = QString("%1").arg(month, 2, 10, QLatin1Char('0'));
     QString prefix = "./png/" + QString::number(year) + "/" + pre;
 
-    /* 更新背景图片 */
-    this->setObjectName("MainWin");
-    QString pic = prefix + '/' + pos + ".png";
-    this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
-
     /* 更新数据库 */
     QString dbFile = prefix + "/voacapx.db";
     int rc = m_env->setup(month, dbFile);
     if (rc != 0) {
         QMessageBox::warning(this, "Warning", "Fail to setup database!");
+        return rc;
     }
 
+    /* 更新背景图片 */
+    this->setObjectName("MainWin");
+    QString pic = prefix + '/' + pos + ".png";
+    this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
     return rc;
 }
 
