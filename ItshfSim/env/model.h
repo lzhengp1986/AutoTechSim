@@ -25,11 +25,8 @@ public:
     ~Model();
 
     /* api */
-    void setup(const ModelCfg* cfg);
-    int get_year(void);
-    int get_month(void);
-    int get_dbIndex(void);
-    int get_bandIndex(void);
+    void win2para(ModelCfg* cfg);
+    void para2win(const ModelCfg* cfg);
     static int get_maxband(int bandIndex);
 
 private:

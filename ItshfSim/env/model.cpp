@@ -13,7 +13,7 @@ Model::~Model()
     delete ui;
 }
 
-void Model::setup(const ModelCfg* cfg)
+void Model::para2win(const ModelCfg* cfg)
 {
     int n = cfg->dbDesc.size();
     for (int i = 0; i < n; i++) {
@@ -26,22 +26,10 @@ void Model::setup(const ModelCfg* cfg)
     ui->bandBox->setCurrentIndex(cfg->bandIndex);
 }
 
-int Model::get_dbIndex(void)
+void Model::win2para(ModelCfg *cfg)
 {
-    return ui->list->currentIndex();
-}
-
-int Model::get_month(void)
-{
-    return ui->month->value();
-}
-
-int Model::get_year(void)
-{
-    return ui->year->value();
-}
-
-int Model::get_bandIndex(void)
-{
-    return ui->bandBox->currentIndex();
+    cfg->year = ui->year->value();
+    cfg->month = ui->month->value();
+    cfg->dbIndex = ui->list->currentIndex();
+    cfg->bandIndex = ui->bandBox->currentIndex();
 }
