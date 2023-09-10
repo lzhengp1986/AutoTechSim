@@ -90,7 +90,7 @@ int MainWin::update_model(const ModelCfg* cfg)
     QString dbFile = prefix + "/voacapx.db";
     int rc = m_env->setup(month, dbFile);
     if (rc != 0) {
-        QMessageBox::warning(this, "Warning", "Fail to setup database!");
+        QMessageBox::warning(this, "Warning", "Fail to setup model!");
         return rc;
     }
 

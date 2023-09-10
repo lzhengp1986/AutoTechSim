@@ -25,9 +25,9 @@ SOURCES += \
     env/dbcreator.cpp \
     env/randmng.cpp \
     env/wenv.cpp \
-    link/linkcfg.cpp \
+    link/linkwin.cpp \
     link/linksim.cpp \
-    auto/autocfg.cpp \
+    auto/autowin.cpp \
     auto/autosim.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
@@ -42,9 +42,9 @@ HEADERS += \
     env/dbcreator.h \
     env/randmng.h \
     env/wenv.h \
-    auto/autocfg.h \
+    auto/autowin.h \
     auto/autosim.h \
-    link/linkcfg.h \
+    link/linkwin.h \
     link/linksim.h \
     win/wchart.h \
     win/wlabel.h \
@@ -54,8 +54,8 @@ HEADERS += \
 FORMS += \
     env/dbcreator.ui \
     env/model.ui \
-    link/linkcfg.ui \
-    auto/autocfg.ui \
+    auto/autowin.ui \
+    link/linkwin.ui \
     mainwin.ui
 
 # 界面图标
