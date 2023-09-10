@@ -11,12 +11,14 @@ MainWin::MainWin(QWidget *parent)
     ui->setupUi(this);
     setup_win();
     setup_env();
+    setup_model();
 }
 
 MainWin::~MainWin()
 {
     free_env();
     free_win();
+    free_model();
     delete ui;
 }
 
@@ -55,38 +57,78 @@ void MainWin::free_env(void)
     delete m_env;
 }
 
+// 设置Model
+void MainWin::setup_model(void)
+{
+    m_cfg = new ModelCfg;
+    m_cfg->month = 1;
+    m_cfg->year = 2023;
+    m_cfg->dbDesc
+            << "成都市区-乐山沐川"
+            << "成都市区-陕西西安"
+            << "成都市区-海南三亚";
+
+    m_cfg->dbIndex = 0;
+    m_cfg->bandIndex = 0;
+    update_model(m_cfg);
+}
+
+// 设置Model
+int MainWin::update_model(const ModelCfg* cfg)
+{
+    /* 获取索引/月份 */
+    int year = cfg->year;
+    int month = cfg->month;
+    int dbIndex = cfg->dbIndex;
+
+    /* 转换成文件名 */
+    QString pre = QString("%1").arg(dbIndex, 2, 10, QLatin1Char('0'));
+    QString pos = QString("%1").arg(month, 2, 10, QLatin1Char('0'));
+    QString prefix = "./png/" + QString::number(year) + "/" + pre;
+
+    /* 更新背景图片 */
+    this->setObjectName("MainWin");
+    QString pic = prefix + '/' + pos + ".png";
+    this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
+
+    /* 更新数据库 */
+    QString dbFile = prefix + "/voacapx.db";
+    int rc = m_env->setup(month, dbFile);
+    if (rc != 0) {
+        QMessageBox::warning(this, "Warning", "Fail to setup database!");
+    }
+
+    return rc;
+}
+
+// 释放model
+void MainWin::free_model(void)
+{
+    delete m_cfg;
+}
+
 void MainWin::on_actModel_triggered(void)
 {
     Model* model = new Model(this);
-    const ModelCfg& cfg = m_env->get_model();
-    model->setup(cfg);
+    model->setup(m_cfg);
 
     int ret = model->exec();
     if (ret == QDialog::Accepted) {
-        /* 获取索引/月份 */
-        ModelCfg newCfg;
-        int year = newCfg.year = model->get_year();
-        int month = newCfg.month = model->get_month();
-        int dbIndex = newCfg.dbIndex = model->get_dbIndex();
-        newCfg.bandIndex = model->get_bandIndex();
-        newCfg.dbDesc = cfg.dbDesc;
-
-        /* 转换成文件名 */
-        QString pre = QString("%1").arg(dbIndex, 2, 10, QLatin1Char('0'));
-        QString pos = QString("%1").arg(month, 2, 10, QLatin1Char('0'));
-        QString prefix = "./png/" + QString::number(year) + "/" + pre;
-
-        /* 更新背景图片 */
-        this->setObjectName("MainWin");
-        QString pic = prefix + '/' + pos + ".png";
-        this->setStyleSheet("#MainWin{border-image:url(" + pic + ")}");
+        /* 获取模型参数 */
+        ModelCfg cfg = *m_cfg;
+        cfg.year = model->get_year();
+        cfg.month = model->get_month();
+        cfg.dbIndex = model->get_dbIndex();
+        cfg.bandIndex = model->get_bandIndex();
 
         /* 更新数据库 */
-        QString dbFile = prefix + "/voacapx.db";
-         int rc = m_env->setup(newCfg, dbFile);
-        if (rc != 0) {
-            QMessageBox::warning(this, "Warning", "Fail to setup database!");
+        int flag = update_model(&cfg);
+        if (flag != 0) {
+            return;
         }
+
+        /* 更新模型参数 */
+        *m_cfg = cfg;
     }
 
     delete model;

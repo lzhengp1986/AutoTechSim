@@ -2,6 +2,7 @@
 #define MAINWIN_H
 
 #include "env/wenv.h"
+#include "env/model.h"
 #include "win/wlabel.h"
 #include "win/wchart.h"
 #include <QMainWindow>
@@ -32,6 +33,10 @@ private:
     void setup_env(void);
     void free_env(void);
 
+    void setup_model(void);
+    int update_model(const ModelCfg* cfg);
+    void free_model(void);
+
 private:
     /* 主窗口 */
     Ui::MainWin *ui;
@@ -40,5 +45,6 @@ private:
 
     /* ITS模型 */
     WEnv *m_env;
+    ModelCfg *m_cfg;
 };
 #endif // MAINWIN_H

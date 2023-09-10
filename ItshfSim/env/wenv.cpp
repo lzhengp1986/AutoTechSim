@@ -7,15 +7,6 @@
 // 构造
 WEnv::WEnv(void)
 {
-    m_model.month = 1;
-    m_model.year = 2023;
-    m_model.dbDesc
-            << "成都市区-乐山沐川"
-            << "成都市区-陕西西安"
-            << "成都市区-海南三亚";
-
-    m_model.dbIndex = 0;
-    m_model.bandIndex = 0;
     memset(&m_dbMonth, 0, sizeof(DbMonth));
 }
 
@@ -25,10 +16,8 @@ WEnv::~WEnv(void)
 }
 
 // 根据dialog选择的Model读出DB月份数据
-int WEnv::setup(const ModelCfg& in, const QString& fn)
+int WEnv::setup(int month, const QString& fn)
 {
-    m_model = in;
-
     /* 打开db */
     sqlite3* db = nullptr;
     std::string stdfn = fn.toStdString();
@@ -40,7 +29,7 @@ int WEnv::setup(const ModelCfg& in, const QString& fn)
 
     /* 参数准备 */
     sqlite3_stmt* stmt;
-    QString sql = "SELECT * FROM ITU WHERE month=" + QString::number(in.month - 1);
+    QString sql = "SELECT * FROM ITU WHERE month=" + QString::number(month - 1);
     std::string stdsql = sql.toStdString();
     const char* cmd = stdsql.c_str();
     rc = sqlite3_prepare_v2(db, cmd, -1, &stmt, NULL);
@@ -85,11 +74,11 @@ int WEnv::setup(const ModelCfg& in, const QString& fn)
 }
 
 // 参数检查
-int WEnv::check(const EnvIn& in)
+int WEnv::check(const ModelCfg* cfg, const EnvIn& in)
 {
     /* 时间检查 */
-    if ((in.year != m_model.year)
-        || (in.month != m_model.month)) {
+    if ((in.year != cfg->year)
+        || (in.month != cfg->month)) {
         return -1;
     }
 
@@ -107,25 +96,25 @@ int WEnv::check(const EnvIn& in)
 }
 
 // api调度函数
-int WEnv::env(const EnvIn& in, EnvOut& out)
+int WEnv::env(const ModelCfg* cfg, const EnvIn& in, EnvOut& out)
 {
     /* 初始化 */
     out.snr = MIN_SNR;
     out.flag = false;
 
     /* 时间检查 */
-    bool ret = check(in);
+    bool ret = check(cfg, in);
     if (ret != 0) {
         return ret;
     }
 
     /* 计算可用标志 */
-    bool flag = calc(in, out);
+    bool flag = calc(cfg, in, out);
     return flag;
 }
 
 // 根据时戳和信道号结合Model计算可用标志和SNR估计值
-bool WEnv::calc(const EnvIn& in, EnvOut& out)
+bool WEnv::calc(const ModelCfg* cfg, const EnvIn& in, EnvOut& out)
 {
     /* 初始化 */
     out.flag = false;
@@ -133,7 +122,7 @@ bool WEnv::calc(const EnvIn& in, EnvOut& out)
 
     /* 获取Hour信息 */
     DbHour* dh = &m_dbMonth.hr[in.hour - 1];
-    int maxband = get_maxband(m_model.bandIndex);
+    int maxband = Model::get_maxband(cfg->bandIndex);
 
     /* 计算可通频率范围 */
     int muf = dh->fc[0].freq;

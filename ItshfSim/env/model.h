@@ -25,14 +25,30 @@ public:
     ~Model();
 
     /* api */
-    void setup(const ModelCfg& in);
+    void setup(const ModelCfg* cfg);
     int get_year(void);
     int get_month(void);
     int get_dbIndex(void);
     int get_bandIndex(void);
+    static int get_maxband(int bandIndex);
 
 private:
     Ui::Model *ui;
 };
+
+// inline
+inline int Model::get_maxband(int bandIndex)
+{
+    int maxband = 0;
+    switch (bandIndex) {
+    case 1: maxband = 1000; break;
+    case 2: maxband = 2000; break;
+    case 3: maxband = 4000; break;
+    case 4: maxband = 8000; break;
+    default: maxband = 30000; break;
+    }
+
+    return maxband;
+}
 
 #endif // MODEL_H

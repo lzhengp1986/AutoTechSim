@@ -25,12 +25,14 @@ SOURCES += \
     env/dbcreator.cpp \
     env/randmng.cpp \
     env/wenv.cpp \
+    link/linkreq.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
     mainwin.cpp \
     main.cpp
 
 HEADERS += \
+    link/linkreq.h \
     macro.h \
     type.h \
     env/model.h \
@@ -46,6 +48,7 @@ HEADERS += \
 FORMS += \
     env/dbcreator.ui \
     env/model.ui \
+    link/linkreq.ui \
     mainwin.ui
 
 # 界面图标

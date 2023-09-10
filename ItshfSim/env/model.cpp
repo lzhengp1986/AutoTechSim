@@ -13,17 +13,17 @@ Model::~Model()
     delete ui;
 }
 
-void Model::setup(const ModelCfg& in)
+void Model::setup(const ModelCfg* cfg)
 {
-    int n = in.dbDesc.size();
+    int n = cfg->dbDesc.size();
     for (int i = 0; i < n; i++) {
-        ui->list->addItem(in.dbDesc.at(i));
+        ui->list->addItem(cfg->dbDesc.at(i));
     }
 
-    ui->year->setValue(in.year);
-    ui->month->setValue(in.month);
-    ui->list->setCurrentIndex(in.dbIndex);
-    ui->bandBox->setCurrentIndex(in.bandIndex);
+    ui->year->setValue(cfg->year);
+    ui->month->setValue(cfg->month);
+    ui->list->setCurrentIndex(cfg->dbIndex);
+    ui->bandBox->setCurrentIndex(cfg->bandIndex);
 }
 
 int Model::get_dbIndex(void)
