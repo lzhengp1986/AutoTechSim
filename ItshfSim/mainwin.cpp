@@ -11,14 +11,20 @@ MainWin::MainWin(QWidget *parent)
     ui->setupUi(this);
     setup_win();
     setup_env();
+    setup_time();
     setup_model();
+    setup_link();
+    setup_auto();
 }
 
 MainWin::~MainWin()
 {
+    free_auto();
+    free_link();
+    free_model();
+    free_time();
     free_env();
     free_win();
-    free_model();
     delete ui;
 }
 
@@ -60,20 +66,21 @@ void MainWin::free_env(void)
 // 设置Model
 void MainWin::setup_model(void)
 {
-    m_cfg = new ModelCfg;
-    m_cfg->month = 1;
-    m_cfg->year = 2023;
-    m_cfg->dbDesc
+    m_model = new ModelCfg;
+    m_model->month = 1;
+    m_model->year = 2023;
+    m_model->dbDesc
             << "成都市区-乐山沐川"
             << "成都市区-陕西西安"
             << "成都市区-海南三亚";
 
-    m_cfg->dbIndex = 0;
-    m_cfg->bandIndex = 0;
-    update_model(m_cfg);
+    m_model->dbIndex = 0;
+    m_model->bandIndex = 0;
+    update_model(m_model);
+    update_time(m_model);
 }
 
-// 设置Model
+// 更新Model
 int MainWin::update_model(const ModelCfg* cfg)
 {
     /* 获取索引/月份 */
@@ -104,19 +111,127 @@ int MainWin::update_model(const ModelCfg* cfg)
 // 释放model
 void MainWin::free_model(void)
 {
-    delete m_cfg;
+    delete m_model;
+}
+
+// 设置time
+void MainWin::setup_time(void)
+{
+    m_time = new Time;
+    m_time->year = 2023;
+    m_time->month = 1;
+    m_time->day = 1;
+    m_time->hour = 1;
+    m_time->min = 0;
+    m_time->sec = 0;
+
+    /* 定时器子线程 */
+    m_tmr = new QTimer;
+    m_thread = new QThread(this);
+    connect(m_tmr, SIGNAL(timeout()), this, SLOT(on_sim_timer_timeout()));
+    m_tmr->start(1000);
+    m_tmr->moveToThread(m_thread);
+    m_thread->start();
+}
+
+// 更新Time += sec
+void MainWin::update_time(int sec)
+{
+    m_time->sec += sec;
+    if (m_time->sec < 60) {
+        goto UPDATE_LABEL;
+    }
+
+    m_time->sec -= 60;
+    m_time->min++;
+    if (m_time->min < 60) {
+        goto UPDATE_LABEL;
+    }
+
+    m_time->min -= 60;
+    m_time->hour++;
+    if (m_time->hour < 24) {
+        goto UPDATE_LABEL;
+    }
+
+    m_time->hour -= 23;
+    m_time->day++;
+
+UPDATE_LABEL:
+    m_label->set_time(m_time);
+}
+
+// 更新Time
+void MainWin::update_time(const ModelCfg* cfg)
+{
+    m_time->year = cfg->year;
+    m_time->month = cfg->month;
+    m_time->day = 1;
+    m_time->hour = 1;
+    m_time->min = 0;
+    m_time->sec = 0;
+    m_label->set_time(m_time);
+}
+
+// 释放time
+void MainWin::free_time(void)
+{
+    m_tmr->stop();
+    m_thread->quit();
+    delete m_tmr;
+    delete m_thread;
+    delete m_time;
+}
+
+// 配置link
+void MainWin::setup_link(void)
+{
+    m_link = new LinkCfg;
+    m_link->reqPtn = 0; /* random */
+    m_link->speed = 64; /* 64x */
+
+    /* 任务请求时戳 */
+    m_stamp = new Time;
+    m_stamp->year = 0;
+    m_stamp->month = 0;
+}
+
+// 释放link
+void MainWin::free_link(void)
+{
+    delete m_stamp;
+    delete m_link;
+}
+
+// 配置auto
+void MainWin::setup_auto(void)
+{
+
+}
+
+// 释放auto
+void MainWin::free_auto(void)
+{
+
+}
+
+// 定时器超时处理
+void MainWin::on_sim_timer_timeout(void)
+{
+    /* 更新当前时间 */
+    update_time(m_link->speed);
 }
 
 void MainWin::on_actModel_triggered(void)
 {
     ModelDlg* dlg = new ModelDlg(this);
-    dlg->para2win(m_cfg);
+    dlg->para2dlg(m_model);
 
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
         /* 获取模型参数 */
-        ModelCfg cfg = *m_cfg;
-        dlg->win2para(&cfg);
+        ModelCfg cfg = *m_model;
+        dlg->dlg2para(&cfg);
 
         /* 更新数据库 */
         int flag = update_model(&cfg);
@@ -125,7 +240,10 @@ void MainWin::on_actModel_triggered(void)
         }
 
         /* 更新模型参数 */
-        *m_cfg = cfg;
+        *m_model = cfg;
+
+        /* 更新时间参数 */
+        update_time(m_model);
     }
 
     delete dlg;
@@ -133,7 +251,12 @@ void MainWin::on_actModel_triggered(void)
 
 void MainWin::on_actRequest_triggered(void)
 {
-
+    LinkDlg* dlg = new LinkDlg(this);
+    dlg->para2dlg(m_link);
+    int ret = dlg->exec();
+    if (ret == QDialog::Accepted) {
+        dlg->dlg2para(m_link);
+    }
 }
 
 void MainWin::on_actStrategy_triggered(void)

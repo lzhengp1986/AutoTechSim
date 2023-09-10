@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>LinkDlg</class>
  <widget class="QDialog" name="LinkDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>281</width>
+    <width>321</width>
     <height>149</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>281</width>
+    <width>321</width>
     <height>149</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>281</width>
+    <width>321</width>
     <height>149</height>
    </size>
   </property>
@@ -45,31 +42,38 @@
       <string>Timer Speed</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="tmr8x">
-        <property name="text">
-         <string>8x</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
-       <widget class="QRadioButton" name="tmr16x">
-        <property name="text">
-         <string>16x</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
        <widget class="QRadioButton" name="tmr32x">
         <property name="text">
          <string>32x</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="0">
        <widget class="QRadioButton" name="tmr64x">
         <property name="text">
          <string>64x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QRadioButton" name="tmr1x">
+        <property name="text">
+         <string>1x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="tmr16x">
+        <property name="text">
+         <string>16x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="tmr8x">
+        <property name="text">
+         <string>8x</string>
         </property>
        </widget>
       </item>
@@ -83,9 +87,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QRadioButton" name="ptn5m">
+       <widget class="QRadioButton" name="ptnRnd">
         <property name="text">
-         <string>5min</string>
+         <string>Random</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QRadioButton" name="ptn2m">
+        <property name="text">
+         <string>2min</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -96,23 +107,29 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QRadioButton" name="ptn10m">
-        <property name="text">
-         <string>10min</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
        <widget class="QRadioButton" name="ptn20m">
         <property name="text">
          <string>20min</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QRadioButton" name="ptnRnd">
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="ptn10m">
         <property name="text">
-         <string>Random</string>
+         <string>10min</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="ptn5m">
+        <property name="text">
+         <string>5min</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

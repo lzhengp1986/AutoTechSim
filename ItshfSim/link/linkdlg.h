@@ -10,7 +10,7 @@ class LinkDlg;
 typedef struct {
     int speed; /* 仿真定时速度 */
     int reqPtn; /* 建链请求类型：周期或随机 */
-} LinkCfgPara;
+} LinkCfg;
 
 class LinkDlg : public QDialog
 {
@@ -19,6 +19,10 @@ class LinkDlg : public QDialog
 public:
     explicit LinkDlg(QWidget *parent = nullptr);
     ~LinkDlg();
+
+    /* api */
+    void dlg2para(LinkCfg* cfg);
+    void para2dlg(const LinkCfg* cfg);
 
 private:
     Ui::LinkDlg *ui;

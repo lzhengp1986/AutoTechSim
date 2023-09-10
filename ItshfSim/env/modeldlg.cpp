@@ -13,7 +13,7 @@ ModelDlg::~ModelDlg()
     delete ui;
 }
 
-void ModelDlg::para2win(const ModelCfg* cfg)
+void ModelDlg::para2dlg(const ModelCfg* cfg)
 {
     int n = cfg->dbDesc.size();
     for (int i = 0; i < n; i++) {
@@ -26,7 +26,7 @@ void ModelDlg::para2win(const ModelCfg* cfg)
     ui->bandBox->setCurrentIndex(cfg->bandIndex);
 }
 
-void ModelDlg::win2para(ModelCfg *cfg)
+void ModelDlg::dlg2para(ModelCfg *cfg)
 {
     cfg->year = ui->year->value();
     cfg->month = ui->month->value();

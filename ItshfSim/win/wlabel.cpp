@@ -54,6 +54,18 @@ QLabel* WLabel::get_label(int index) const
     return m_label.at(index);
 }
 
+void WLabel::set_time(const Time* ts)
+{
+    QString stamp = QString("%1-%2-%3 %4:%5:%6")
+            .arg(ts->year, 2, 10, QLatin1Char('0'))
+            .arg(ts->month, 2, 10, QLatin1Char('0'))
+            .arg(ts->day, 2, 10, QLatin1Char('0'))
+            .arg(ts->hour, 2, 10, QLatin1Char('0'))
+            .arg(ts->min, 2, 10, QLatin1Char('0'))
+            .arg(ts->sec, 2, 10, QLatin1Char('0'));
+    m_label.at(STAMP)->setText(stamp);
+}
+
 void WLabel::set_channel(int glbChId)
 {
     int fc = glb2freq(glbChId);

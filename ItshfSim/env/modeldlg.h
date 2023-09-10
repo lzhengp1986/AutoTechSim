@@ -25,8 +25,8 @@ public:
     ~ModelDlg();
 
     /* api */
-    void win2para(ModelCfg* cfg);
-    void para2win(const ModelCfg* cfg);
+    void dlg2para(ModelCfg* cfg);
+    void para2dlg(const ModelCfg* cfg);
     static int get_maxband(int bandIndex);
 
 private:

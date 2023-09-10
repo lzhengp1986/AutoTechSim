@@ -1,6 +1,7 @@
 #ifndef QWLABEL_H
 #define QWLABEL_H
 
+#include "type.h"
 #include <QList>
 #include <QLabel>
 
@@ -11,6 +12,7 @@ public:
 
     /* api */
     QLabel* get_label(int index) const;
+    void set_time(const Time* ts);
     void set_channel(int glbChId);
     void set_ratio(int snr);
     void set_noise(int n0);
