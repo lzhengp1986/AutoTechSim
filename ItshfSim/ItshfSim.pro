@@ -25,9 +25,9 @@ SOURCES += \
     env/modeldlg.cpp \
     env/randmng.cpp \
     env/wenv.cpp \
-    link/linkwin.cpp \
+    link/linkdlg.cpp \
     link/linksim.cpp \
-    auto/autowin.cpp \
+    auto/autodlg.cpp \
     auto/autosim.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
@@ -42,9 +42,9 @@ HEADERS += \
     env/modeldlg.h \
     env/randmng.h \
     env/wenv.h \
-    auto/autowin.h \
+    auto/autodlg.h \
     auto/autosim.h \
-    link/linkwin.h \
+    link/linkdlg.h \
     link/linksim.h \
     win/wchart.h \
     win/wlabel.h \
@@ -54,8 +54,8 @@ HEADERS += \
 FORMS += \
     env/dbdlg.ui \
     env/modeldlg.ui \
-    auto/autowin.ui \
-    link/linkwin.ui \
+    auto/autodlg.ui \
+    link/linkdlg.ui \
     mainwin.ui
 
 # 界面图标

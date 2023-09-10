@@ -2,8 +2,8 @@
  <author/>
  <comment/>
  <exportmacro/>
- <class>AutoWin</class>
- <widget class="QDialog" name="AutoWin">
+ <class>AutoDlg</class>
+ <widget class="QDialog" name="AutoDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -38,7 +38,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>AutoWin</receiver>
+   <receiver>AutoDlg</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -54,7 +54,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>AutoWin</receiver>
+   <receiver>AutoDlg</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
