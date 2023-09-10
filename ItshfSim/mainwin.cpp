@@ -110,16 +110,13 @@ void MainWin::free_model(void)
 void MainWin::on_actModel_triggered(void)
 {
     Model* model = new Model(this);
-    model->setup(m_cfg);
+    model->para2win(m_cfg);
 
     int ret = model->exec();
     if (ret == QDialog::Accepted) {
         /* 获取模型参数 */
         ModelCfg cfg = *m_cfg;
-        cfg.year = model->get_year();
-        cfg.month = model->get_month();
-        cfg.dbIndex = model->get_dbIndex();
-        cfg.bandIndex = model->get_bandIndex();
+        model->win2para(&cfg);
 
         /* 更新数据库 */
         int flag = update_model(&cfg);
