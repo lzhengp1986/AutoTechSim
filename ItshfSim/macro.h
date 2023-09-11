@@ -12,6 +12,9 @@
 #define MIN_PN0 -130 /* 最小N0 */
 #define MAX_PN0 +60 /* 最大N0 */
 
+#define REQ_FREQ_NUM 10 /* 最大请求频点数 */
+#define RSP_FREQ_NUM REQ_FREQ_NUM /* 最大响应频点数 */
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 

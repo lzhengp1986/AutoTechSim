@@ -187,8 +187,10 @@ void MainWin::free_time(void)
 void MainWin::setup_link(void)
 {
     m_link = new LinkCfg;
-    m_link->reqPtn = 0; /* random */
-    m_link->speed = 64; /* 64x */
+    m_link->fcNumIndex = 0; /* 10 */
+    m_link->tmrSpeedIndex = 2; /* x8 */
+    m_link->scanIntvIndex = 0; /* 2sec */
+    m_link->svcIntvIndex = 0; /* random */
 
     /* 任务请求时戳 */
     m_stamp = new Time;
@@ -219,7 +221,9 @@ void MainWin::free_auto(void)
 void MainWin::on_sim_timer_timeout(void)
 {
     /* 更新当前时间 */
-    update_time(m_link->speed);
+    int speedIndex = m_link->tmrSpeedIndex;
+    int speed = LinkDlg::timerSpeed(speedIndex);
+    update_time(speed);
 }
 
 void MainWin::on_actModel_triggered(void)

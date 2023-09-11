@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>ModelDlg</class>
  <widget class="QDialog" name="ModelDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
+    <width>400</width>
     <height>85</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>350</width>
+    <width>400</width>
     <height>85</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>400</width>
+    <width>450</width>
     <height>85</height>
    </size>
   </property>
@@ -29,7 +26,37 @@
    <string>Circuit Model</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="4">
+   <item row="1" column="6">
+    <widget class="QSpinBox" name="month">
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>12</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="3">
+    <widget class="QLabel" name="dbLabel">
+     <property name="text">
+      <string>Database List</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="6">
+    <widget class="QLabel" name="monthLabel">
+     <property name="text">
+      <string>Month</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="list"/>
+   </item>
+   <item row="1" column="5">
     <widget class="QSpinBox" name="year">
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::NoButtons</enum>
@@ -45,51 +72,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="5">
-    <widget class="QLabel" name="monthLabel">
-     <property name="text">
-      <string>Month</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QComboBox" name="list"/>
-   </item>
-   <item row="1" column="5">
-    <widget class="QSpinBox" name="month">
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::NoButtons</enum>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>12</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="yearLabel">
-     <property name="text">
-      <string>Year</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLabel" name="dbLabel">
-     <property name="text">
-      <string>Database List</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="6">
+   <item row="0" column="7">
     <widget class="QLabel" name="bandLabel">
      <property name="text">
       <string>Max-Band</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="6">
+   <item row="2" column="1" colspan="7">
     <widget class="QDialogButtonBox" name="btnBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -99,7 +89,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
+   <item row="1" column="7">
     <widget class="QComboBox" name="bandBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -135,6 +125,27 @@
        <string>8MHz</string>
       </property>
      </item>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QLabel" name="yearLabel">
+     <property name="text">
+      <string>Year</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QCheckBox" name="noiseChk">
+     <property name="text">
+      <string>WithNoise</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLabel" name="noiseLabel">
+     <property name="text">
+      <string>Backgroud</string>
+     </property>
     </widget>
    </item>
   </layout>
