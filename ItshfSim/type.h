@@ -13,6 +13,11 @@ typedef struct {
     int sec; /* 秒(0~59) */
 } Time;
 
+// 状态机
+typedef enum {
+    INIT, IDLE, WAIT, SCAN, LINK
+} SimState;
+
 // 消息类型
 typedef enum {
     MSG_FREQ_REQ = 0x1,
@@ -32,6 +37,7 @@ typedef struct {
 // 频率响应
 typedef struct {
     MsgHead head;
+    int num;
     int fc[RSP_FREQ_NUM];
 } FreqRsp;
 

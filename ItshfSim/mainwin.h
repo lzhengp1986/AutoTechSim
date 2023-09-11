@@ -53,6 +53,12 @@ private:
     void setup_auto(void);
     void free_auto(void);
 
+    void simulate(const Time* ts);
+    void sim_idle(const Time* ts);
+    void sim_scan(const Time* ts);
+    void sim_link(const Time* ts);
+    int second(const Time* ts);
+
 private:
     /* 主窗口 */
     Ui::MainWin *ui;
@@ -70,6 +76,12 @@ private:
 
     /* 仿真配置 */
     LinkCfg *m_link;
-    Time *m_stamp;
+    AutoCfg *m_auto;
+    FreqReq m_req;
+    FreqRsp m_rsp;
+    Time m_hist;
+
+    /* 状态机 */
+    int m_state;
 };
 #endif // MAINWIN_H

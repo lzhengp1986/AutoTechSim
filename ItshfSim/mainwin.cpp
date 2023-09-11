@@ -9,6 +9,7 @@ MainWin::MainWin(QWidget *parent)
     , ui(new Ui::MainWin)
 {
     ui->setupUi(this);
+    m_state = INIT;
     setup_win();
     setup_env();
     setup_time();
@@ -19,6 +20,7 @@ MainWin::MainWin(QWidget *parent)
 
 MainWin::~MainWin()
 {
+    m_state = INIT;
     free_auto();
     free_link();
     free_model();
@@ -49,6 +51,8 @@ void MainWin::free_win(void)
 {
     delete m_label;
     delete m_chart;
+    m_label = nullptr;
+    m_chart = nullptr;
 }
 
 // 设置env
@@ -61,6 +65,7 @@ void MainWin::setup_env(void)
 void MainWin::free_env(void)
 {
     delete m_env;
+    m_env = nullptr;
 }
 
 // 设置Model
@@ -112,6 +117,7 @@ int MainWin::update_model(const ModelCfg* cfg)
 void MainWin::free_model(void)
 {
     delete m_model;
+    m_model = nullptr;
 }
 
 // 设置time
@@ -181,6 +187,9 @@ void MainWin::free_time(void)
     delete m_tmr;
     delete m_thread;
     delete m_time;
+    m_tmr = nullptr;
+    m_thread = nullptr;
+    m_time = nullptr;
 }
 
 // 配置link
@@ -188,33 +197,109 @@ void MainWin::setup_link(void)
 {
     m_link = new LinkCfg;
     m_link->fcNumIndex = 0; /* 10 */
-    m_link->tmrSpeedIndex = 2; /* x8 */
+    m_link->tmrSpeedIndex = 0; /* x1 */
     m_link->scanIntvIndex = 0; /* 2sec */
     m_link->svcIntvIndex = 0; /* random */
-
-    /* 任务请求时戳 */
-    m_stamp = new Time;
-    m_stamp->year = 0;
-    m_stamp->month = 0;
+    memset(&m_hist, 0, sizeof(Time));
+    m_hist.year = 2023;
 }
 
 // 释放link
 void MainWin::free_link(void)
 {
-    delete m_stamp;
     delete m_link;
+    m_link = nullptr;
 }
 
 // 配置auto
 void MainWin::setup_auto(void)
 {
-
+    m_auto = new AutoCfg;
+    m_auto->algId = 0;
 }
 
 // 释放auto
 void MainWin::free_auto(void)
 {
+    delete m_auto;
+    m_auto = nullptr;
+}
 
+// 主调度函数
+void MainWin::simulate(const Time* ts)
+{
+    switch (m_state) {
+    case IDLE: sim_idle(ts); break;
+    case SCAN: sim_scan(ts); break;
+    case LINK: sim_link(ts); break;
+    }
+}
+
+// idle
+void MainWin::sim_idle(const Time* ts)
+{
+    int diff = second(ts) - second(&m_hist);
+    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+    if (diff < svcIntv) {
+        return;
+    }
+
+    m_hist = *ts;
+    m_req.head.type = MSG_FREQ_REQ;
+    /* call alg */
+    int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
+    m_rsp.head.type = MSG_FREQ_RSP;
+    m_rsp.num = fcNum;
+    m_rsp.fc[0] = 50;
+    m_rsp.fc[1] = 1800;
+    m_rsp.fc[2] = 2400;
+    m_rsp.fc[3] = 3200;
+    m_rsp.fc[4] = 5000;
+    m_rsp.fc[5] = 250;
+    m_rsp.fc[6] = 4800;
+    m_rsp.fc[7] = 7400;
+    m_rsp.fc[8] = 2200;
+    m_rsp.fc[9] = 8000;
+    m_label->set_state(SCAN);
+    m_state = SCAN;
+}
+
+// scan
+void MainWin::sim_scan(const Time* ts)
+{
+    int diff = second(ts) - second(&m_hist);
+    int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
+    if (diff < scanIntv) {
+        return;
+    }
+
+    m_hist = *ts;
+    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+    m_hist.sec += 10 + qrand() % svcIntv;
+    m_label->set_state(LINK);
+    m_state = LINK;
+}
+
+// link
+void MainWin::sim_link(const Time* ts)
+{
+    int diff = second(ts) - second(&m_hist);
+    if (diff < 0) {
+        return;
+    }
+
+    m_label->set_state(IDLE);
+    m_state = IDLE;
+}
+
+// 秒计数
+int MainWin::second(const Time* ts)
+{
+    int day = (ts->year - 2020) * 366 + ts->month * 31 + ts->day;
+    int hour = day * 24 + ts->hour;
+    int min = hour * 60 + ts->min;
+    int sec = min * 60 + ts->sec;
+    return sec;
 }
 
 // 定时器超时处理
@@ -224,6 +309,7 @@ void MainWin::on_sim_timer_timeout(void)
     int speedIndex = m_link->tmrSpeedIndex;
     int speed = LinkDlg::timerSpeed(speedIndex);
     update_time(speed);
+    simulate(m_time);
 }
 
 void MainWin::on_actModel_triggered(void)
@@ -265,7 +351,8 @@ void MainWin::on_actRequest_triggered(void)
 
 void MainWin::on_actStrategy_triggered(void)
 {
-
+    m_label->set_state(IDLE);
+    m_state = IDLE;
 }
 
 void MainWin::on_actDatabase_triggered(void)

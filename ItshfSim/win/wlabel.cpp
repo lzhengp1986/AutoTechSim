@@ -19,6 +19,10 @@ WLabel::WLabel(void)
     m_label.at(STAMP)->setMinimumWidth(120);
     m_label.at(STAMP)->setText(stamp);
 
+    /* 状态 */
+    m_label.at(STATE)->setMinimumWidth(30);
+    m_label.at(STATE)->setText("INIT");
+
     /* 信道 */
     m_label.at(CHAN_NAME)->setText("glbChId");
     m_label.at(CHAN_VALUE)->setMinimumWidth(30);
@@ -64,6 +68,18 @@ void WLabel::set_time(const Time* ts)
             .arg(ts->min, 2, 10, QLatin1Char('0'))
             .arg(ts->sec, 2, 10, QLatin1Char('0'));
     m_label.at(STAMP)->setText(stamp);
+}
+
+void WLabel::set_state(int state)
+{
+    switch (state) {
+    case INIT: m_label.at(STATE)->setText("INIT"); break;
+    case IDLE: m_label.at(STATE)->setText("IDLE"); break;
+    case WAIT: m_label.at(STATE)->setText("WAIT"); break;
+    case SCAN: m_label.at(STATE)->setText("SCAN"); break;
+    case LINK: m_label.at(STATE)->setText("LINK"); break;
+    default: m_label.at(STATE)->setText("IDLE"); break;
+    }
 }
 
 void WLabel::set_channel(int glbChId)
