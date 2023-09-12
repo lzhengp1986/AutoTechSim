@@ -83,7 +83,8 @@ int MainWin::update_model(const ModelCfg* cfg)
 
     /* 更新数据库 */
     QString dbFile = prefix + "/voacapx.db";
-    int rc = m_sim->m_env->setup(month, dbFile);
+    int maxband = ModelDlg::get_maxband(cfg->bandIndex);
+    int rc = m_sim->m_env->setup(month, maxband, dbFile);
     if (rc != 0) {
         QMessageBox::warning(this, "Warning", "Fail to setup model!");
         return rc;
@@ -111,7 +112,7 @@ void MainWin::setup_sim(void)
     /* 信号连接 */
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_freq(int, int, int)), this, SLOT(on_new_freq(int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(int, int, int)), this, SLOT(on_new_chan(int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
@@ -135,8 +136,11 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_freq(int glbChId, int snr, int n0)
+void MainWin::on_new_chan(int glbChId, int snr, int n0)
 {
+    /* TODO 绘图 */
+
+    /* 状态栏显示 */
     m_label->set_channel(glbChId);
     m_label->set_ratio(snr);
     m_label->set_noise(n0);
@@ -144,6 +148,7 @@ void MainWin::on_new_freq(int glbChId, int snr, int n0)
 
 void MainWin::on_actModel_triggered(void)
 {
+    m_sim->stop();
     ModelDlg* dlg = new ModelDlg(this);
     dlg->para2dlg(m_model);
 

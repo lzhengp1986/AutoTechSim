@@ -18,7 +18,8 @@ public:
     void set_ratio(int snr);
     void set_noise(int n0);
 
-    enum {VERSION = 0, STAMP, STATE, /* 时戳 */
+    enum {VERSION = 0,
+          STAMP, STATE, COUNTDOWN,/* 时戳 */
           CHAN_NAME, CHAN_VALUE, /* 信道号 */
           FREQ_NAME, FREQ_VALUE, FREQ_UNIT, /* 频率 */
           SNR_NAME, SNR_VALUE, SNR_UNIT, /* SNR */

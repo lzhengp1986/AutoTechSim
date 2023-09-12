@@ -37,8 +37,9 @@ private:
     int sim_link(int& dsec);
     int second(const Time* ts);
 
-    /*! @brief 在ts上累加plus秒，保存到hist中 */
-    void stamp(int plus = 0);
+    /*! @brief 超时时戳 */
+    void stamp(int plus);
+    void stamp(void);
 
 private slots:
     void on_timer_timeout(void);
@@ -46,7 +47,7 @@ private slots:
 signals:
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
-    void new_freq(int glbChId, int snr, int n0);
+    void new_chan(int glbChId, int snr, int n0);
 
 public:
     /* 仿真配置 */

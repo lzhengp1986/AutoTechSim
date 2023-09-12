@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     bool flag;
     int snr;
+    int n0;
 } EnvOut;
 
 /* DB频点信息 */
@@ -42,6 +43,11 @@ typedef struct {
     DbHour hr[MAX_HOUR_NUM];
 } DbMonth;
 
+/* 错误码 */
+#define ENV_OK 0
+#define ENV_INV_PARA 1 /* 参数非法 */
+#define ENV_INV_GLB  2 /* glbChId非法 */
+
 class WEnv
 {
 public:
@@ -52,16 +58,17 @@ public:
     static int glb2freq(int glbChId);
 
     /*! @brief 根据dialog选择的Model读出DB月份数据 */
-    int setup(int month, const QString& fn);
+    int setup(int month, int maxband, const QString& fn);
 
     /*! @brief 根据时戳和信道号结合Model计算可用标志和SNR估计值 */
-    int env(const ModelCfg* cfg, const EnvIn& in, EnvOut& out);
+    int env(const EnvIn& in, EnvOut& out);
 
 private:
-    int check(const ModelCfg* cfg, const EnvIn& in);
-    bool calc(const ModelCfg* cfg, const EnvIn& in, EnvOut& out);
+    int check(const EnvIn& in);
+    int calc(const EnvIn& in, EnvOut& out);
 
 private:
+    int m_maxband; /* 最大可通带宽 */
     DbMonth m_dbMonth; /* 月DB模型 */
     RandMng m_rand; /* 随机数发生器 */
 };

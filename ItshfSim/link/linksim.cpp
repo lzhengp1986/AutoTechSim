@@ -40,7 +40,7 @@ void LinkSim::stop(void)
 
 void LinkSim::trigger(void)
 {
-    stamp(30);
+    stamp(10);
     m_state = IDLE;
 }
 
@@ -183,24 +183,30 @@ int LinkSim::sim_idle(int& dsec)
         return IDLE;
     }
 
-    m_req.head.type = MSG_FREQ_REQ;
-    /* call alg */
+    /* 构造频率请求消息 */
+    FreqReq* req = &m_req;
     int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
-    m_rsp.head.type = MSG_FREQ_RSP;
-    m_rsp.num = fcNum;
-    m_rsp.fc[0] = 50;
-    m_rsp.fc[1] = 1800;
-    m_rsp.fc[2] = 2400;
-    m_rsp.fc[3] = 3200;
-    m_rsp.fc[4] = 5000;
-    m_rsp.fc[5] = 250;
-    m_rsp.fc[6] = 4800;
-    m_rsp.fc[7] = 7400;
-    m_rsp.fc[8] = 2200;
-    m_rsp.fc[9] = 8000;
+    req->head.type = MSG_FREQ_REQ;
+    req->num = MIN(fcNum, REQ_FREQ_NUM);
 
-    /* scan时戳 */
+    /* 调用策略推荐频率 */
+    FreqRsp* rsp = &m_rsp;
+    rsp->head.type = MSG_FREQ_RSP;
+    rsp->total = RSP_FREQ_NUM;
+    rsp->glb[0] = 50;
+    rsp->glb[1] = 1800;
+    rsp->glb[2] = 2400;
+    rsp->glb[3] = 3200;
+    rsp->glb[4] = 5000;
+    rsp->glb[5] = 250;
+    rsp->glb[6] = 4800;
+    rsp->glb[7] = 7400;
+    rsp->glb[8] = 2200;
+    rsp->glb[9] = 8000;
+
+    /* 切换状态 */
     stamp(1);
+    m_rsp.used = 0;
     return SCAN;
 }
 
@@ -214,10 +220,39 @@ int LinkSim::sim_scan(int& dsec)
         return SCAN;
     }
 
-    /* 为link态打时戳 */
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    stamp(svcIntv);
-    return LINK;
+    /* 处理1个频率 */
+    FreqRsp* rsp = &m_rsp;
+    if (rsp->used < rsp->total) {
+        EnvIn in;
+        EnvOut out;
+        int glbChId = rsp->glb[rsp->used];
+
+        /* 调用环境模型 */
+        in.year = m_stamp->year;
+        in.month = m_stamp->month;
+        in.hour = m_stamp->hour;
+        in.glbChId = glbChId;
+        int flag = m_env->env(in, out);
+
+        /* 将scan结果发到MainWin */
+        emit new_chan(glbChId, out.snr, out.n0);
+
+        /* TODO 将scan结果发到alg */
+
+        /* 状态切换: LINK or SCAN */
+        if ((flag == ENV_OK) && (out.flag == true)) {
+            int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+            stamp(svcIntv);
+            return LINK;
+        } else {
+            stamp(scanIntv);
+            rsp->used++;
+            return SCAN;
+        }
+    } else {
+        stamp();
+        return IDLE;
+    }
 }
 
 // link
@@ -225,14 +260,38 @@ int LinkSim::sim_link(int& dsec)
 {
     int diff = second(&m_hist) - second(m_stamp);
     dsec = ABS(diff);
-    if (diff > 0) {
-        return LINK;
+
+    /* 每分钟上报link信息 */
+    if (dsec % 60 == 0) {
+        EnvIn in;
+        EnvOut out;
+        FreqRsp* rsp = &m_rsp;
+        int glbChId = rsp->glb[rsp->used];
+
+        /* 调用环境模型 */
+        in.year = m_stamp->year;
+        in.month = m_stamp->month;
+        in.hour = m_stamp->hour;
+        in.glbChId = glbChId;
+        int flag = m_env->env(in, out);
+        if ((flag == ENV_OK) && (out.flag == true)) {
+            /* 将link结果发到MainWin */
+            emit new_chan(glbChId, out.snr, out.n0);
+
+            /* TODO 将link结果发到alg */
+        } else { /* 断链 */
+            stamp();
+            return IDLE;
+        }
     }
 
-    /* 为idle态打时戳:<10min */
-    int intv = MAX(1, qrand() % 10);
-    stamp(intv * 60);
-    return IDLE;
+    /* 状态切换 */
+    if (diff > 0) {
+        return LINK;
+    } else {
+        stamp();
+        return IDLE;
+    }
 }
 
 // 秒计数
@@ -251,3 +310,12 @@ void LinkSim::stamp(int plus)
     m_hist = *m_stamp;
     m_hist.sec += plus;
 }
+
+// 为idle打时戳
+void LinkSim::stamp(void)
+{
+    m_hist = *m_stamp;
+    int min = MAX(1, qrand() % 10);
+    m_hist.sec += min * 60;
+}
+

@@ -33,13 +33,15 @@ typedef struct {
 // 频率请求
 typedef struct {
     MsgHead head;
+    int num; /* 请求频点个数 */
 } FreqReq;
 
 // 频率响应
 typedef struct {
     MsgHead head;
-    int num;
-    int fc[RSP_FREQ_NUM];
+    int used; /* 已探测索引 */
+    int total; /* 应答频点个数 */
+    int glb[RSP_FREQ_NUM];
 } FreqRsp;
 
 #endif // TYPE_H

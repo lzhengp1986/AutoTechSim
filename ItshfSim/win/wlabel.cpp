@@ -21,25 +21,35 @@ WLabel::WLabel(void)
     m_label.at(STAMP)->setText(stamp);
 
     /* 状态 */
-    m_label.at(STATE)->setMinimumWidth(60);
+    m_label.at(STATE)->setStyleSheet("color:blue;font-weight:bold");
+    m_label.at(STATE)->setMinimumWidth(30);
     m_label.at(STATE)->setText("WAIT");
+    m_label.at(COUNTDOWN)->setStyleSheet("color:green");
+    m_label.at(COUNTDOWN)->setMinimumWidth(30);
+    m_label.at(COUNTDOWN)->setText("*");
 
     /* 信道 */
     m_label.at(CHAN_NAME)->setText("glbChId");
     m_label.at(CHAN_VALUE)->setMinimumWidth(30);
-    m_label.at(FREQ_NAME)->setText("frequency");
+    m_label.at(FREQ_NAME)->setText("fc");
+    m_label.at(FREQ_NAME)->setStyleSheet("font-weight:bold");
+    m_label.at(FREQ_VALUE)->setStyleSheet("color:red");
     m_label.at(FREQ_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_UNIT)->setText("KHz");
     set_channel(0);
 
     /* SNR */
     m_label.at(SNR_NAME)->setText("SNR");
+    m_label.at(SNR_NAME)->setStyleSheet("font-weight:bold");
+    m_label.at(SNR_VALUE)->setStyleSheet("color:red");
     m_label.at(SNR_VALUE)->setMinimumWidth(30);
     m_label.at(SNR_UNIT)->setText("dB");
     set_ratio(-10);
 
     /* Noise */
-    m_label.at(NOISE_NAME)->setText("Noise");
+    m_label.at(NOISE_NAME)->setText("N0");
+    m_label.at(NOISE_NAME)->setStyleSheet("font-weight:bold");
+    m_label.at(NOISE_VALUE)->setStyleSheet("color:red");
     m_label.at(NOISE_VALUE)->setMinimumWidth(30);
     m_label.at(NOISE_UNIT)->setText("dBm");
     set_noise(-120);
@@ -81,9 +91,10 @@ void WLabel::set_state(int state, int dsec)
     case LINK: text = "LINK"; break;
     default: text = "WAIT"; break;
     }
+    m_label.at(STATE)->setText(text);
 
+    /* 倒计时 */
     if (state != WAIT) {
-        /* 倒计时 */
         QString ts;
         int asec = ABS(dsec);
         if (asec > 24 * 3600) {
@@ -96,9 +107,9 @@ void WLabel::set_state(int state, int dsec)
             ts = QString::number(asec) + "s";
         }
 
-        m_label.at(STATE)->setText(text + ":" + ts);
+        m_label.at(COUNTDOWN)->setText(ts);
     } else {
-        m_label.at(STATE)->setText(text);
+        m_label.at(COUNTDOWN)->setText("*");
     }
 }
 
