@@ -17,12 +17,12 @@ WChart::WChart(void)
     m_link->setName("link");
     m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
     m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_scan->setBorderColor(Qt::transparent);
-    m_link->setBorderColor(Qt::transparent);
+    m_scan->setBorderColor(Qt::cyan);
+    m_link->setBorderColor(Qt::magenta);
     m_scan->setBrush(QBrush(Qt::cyan));
     m_link->setBrush(QBrush(Qt::magenta));
-    m_scan->setMarkerSize(2);
-    m_link->setMarkerSize(2);
+    m_scan->setMarkerSize(1);
+    m_link->setMarkerSize(1);
 
     /* step3.设置x坐标轴 */
     QValueAxis *x = new QValueAxis;
