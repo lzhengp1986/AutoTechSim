@@ -18,9 +18,9 @@ public:
     int simulate(const Time* ts, int& dsec);
 
 private:
-    void sim_idle(const Time* ts, int& dsec);
-    void sim_scan(const Time* ts, int& dsec);
-    void sim_link(const Time* ts, int& dsec);
+    int sim_idle(const Time* ts, int& dsec);
+    int sim_scan(const Time* ts, int& dsec);
+    int sim_link(const Time* ts, int& dsec);
     int second(const Time* ts);
 
 public:
@@ -36,16 +36,5 @@ private:
     Time m_hist;
     int m_state;
 };
-
-inline void LinkSim::quit(void)
-{
-    m_state = WAIT;
-}
-
-inline void LinkSim::start(const Time* ts)
-{
-    m_hist = *ts;
-    m_state = IDLE;
-}
 
 #endif // LINKSIM_H

@@ -30,26 +30,40 @@ LinkSim::~LinkSim(void)
     m_auto = nullptr;
 }
 
+void LinkSim::quit(void)
+{
+    m_state = WAIT;
+}
+
+void LinkSim::start(const Time* ts)
+{
+    m_hist = *ts;
+    m_state = IDLE;
+    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+    m_hist.sec += svcIntv;
+}
+
 // 主调度函数
 int LinkSim::simulate(const Time* ts, int& dsec)
 {
+    int next;
     switch (m_state) {
-    case IDLE: sim_idle(ts, dsec); break;
-    case SCAN: sim_scan(ts, dsec); break;
-    case LINK: sim_link(ts, dsec); break;
+    case IDLE: next = sim_idle(ts, dsec); break;
+    case SCAN: next = sim_scan(ts, dsec); break;
+    case LINK: next = sim_link(ts, dsec); break;
+    default: next = WAIT; break;
     }
 
-    return m_state;
+    return m_state = next;
 }
 
 // idle
-void LinkSim::sim_idle(const Time* ts, int& dsec)
+int LinkSim::sim_idle(const Time* ts, int& dsec)
 {
-    int diff = second(ts) - second(&m_hist);
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    dsec = svcIntv - diff;
-    if (dsec > 0) {
-        return;
+    int diff = second(&m_hist) - second(ts);
+    dsec = ABS(diff);
+    if (diff > 0) {
+        return IDLE;
     }
 
     m_hist = *ts;
@@ -68,34 +82,38 @@ void LinkSim::sim_idle(const Time* ts, int& dsec)
     m_rsp.fc[7] = 7400;
     m_rsp.fc[8] = 2200;
     m_rsp.fc[9] = 8000;
-    m_state = SCAN;
+    return SCAN;
 }
 
 // scan
-void LinkSim::sim_scan(const Time* ts, int& dsec)
+int LinkSim::sim_scan(const Time* ts, int& dsec)
 {
     int diff = second(ts) - second(&m_hist);
     int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
-    dsec = scanIntv - diff;
-    if (dsec > 0) {
-        return;
+    dsec = ABS(scanIntv - diff);
+    if (diff < scanIntv) {
+        return SCAN;
     }
 
     m_hist = *ts;
     int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
     m_hist.sec += ABS(10 + qrand() % svcIntv);
-    m_state = LINK;
+    return LINK;
 }
 
 // link
-void LinkSim::sim_link(const Time* ts, int& dsec)
+int LinkSim::sim_link(const Time* ts, int& dsec)
 {
-    dsec = second(ts) - second(&m_hist);
-    if (dsec < 0) {
-        return;
+    int diff = second(&m_hist) - second(ts);
+    dsec = ABS(diff);
+    if (diff > 0) {
+        return LINK;
     }
 
-    m_state = IDLE;
+    m_hist = *ts;
+    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+    m_hist.sec += svcIntv;
+    return IDLE;
 }
 
 // 秒计数
