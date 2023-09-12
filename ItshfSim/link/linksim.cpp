@@ -66,8 +66,8 @@ void LinkSim::setup_time(void)
     m_subthr->start();
 }
 
-// 更新Time += sec
-void LinkSim::update_time(int msec)
+// 更新Time += msec
+bool LinkSim::update_time(int msec)
 {
     m_stamp->msec += msec;
 
@@ -78,7 +78,7 @@ void LinkSim::update_time(int msec)
             m_stamp->sec++;
         } while (m_stamp->msec >= 1000);
     } else {
-        goto UPDATE_LABEL;
+        return false;
     }
 
     /* 秒进位 */
@@ -113,6 +113,7 @@ void LinkSim::update_time(int msec)
 
 UPDATE_LABEL:
     emit new_time(m_stamp);
+    return true;
 }
 
 // 更新Time
@@ -147,12 +148,14 @@ void LinkSim::on_timer_timeout(void)
     /* 更新时间 */
     int speedIndex = m_link->tmrSpeedIndex;
     int speed = LinkDlg::timerSpeed(speedIndex);
-    update_time(speed * TIMER_INTERVAL_MS);
+    bool flag = update_time(speed * TIMER_INTERVAL_MS);
 
     /* 建链仿真 */
-    int dsec = 0;
-    int state = simulate(dsec);
-    emit new_state(state, dsec);
+    if (flag == true) {
+        int dsec = 0;
+        int state = simulate(dsec);
+        emit new_state(state, dsec);
+    }
 }
 
 // 主调度函数

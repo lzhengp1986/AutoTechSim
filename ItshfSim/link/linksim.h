@@ -1,6 +1,7 @@
 #ifndef LINKSIM_H
 #define LINKSIM_H
 
+#include "macro.h"
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"
@@ -9,7 +10,7 @@
 #include <QTimer>
 
 /* 定时器最小精度 */
-#define TIMER_INTERVAL_MS 200
+#define TIMER_INTERVAL_MS 10
 
 class LinkSim : public QThread
 {
@@ -27,7 +28,7 @@ public:
 
 private:
     void setup_time(void);
-    void update_time(int msec);
+    bool update_time(int msec);
     void free_time(void);
 
     /*! @brief 各状态处理函数，返回状态倒计时 */
