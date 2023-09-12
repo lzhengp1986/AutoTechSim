@@ -18,10 +18,14 @@ public:
     int simulate(const Time* ts, int& dsec);
 
 private:
+    /*! @brief 各状态处理函数，返回状态倒计时 */
     int sim_idle(const Time* ts, int& dsec);
     int sim_scan(const Time* ts, int& dsec);
     int sim_link(const Time* ts, int& dsec);
     int second(const Time* ts);
+
+    /*! @brief 在ts上累加plus秒，保存到hist中 */
+    void stamp(const Time* ts, int plus = 0);
 
 public:
     /* 仿真配置 */

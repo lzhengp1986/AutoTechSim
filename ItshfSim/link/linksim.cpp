@@ -37,24 +37,25 @@ void LinkSim::quit(void)
 
 void LinkSim::start(const Time* ts)
 {
-    m_hist = *ts;
+    /* 固定30秒 */
+    stamp(ts, 30);
     m_state = IDLE;
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    m_hist.sec += svcIntv;
 }
 
 // 主调度函数
 int LinkSim::simulate(const Time* ts, int& dsec)
 {
-    int next;
-    switch (m_state) {
-    case IDLE: next = sim_idle(ts, dsec); break;
-    case SCAN: next = sim_scan(ts, dsec); break;
-    case LINK: next = sim_link(ts, dsec); break;
-    default: next = WAIT; break;
+    int nxt;
+    int prv = m_state;
+    switch (prv) {
+    case IDLE: nxt = sim_idle(ts, dsec); break;
+    case SCAN: nxt = sim_scan(ts, dsec); break;
+    case LINK: nxt = sim_link(ts, dsec); break;
+    default: nxt = WAIT; break;
     }
 
-    return m_state = next;
+    m_state = nxt;
+    return prv;
 }
 
 // idle
@@ -66,7 +67,6 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
         return IDLE;
     }
 
-    m_hist = *ts;
     m_req.head.type = MSG_FREQ_REQ;
     /* call alg */
     int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
@@ -82,6 +82,9 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
     m_rsp.fc[7] = 7400;
     m_rsp.fc[8] = 2200;
     m_rsp.fc[9] = 8000;
+
+    /* scan时戳 */
+    stamp(ts, 1);
     return SCAN;
 }
 
@@ -95,9 +98,9 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
         return SCAN;
     }
 
-    m_hist = *ts;
+    /* 为link态打时戳 */
     int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    m_hist.sec += ABS(10 + qrand() % svcIntv);
+    stamp(ts, svcIntv);
     return LINK;
 }
 
@@ -110,9 +113,9 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
         return LINK;
     }
 
-    m_hist = *ts;
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    m_hist.sec += svcIntv;
+    /* 为idle态打时戳:<10min */
+    int intv = qrand() % 10;
+    stamp(ts, intv * 60);
     return IDLE;
 }
 
@@ -124,4 +127,11 @@ int LinkSim::second(const Time* ts)
     int min = hour * 60 + ts->min;
     int sec = min * 60 + ts->sec;
     return sec;
+}
+
+// 打时戳
+void LinkSim::stamp(const Time* ts, int plus)
+{
+    m_hist = *ts;
+    m_hist.sec += plus;
 }
