@@ -4,11 +4,11 @@
 
 WChart::WChart(void)
 {
-    /* 添加chart */
+    /* step1.建立chart */
     QChart* chart = new QChart();
     m_chart = chart;
 
-    /* 设置散点 */
+    /* step2.设置散点 */
     m_scan = new QScatterSeries;
     m_link = new QScatterSeries;
     chart->addSeries(m_scan);
@@ -24,7 +24,7 @@ WChart::WChart(void)
     m_scan->setMarkerSize(5);
     m_link->setMarkerSize(5);
 
-    /* 设置x坐标轴 */
+    /* step3.设置x坐标轴 */
     QValueAxis *x = new QValueAxis;
     x->setTitleText("frequency/MHz");
     x->setRange(2, 30); /* MHz */
@@ -46,7 +46,7 @@ WChart::WChart(void)
     y0->setMinorGridLineVisible(false);
     y0->setGridLineVisible(false);
 
-    /* 添加坐标轴 */
+    /* step4.添加坐标轴 */
     chart->addAxis(x, Qt::AlignLeft);
     chart->addAxis(y0, Qt::AlignBottom);
     m_scan->attachAxis(x);
