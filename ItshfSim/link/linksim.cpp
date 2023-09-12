@@ -114,7 +114,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
     }
 
     /* 为idle态打时戳:<10min */
-    int intv = qrand() % 10;
+    int intv = MAX(1, qrand() % 10);
     stamp(ts, intv * 60);
     return IDLE;
 }

@@ -7,59 +7,26 @@
     <x>0</x>
     <y>0</y>
     <width>210</width>
-    <height>157</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>210</width>
-    <height>157</height>
+    <height>185</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>210</width>
-    <height>157</height>
+    <height>185</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>first-stage Search</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QComboBox" name="comboBox">
-        <item>
-         <property name="text">
-          <string>random Search</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Bisecting Search</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Monte Carlo Tree</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ITS-HF Propagation</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -70,31 +37,66 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="secGrp">
      <property name="title">
-      <string>Second-Stage Search</string>
+      <string>Second-Stage</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QComboBox" name="comboBox_2">
+       <widget class="QComboBox" name="secAlg">
         <item>
          <property name="text">
-          <string>Best Group</string>
+          <string>Expanding Around(714)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>K-Means Clustering</string>
+          <string>K-Means Clustering(New)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>K-Means + Bisecting</string>
+          <string>K-Means + Bisecting(Excel)</string>
          </property>
         </item>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="fstGrp">
+     <property name="title">
+      <string>First-Stage</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="fstAlg">
+        <item>
+         <property name="text">
+          <string>Random Search(Test)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bisecting Search(714)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Monte Carlo Tree(New)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="itsChkBox">
+     <property name="text">
+      <string>ITS-HF Propagation</string>
+     </property>
     </widget>
    </item>
   </layout>
