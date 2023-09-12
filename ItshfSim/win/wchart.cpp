@@ -15,14 +15,14 @@ WChart::WChart(void)
     chart->addSeries(m_link);
     m_scan->setName("scan");
     m_link->setName("link");
-    m_scan->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_link->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scan->setBorderColor(Qt::transparent);
     m_link->setBorderColor(Qt::transparent);
     m_scan->setBrush(QBrush(Qt::cyan));
     m_link->setBrush(QBrush(Qt::magenta));
-    m_scan->setMarkerSize(5);
-    m_link->setMarkerSize(5);
+    m_scan->setMarkerSize(2);
+    m_link->setMarkerSize(2);
 
     /* step3.设置x坐标轴 */
     QValueAxis *x = new QValueAxis;
