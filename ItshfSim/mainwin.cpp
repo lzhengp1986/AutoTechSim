@@ -11,14 +11,16 @@ MainWin::MainWin(QWidget *parent)
     ui->setupUi(this);
     setup_win();
     setup_time();
-    setup_model();
+
+    /* 顺序依赖 */
     setup_sim();
+    setup_model();
 }
 
 MainWin::~MainWin()
 {
-    free_sim();
     free_model();
+    free_sim();
     free_time();
     free_win();
     delete ui;
