@@ -17,12 +17,11 @@ LinkSim::LinkSim(void)
     /* auto */
     m_auto = new AutoCfg;
     m_auto->algId = 0;
-    m_state = INIT;
+    m_state = WAIT;
 }
 
 LinkSim::~LinkSim(void)
 {
-    m_state = INIT;
     delete m_env;
     delete m_link;
     delete m_auto;

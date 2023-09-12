@@ -14,7 +14,7 @@ public:
 
     /* api */
     void quit(void);
-    void start(void);
+    void start(const Time* ts);
     int simulate(const Time* ts, int& dsec);
 
 private:
@@ -39,11 +39,12 @@ private:
 
 inline void LinkSim::quit(void)
 {
-    m_state = INIT;
+    m_state = WAIT;
 }
 
-inline void LinkSim::start(void)
+inline void LinkSim::start(const Time* ts)
 {
+    m_hist = *ts;
     m_state = IDLE;
 }
 

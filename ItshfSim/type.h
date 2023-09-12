@@ -16,7 +16,7 @@ typedef struct {
 
 // 状态机
 typedef enum {
-    INIT, IDLE, WAIT, SCAN, LINK
+    WAIT, IDLE, SCAN, LINK
 } SimState;
 
 // 消息类型

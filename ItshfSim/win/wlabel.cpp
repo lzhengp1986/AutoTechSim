@@ -21,7 +21,7 @@ WLabel::WLabel(void)
 
     /* 状态 */
     m_label.at(STATE)->setMinimumWidth(60);
-    m_label.at(STATE)->setText("INIT");
+    m_label.at(STATE)->setText("WAIT");
 
     /* 信道 */
     m_label.at(CHAN_NAME)->setText("glbChId");
@@ -78,19 +78,27 @@ void WLabel::set_state(int state, int dsec)
     case IDLE: text = "IDLE"; break;
     case SCAN: text = "SCAN"; break;
     case LINK: text = "LINK"; break;
-    default: text = "INIT"; break;
+    default: text = "WAIT"; break;
     }
 
-    /* 倒计时 */
-    QString ts;
-    int asec = ABS(dsec);
-    if (asec > 60) {
-        ts = QString::number(asec / 60) + "m";
+    if (state != WAIT) {
+        /* 倒计时 */
+        QString ts;
+        int asec = ABS(dsec);
+        if (asec > 24 * 3600) {
+            ts = "inf";
+        } else if (asec > 3600) {
+            ts = QString::number(asec / 3600) + "h";
+        } else if (asec > 60) {
+            ts = QString::number(asec / 60) + "m";
+        } else {
+            ts = QString::number(asec) + "s";
+        }
+
+        m_label.at(STATE)->setText(text + ":" + ts);
     } else {
-        ts = QString::number(asec) + "s";
+        m_label.at(STATE)->setText(text);
     }
-
-    m_label.at(STATE)->setText(text + ":" + ts);
 }
 
 void WLabel::set_channel(int glbChId)

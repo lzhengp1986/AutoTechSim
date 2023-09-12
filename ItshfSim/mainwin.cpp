@@ -249,7 +249,7 @@ void MainWin::on_actStrategy_triggered(void)
     }
 
     /* 启动仿真 */
-    m_sim->start();
+    m_sim->start(m_time);
 }
 
 void MainWin::on_actDatabase_triggered(void)
