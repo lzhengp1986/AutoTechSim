@@ -10,12 +10,13 @@ MainWin::MainWin(QWidget *parent)
 {
     ui->setupUi(this);
     setup_win();
-    setup_time();
     setup_model();
     setup_sim();
 
     /* 更新参数 */
-    update_time(m_model);
+    int year = m_model->year;
+    int month = m_model->month;
+    m_sim->set_time(year, month);
     update_model(m_model);
 }
 
@@ -23,7 +24,6 @@ MainWin::~MainWin()
 {
     free_sim();
     free_model();
-    free_time();
     free_win();
     delete ui;
 }
@@ -103,103 +103,43 @@ void MainWin::free_model(void)
     m_model = nullptr;
 }
 
-// 设置time
-void MainWin::setup_time(void)
-{
-    m_time = new Time;
-    m_time->year = 2023;
-    m_time->month = 1;
-    m_time->day = 1;
-    m_time->hour = 1;
-    m_time->min = 0;
-    m_time->sec = 0;
-    m_time->msec = 0;
-
-    /* 定时器子线程 */
-    m_tmr = new QTimer;
-    m_thread = new QThread(this);
-    connect(m_tmr, SIGNAL(timeout()), this, SLOT(on_sim_timer_timeout()));
-    m_tmr->start(1000);
-    m_tmr->moveToThread(m_thread);
-    m_thread->start();
-}
-
-// 更新Time += sec
-void MainWin::update_time(int sec)
-{
-    m_time->sec += sec;
-    if (m_time->sec < 60) {
-        goto UPDATE_LABEL;
-    }
-
-    m_time->sec %= 60;
-    m_time->min++;
-    if (m_time->min < 60) {
-        goto UPDATE_LABEL;
-    }
-
-    m_time->min %= 60;
-    m_time->hour++;
-    if (m_time->hour < 24) {
-        goto UPDATE_LABEL;
-    }
-
-    m_time->hour -= 23;
-    m_time->day++;
-
-UPDATE_LABEL:
-    m_label->set_time(m_time);
-}
-
-// 更新Time
-void MainWin::update_time(const ModelCfg* cfg)
-{
-    m_time->year = cfg->year;
-    m_time->month = cfg->month;
-    m_time->day = 1;
-    m_time->hour = 1;
-    m_time->min = 0;
-    m_time->sec = 0;
-    m_time->msec = 0;
-    m_label->set_time(m_time);
-}
-
-// 释放time
-void MainWin::free_time(void)
-{
-    m_tmr->stop();
-    m_thread->quit();
-    delete m_tmr;
-    delete m_thread;
-    delete m_time;
-    m_tmr = nullptr;
-    m_thread = nullptr;
-    m_time = nullptr;
-}
-
 void MainWin::setup_sim(void)
 {
-    m_sim = new LinkSim;
+    /* 构造sim */
+    m_sim = new LinkSim(this);
+
+    /* 信号连接 */
+    connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
+    connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
+    connect(m_sim, SIGNAL(new_freq(int, int, int)), this, SLOT(on_new_freq(int, int, int)));
+
+    /* 启动线程 */
+    m_sim->start();
 }
 
 void MainWin::free_sim(void)
 {
+    m_sim->stop();
+    m_sim->quit();
     delete m_sim;
     m_sim = nullptr;
 }
 
-// 定时器超时处理
-void MainWin::on_sim_timer_timeout(void)
+void MainWin::on_new_time(const Time* ts)
 {
-    /* 更新时间 */
-    int speedIndex = m_sim->m_link->tmrSpeedIndex;
-    int speed = LinkDlg::timerSpeed(speedIndex);
-    update_time(speed);
+    m_label->set_time(ts);
+}
 
-    /* 建链仿真 */
-    int dsec = 0;
-    int state = m_sim->simulate(m_time, dsec);
+void MainWin::on_new_state(int state, int dsec)
+{
     m_label->set_state(state, dsec);
+}
+
+void MainWin::on_new_freq(int glbChId, int snr, int n0)
+{
+    m_label->set_channel(glbChId);
+    m_label->set_ratio(snr);
+    m_label->set_noise(n0);
 }
 
 void MainWin::on_actModel_triggered(void)
@@ -223,7 +163,9 @@ void MainWin::on_actModel_triggered(void)
         *m_model = cfg;
 
         /* 更新时间参数 */
-        update_time(m_model);
+        int year = m_model->year;
+        int month = m_model->month;
+        m_sim->set_time(year, month);
     }
 
     delete dlg;
@@ -249,7 +191,7 @@ void MainWin::on_actStrategy_triggered(void)
     }
 
     /* 启动仿真 */
-    m_sim->start(m_time);
+    m_sim->trigger();
 }
 
 void MainWin::on_actDatabase_triggered(void)

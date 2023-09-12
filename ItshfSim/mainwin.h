@@ -7,8 +7,6 @@
 #include "win/wlabel.h"
 #include "win/wchart.h"
 #include <QMainWindow>
-#include <QThread>
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWin; }
@@ -23,7 +21,10 @@ public:
     ~MainWin();
 
 private slots:
-    void on_sim_timer_timeout(void);
+    void on_new_time(const Time* ts);
+    void on_new_state(int state, int dsec);
+    void on_new_freq(int glbChId, int snr, int n0);
+
     void on_actModel_triggered(void);
     void on_actRequest_triggered(void);
     void on_actStrategy_triggered(void);
@@ -39,11 +40,6 @@ private:
     int update_model(const ModelCfg* cfg);
     void free_model(void);
 
-    void setup_time(void);
-    void update_time(int sec);
-    void update_time(const ModelCfg* cfg);
-    void free_time(void);
-
     void setup_sim(void);
     void free_sim(void);
 
@@ -55,11 +51,6 @@ private:
 
     /* ITS模型 */
     ModelCfg *m_model;
-
-    /* 定时器线程 */
-    Time *m_time;
-    QTimer *m_tmr;
-    QThread *m_thread;
 
     /* 仿真状态机 */
     LinkSim *m_sim;

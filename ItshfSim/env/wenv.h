@@ -49,6 +49,8 @@ public:
     ~WEnv(void);
 
     /* api */
+    static int glb2freq(int glbChId);
+
     /*! @brief 根据dialog选择的Model读出DB月份数据 */
     int setup(int month, const QString& fn);
 
@@ -58,7 +60,6 @@ public:
 private:
     int check(const ModelCfg* cfg, const EnvIn& in);
     bool calc(const ModelCfg* cfg, const EnvIn& in, EnvOut& out);
-    static int glb2freq(int glbChId);
 
 private:
     DbMonth m_dbMonth; /* 月DB模型 */

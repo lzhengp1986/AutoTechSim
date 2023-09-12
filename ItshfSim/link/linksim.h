@@ -5,27 +5,44 @@
 #include "linkdlg.h"
 #include "env/wenv.h"
 #include "auto/autodlg.h"
+#include <QThread>
+#include <QTimer>
 
-class LinkSim
+class LinkSim : public QThread
 {
+    Q_OBJECT
+
 public:
-    LinkSim(void);
+    LinkSim(QObject *parent = nullptr);
     ~LinkSim(void);
 
     /* api */
-    void quit(void);
-    void start(const Time* ts);
-    int simulate(const Time* ts, int& dsec);
+    void stop(void);
+    void trigger(void);
+    void set_time(int year, int month);
+    int simulate(int& dsec);
 
 private:
+    void setup_time(void);
+    void update_time(int sec);
+    void free_time(void);
+
     /*! @brief 各状态处理函数，返回状态倒计时 */
-    int sim_idle(const Time* ts, int& dsec);
-    int sim_scan(const Time* ts, int& dsec);
-    int sim_link(const Time* ts, int& dsec);
+    int sim_idle(int& dsec);
+    int sim_scan(int& dsec);
+    int sim_link(int& dsec);
     int second(const Time* ts);
 
     /*! @brief 在ts上累加plus秒，保存到hist中 */
-    void stamp(const Time* ts, int plus = 0);
+    void stamp(int plus = 0);
+
+private slots:
+    void on_timer_timeout(void);
+
+signals:
+    void new_time(const Time* ts);
+    void new_state(int state, int dsec);
+    void new_freq(int glbChId, int snr, int n0);
 
 public:
     /* 仿真配置 */
@@ -34,6 +51,11 @@ public:
     AutoCfg *m_auto;
 
 private:
+    /* 定时器线程 */
+    Time *m_stamp;
+    QTimer *m_timer;
+    QThread *m_subthr;
+
     /* 状态机 */
     FreqReq m_req;
     FreqRsp m_rsp;

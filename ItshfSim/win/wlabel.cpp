@@ -1,3 +1,4 @@
+#include "macro.h"
 #include "wlabel.h"
 #include <QDateTime>
 
@@ -120,7 +121,7 @@ void WLabel::set_noise(int n0)
 
 int WLabel::glb2freq(int glbChId)
 {
-    return (glbChId * 3 + 2000);
+    return (glbChId * ONE_CHN_BW + MIN_CHN_FREQ);
 }
 
 QString WLabel::int2str(int value)
