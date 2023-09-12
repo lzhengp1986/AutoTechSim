@@ -61,33 +61,55 @@ void LinkSim::setup_time(void)
     m_timer = new QTimer;
     m_subthr = new QThread(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(on_timer_timeout()));
-    m_timer->start(1000);
+    m_timer->start(TIMER_INTERVAL_MS);
     m_timer->moveToThread(m_subthr);
     m_subthr->start();
 }
 
 // 更新Time += sec
-void LinkSim::update_time(int sec)
+void LinkSim::update_time(int msec)
 {
-    m_stamp->sec += sec;
-    if (m_stamp->sec < 60) {
+    m_stamp->msec += msec;
+
+    /* 毫秒进位 */
+    if (m_stamp->msec >= 1000) {
+        do {
+            m_stamp->msec -= 1000;
+            m_stamp->sec++;
+        } while (m_stamp->msec >= 1000);
+    } else {
         goto UPDATE_LABEL;
     }
 
-    m_stamp->sec %= 60;
-    m_stamp->min++;
-    if (m_stamp->min < 60) {
+    /* 秒进位 */
+    if (m_stamp->sec >= 60) {
+        do {
+            m_stamp->sec -= 60;
+            m_stamp->min++;
+        } while (m_stamp->sec >= 60);
+    } else {
         goto UPDATE_LABEL;
     }
 
-    m_stamp->min %= 60;
-    m_stamp->hour++;
-    if (m_stamp->hour < 24) {
+    /* 分钟进位 */
+    if (m_stamp->min >= 60) {
+        do {
+            m_stamp->min -= 60;
+            m_stamp->hour++;
+        } while (m_stamp->min >= 60);
+    } else {
         goto UPDATE_LABEL;
     }
 
-    m_stamp->hour -= 23;
-    m_stamp->day++;
+    /* 小时进位 */
+    if (m_stamp->hour > 24) {
+        do {
+            m_stamp->hour -= 24;
+            m_stamp->day++;
+        } while (m_stamp->hour > 24);
+    } else {
+        goto UPDATE_LABEL;
+    }
 
 UPDATE_LABEL:
     emit new_time(m_stamp);
@@ -125,7 +147,7 @@ void LinkSim::on_timer_timeout(void)
     /* 更新时间 */
     int speedIndex = m_link->tmrSpeedIndex;
     int speed = LinkDlg::timerSpeed(speedIndex);
-    update_time(speed);
+    update_time(speed * TIMER_INTERVAL_MS);
 
     /* 建链仿真 */
     int dsec = 0;

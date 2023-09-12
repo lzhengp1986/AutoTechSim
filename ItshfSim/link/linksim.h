@@ -8,6 +8,9 @@
 #include <QThread>
 #include <QTimer>
 
+/* 定时器最小精度 */
+#define TIMER_INTERVAL_MS 200
+
 class LinkSim : public QThread
 {
     Q_OBJECT
@@ -24,7 +27,7 @@ public:
 
 private:
     void setup_time(void);
-    void update_time(int sec);
+    void update_time(int msec);
     void free_time(void);
 
     /*! @brief 各状态处理函数，返回状态倒计时 */
