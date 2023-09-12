@@ -45,9 +45,10 @@ int LinkSim::simulate(const Time* ts, int& dsec)
 // idle
 void LinkSim::sim_idle(const Time* ts, int& dsec)
 {
-    dsec = second(ts) - second(&m_hist);
+    int diff = second(ts) - second(&m_hist);
     int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    if (dsec < svcIntv) {
+    dsec = svcIntv - diff;
+    if (dsec > 0) {
         return;
     }
 
@@ -73,9 +74,10 @@ void LinkSim::sim_idle(const Time* ts, int& dsec)
 // scan
 void LinkSim::sim_scan(const Time* ts, int& dsec)
 {
-    dsec = second(ts) - second(&m_hist);
+    int diff = second(ts) - second(&m_hist);
     int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
-    if (dsec < scanIntv) {
+    dsec = scanIntv - diff;
+    if (dsec > 0) {
         return;
     }
 
