@@ -11,8 +11,8 @@ WLabel::WLabel(void)
     }
 
     /* 版本 */
-    m_label.at(VERSION)->setText("version1.0");
-    m_label.at(VERSION)->setMinimumWidth(70);
+    m_label.at(VERSION)->setText("ver1.0");
+    m_label.at(VERSION)->setStyleSheet("background-color:yellow");
 
     /* 时戳 */
     QDateTime ts = QDateTime::currentDateTime();
@@ -24,7 +24,7 @@ WLabel::WLabel(void)
     m_label.at(STATE)->setStyleSheet("color:blue;font-weight:bold");
     m_label.at(STATE)->setMinimumWidth(30);
     m_label.at(STATE)->setText("WAIT");
-    m_label.at(COUNTDOWN)->setStyleSheet("color:green");
+    m_label.at(COUNTDOWN)->setStyleSheet("color:blue");
     m_label.at(COUNTDOWN)->setMinimumWidth(30);
     m_label.at(COUNTDOWN)->setText("*");
 
@@ -32,7 +32,6 @@ WLabel::WLabel(void)
     m_label.at(CHAN_NAME)->setText("glbChId");
     m_label.at(CHAN_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_NAME)->setText("fc");
-    m_label.at(FREQ_NAME)->setStyleSheet("font-weight:bold");
     m_label.at(FREQ_VALUE)->setStyleSheet("color:red");
     m_label.at(FREQ_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_UNIT)->setText("KHz");
@@ -40,7 +39,6 @@ WLabel::WLabel(void)
 
     /* SNR */
     m_label.at(SNR_NAME)->setText("SNR");
-    m_label.at(SNR_NAME)->setStyleSheet("font-weight:bold");
     m_label.at(SNR_VALUE)->setStyleSheet("color:red");
     m_label.at(SNR_VALUE)->setMinimumWidth(30);
     m_label.at(SNR_UNIT)->setText("dB");
@@ -48,7 +46,6 @@ WLabel::WLabel(void)
 
     /* Noise */
     m_label.at(NOISE_NAME)->setText("N0");
-    m_label.at(NOISE_NAME)->setStyleSheet("font-weight:bold");
     m_label.at(NOISE_VALUE)->setStyleSheet("color:red");
     m_label.at(NOISE_VALUE)->setMinimumWidth(30);
     m_label.at(NOISE_UNIT)->setText("dBm");
