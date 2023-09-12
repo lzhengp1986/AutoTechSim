@@ -12,3 +12,12 @@ AutoDlg::~AutoDlg()
 {
     delete ui;
 }
+
+void AutoDlg::dlg2para(AutoCfg* cfg)
+{
+}
+
+void AutoDlg::para2dlg(const AutoCfg* cfg)
+{
+}
+

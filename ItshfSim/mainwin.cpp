@@ -9,23 +9,17 @@ MainWin::MainWin(QWidget *parent)
     , ui(new Ui::MainWin)
 {
     ui->setupUi(this);
-    m_state = INIT;
     setup_win();
-    setup_env();
     setup_time();
     setup_model();
-    setup_link();
-    setup_auto();
+    setup_sim();
 }
 
 MainWin::~MainWin()
 {
-    m_state = INIT;
-    free_auto();
-    free_link();
+    free_sim();
     free_model();
     free_time();
-    free_env();
     free_win();
     delete ui;
 }
@@ -53,19 +47,6 @@ void MainWin::free_win(void)
     delete m_chart;
     m_label = nullptr;
     m_chart = nullptr;
-}
-
-// 设置env
-void MainWin::setup_env(void)
-{
-    m_env = new WEnv;
-}
-
-// 释放env
-void MainWin::free_env(void)
-{
-    delete m_env;
-    m_env = nullptr;
 }
 
 // 设置Model
@@ -100,7 +81,7 @@ int MainWin::update_model(const ModelCfg* cfg)
 
     /* 更新数据库 */
     QString dbFile = prefix + "/voacapx.db";
-    int rc = m_env->setup(month, dbFile);
+    int rc = m_sim->m_env->setup(month, dbFile);
     if (rc != 0) {
         QMessageBox::warning(this, "Warning", "Fail to setup model!");
         return rc;
@@ -192,124 +173,28 @@ void MainWin::free_time(void)
     m_time = nullptr;
 }
 
-// 配置link
-void MainWin::setup_link(void)
+void MainWin::setup_sim(void)
 {
-    m_link = new LinkCfg;
-    m_link->fcNumIndex = 0; /* 10 */
-    m_link->tmrSpeedIndex = 0; /* x1 */
-    m_link->scanIntvIndex = 0; /* 2sec */
-    m_link->svcIntvIndex = 0; /* random */
-    memset(&m_hist, 0, sizeof(Time));
-    m_hist.year = 2023;
+    m_sim = new LinkSim;
 }
 
-// 释放link
-void MainWin::free_link(void)
+void MainWin::free_sim(void)
 {
-    delete m_link;
-    m_link = nullptr;
-}
-
-// 配置auto
-void MainWin::setup_auto(void)
-{
-    m_auto = new AutoCfg;
-    m_auto->algId = 0;
-}
-
-// 释放auto
-void MainWin::free_auto(void)
-{
-    delete m_auto;
-    m_auto = nullptr;
-}
-
-// 主调度函数
-void MainWin::simulate(const Time* ts)
-{
-    switch (m_state) {
-    case IDLE: sim_idle(ts); break;
-    case SCAN: sim_scan(ts); break;
-    case LINK: sim_link(ts); break;
-    }
-}
-
-// idle
-void MainWin::sim_idle(const Time* ts)
-{
-    int diff = second(ts) - second(&m_hist);
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    if (diff < svcIntv) {
-        return;
-    }
-
-    m_hist = *ts;
-    m_req.head.type = MSG_FREQ_REQ;
-    /* call alg */
-    int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
-    m_rsp.head.type = MSG_FREQ_RSP;
-    m_rsp.num = fcNum;
-    m_rsp.fc[0] = 50;
-    m_rsp.fc[1] = 1800;
-    m_rsp.fc[2] = 2400;
-    m_rsp.fc[3] = 3200;
-    m_rsp.fc[4] = 5000;
-    m_rsp.fc[5] = 250;
-    m_rsp.fc[6] = 4800;
-    m_rsp.fc[7] = 7400;
-    m_rsp.fc[8] = 2200;
-    m_rsp.fc[9] = 8000;
-    m_label->set_state(SCAN);
-    m_state = SCAN;
-}
-
-// scan
-void MainWin::sim_scan(const Time* ts)
-{
-    int diff = second(ts) - second(&m_hist);
-    int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
-    if (diff < scanIntv) {
-        return;
-    }
-
-    m_hist = *ts;
-    int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    m_hist.sec += 10 + qrand() % svcIntv;
-    m_label->set_state(LINK);
-    m_state = LINK;
-}
-
-// link
-void MainWin::sim_link(const Time* ts)
-{
-    int diff = second(ts) - second(&m_hist);
-    if (diff < 0) {
-        return;
-    }
-
-    m_label->set_state(IDLE);
-    m_state = IDLE;
-}
-
-// 秒计数
-int MainWin::second(const Time* ts)
-{
-    int day = (ts->year - 2020) * 366 + ts->month * 31 + ts->day;
-    int hour = day * 24 + ts->hour;
-    int min = hour * 60 + ts->min;
-    int sec = min * 60 + ts->sec;
-    return sec;
+    delete m_sim;
+    m_sim = nullptr;
 }
 
 // 定时器超时处理
 void MainWin::on_sim_timer_timeout(void)
 {
-    /* 更新当前时间 */
-    int speedIndex = m_link->tmrSpeedIndex;
+    /* 更新时间 */
+    int speedIndex = m_sim->m_link->tmrSpeedIndex;
     int speed = LinkDlg::timerSpeed(speedIndex);
     update_time(speed);
-    simulate(m_time);
+
+    /* 建链仿真 */
+    int state = m_sim->simulate(m_time);
+    m_label->set_state(state);
 }
 
 void MainWin::on_actModel_triggered(void)
@@ -342,17 +227,25 @@ void MainWin::on_actModel_triggered(void)
 void MainWin::on_actRequest_triggered(void)
 {
     LinkDlg* dlg = new LinkDlg(this);
-    dlg->para2dlg(m_link);
+    dlg->para2dlg(m_sim->m_link);
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
-        dlg->dlg2para(m_link);
+        dlg->dlg2para(m_sim->m_link);
     }
 }
 
 void MainWin::on_actStrategy_triggered(void)
 {
+    AutoDlg* dlg = new AutoDlg(this);
+    dlg->para2dlg(m_sim->m_auto);
+    int ret = dlg->exec();
+    if (ret == QDialog::Accepted) {
+        dlg->dlg2para(m_sim->m_auto);
+    }
+
+    /* 启动仿真 */
     m_label->set_state(IDLE);
-    m_state = IDLE;
+    m_sim->start();
 }
 
 void MainWin::on_actDatabase_triggered(void)

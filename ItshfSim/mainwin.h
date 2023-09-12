@@ -2,10 +2,8 @@
 #define MAINWIN_H
 
 #include "type.h"
-#include "env/wenv.h"
 #include "env/modeldlg.h"
-#include "link/linkdlg.h"
-#include "auto/autodlg.h"
+#include "link/linksim.h"
 #include "win/wlabel.h"
 #include "win/wchart.h"
 #include <QMainWindow>
@@ -36,8 +34,6 @@ private slots:
 private:
     void setup_win(void);
     void free_win(void);
-    void setup_env(void);
-    void free_env(void);
 
     void setup_model(void);
     int update_model(const ModelCfg* cfg);
@@ -48,16 +44,8 @@ private:
     void update_time(const ModelCfg* cfg);
     void free_time(void);
 
-    void setup_link(void);
-    void free_link(void);
-    void setup_auto(void);
-    void free_auto(void);
-
-    void simulate(const Time* ts);
-    void sim_idle(const Time* ts);
-    void sim_scan(const Time* ts);
-    void sim_link(const Time* ts);
-    int second(const Time* ts);
+    void setup_sim(void);
+    void free_sim(void);
 
 private:
     /* 主窗口 */
@@ -66,7 +54,6 @@ private:
     WChart *m_chart;
 
     /* ITS模型 */
-    WEnv *m_env;
     ModelCfg *m_model;
 
     /* 定时器线程 */
@@ -74,14 +61,7 @@ private:
     QTimer *m_tmr;
     QThread *m_thread;
 
-    /* 仿真配置 */
-    LinkCfg *m_link;
-    AutoCfg *m_auto;
-    FreqReq m_req;
-    FreqRsp m_rsp;
-    Time m_hist;
-
-    /* 状态机 */
-    int m_state;
+    /* 仿真状态机 */
+    LinkSim *m_sim;
 };
 #endif // MAINWIN_H

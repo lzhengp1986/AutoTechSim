@@ -20,6 +20,10 @@ public:
     explicit AutoDlg(QWidget *parent = nullptr);
     ~AutoDlg();
 
+    /* api */
+    void dlg2para(AutoCfg* cfg);
+    void para2dlg(const AutoCfg* cfg);
+
 private:
     Ui::AutoDlg *ui;
 };
