@@ -11,16 +11,18 @@ MainWin::MainWin(QWidget *parent)
     ui->setupUi(this);
     setup_win();
     setup_time();
-
-    /* 顺序依赖 */
-    setup_sim();
     setup_model();
+    setup_sim();
+
+    /* 更新参数 */
+    update_time(m_model);
+    update_model(m_model);
 }
 
 MainWin::~MainWin()
 {
-    free_model();
     free_sim();
+    free_model();
     free_time();
     free_win();
     delete ui;
@@ -64,8 +66,6 @@ void MainWin::setup_model(void)
 
     m_model->dbIndex = 0;
     m_model->bandIndex = 0;
-    update_model(m_model);
-    update_time(m_model);
 }
 
 // 更新Model
