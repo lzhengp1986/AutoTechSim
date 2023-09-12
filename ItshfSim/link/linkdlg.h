@@ -1,6 +1,7 @@
 #ifndef LINKDLG_H
 #define LINKDLG_H
 
+#include "macro.h"
 #include <QDialog>
 
 namespace Ui {
@@ -72,7 +73,7 @@ inline int LinkDlg::svcIntv(int index)
     case 5: svcIntv = 30; break;
     case 6: svcIntv = 60; break;
     case 7: svcIntv = 120; break;
-    default: svcIntv = (qrand() % 10 + 1); break;
+    default: svcIntv = ABS(qrand() % 10 + 1); break;
     }
     return (svcIntv * 60);
 }

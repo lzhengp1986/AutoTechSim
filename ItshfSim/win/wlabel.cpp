@@ -11,7 +11,7 @@ WLabel::WLabel(void)
 
     /* 版本 */
     m_label.at(VERSION)->setText("version1.0");
-    m_label.at(VERSION)->setMinimumWidth(80);
+    m_label.at(VERSION)->setMinimumWidth(70);
 
     /* 时戳 */
     QDateTime ts = QDateTime::currentDateTime();
@@ -20,7 +20,7 @@ WLabel::WLabel(void)
     m_label.at(STAMP)->setText(stamp);
 
     /* 状态 */
-    m_label.at(STATE)->setMinimumWidth(30);
+    m_label.at(STATE)->setMinimumWidth(60);
     m_label.at(STATE)->setText("INIT");
 
     /* 信道 */
@@ -70,16 +70,27 @@ void WLabel::set_time(const Time* ts)
     m_label.at(STAMP)->setText(stamp);
 }
 
-void WLabel::set_state(int state)
+void WLabel::set_state(int state, int dsec)
 {
+    /* 状态 */
+    QString text;
     switch (state) {
-    case INIT: m_label.at(STATE)->setText("INIT"); break;
-    case IDLE: m_label.at(STATE)->setText("IDLE"); break;
-    case WAIT: m_label.at(STATE)->setText("WAIT"); break;
-    case SCAN: m_label.at(STATE)->setText("SCAN"); break;
-    case LINK: m_label.at(STATE)->setText("LINK"); break;
-    default: m_label.at(STATE)->setText("IDLE"); break;
+    case IDLE: text = "IDLE"; break;
+    case SCAN: text = "SCAN"; break;
+    case LINK: text = "LINK"; break;
+    default: text = "INIT"; break;
     }
+
+    /* 倒计时 */
+    QString ts;
+    int asec = ABS(dsec);
+    if (asec > 60) {
+        ts = QString::number(asec / 60) + "m";
+    } else {
+        ts = QString::number(asec) + "s";
+    }
+
+    m_label.at(STATE)->setText(text + ":" + ts);
 }
 
 void WLabel::set_channel(int glbChId)

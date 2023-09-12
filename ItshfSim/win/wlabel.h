@@ -12,8 +12,8 @@ public:
 
     /* api */
     QLabel* get_label(int index) const;
+    void set_state(int state, int dsec);
     void set_time(const Time* ts);
-    void set_state(int state);
     void set_channel(int glbChId);
     void set_ratio(int snr);
     void set_noise(int n0);

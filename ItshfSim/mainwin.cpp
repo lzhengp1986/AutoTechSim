@@ -113,6 +113,7 @@ void MainWin::setup_time(void)
     m_time->hour = 1;
     m_time->min = 0;
     m_time->sec = 0;
+    m_time->msec = 0;
 
     /* 定时器子线程 */
     m_tmr = new QTimer;
@@ -131,13 +132,13 @@ void MainWin::update_time(int sec)
         goto UPDATE_LABEL;
     }
 
-    m_time->sec -= 60;
+    m_time->sec %= 60;
     m_time->min++;
     if (m_time->min < 60) {
         goto UPDATE_LABEL;
     }
 
-    m_time->min -= 60;
+    m_time->min %= 60;
     m_time->hour++;
     if (m_time->hour < 24) {
         goto UPDATE_LABEL;
@@ -159,6 +160,7 @@ void MainWin::update_time(const ModelCfg* cfg)
     m_time->hour = 1;
     m_time->min = 0;
     m_time->sec = 0;
+    m_time->msec = 0;
     m_label->set_time(m_time);
 }
 
@@ -195,8 +197,9 @@ void MainWin::on_sim_timer_timeout(void)
     update_time(speed);
 
     /* 建链仿真 */
-    int state = m_sim->simulate(m_time);
-    m_label->set_state(state);
+    int dsec = 0;
+    int state = m_sim->simulate(m_time, dsec);
+    m_label->set_state(state, dsec);
 }
 
 void MainWin::on_actModel_triggered(void)
@@ -246,7 +249,6 @@ void MainWin::on_actStrategy_triggered(void)
     }
 
     /* 启动仿真 */
-    m_label->set_state(IDLE);
     m_sim->start();
 }
 

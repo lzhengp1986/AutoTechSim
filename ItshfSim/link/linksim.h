@@ -15,12 +15,12 @@ public:
     /* api */
     void quit(void);
     void start(void);
-    int simulate(const Time* ts);
+    int simulate(const Time* ts, int& dsec);
 
 private:
-    void sim_idle(const Time* ts);
-    void sim_scan(const Time* ts);
-    void sim_link(const Time* ts);
+    void sim_idle(const Time* ts, int& dsec);
+    void sim_scan(const Time* ts, int& dsec);
+    void sim_link(const Time* ts, int& dsec);
     int second(const Time* ts);
 
 public:

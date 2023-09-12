@@ -11,6 +11,7 @@ typedef struct {
     int hour; /* 小时(1~24) */
     int min; /* 分(0~59) */
     int sec; /* 秒(0~59) */
+    int msec; /* 毫秒 */
 } Time;
 
 // 状态机

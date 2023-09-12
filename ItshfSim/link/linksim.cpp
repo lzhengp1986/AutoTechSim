@@ -32,23 +32,23 @@ LinkSim::~LinkSim(void)
 }
 
 // 主调度函数
-int LinkSim::simulate(const Time* ts)
+int LinkSim::simulate(const Time* ts, int& dsec)
 {
     switch (m_state) {
-    case IDLE: sim_idle(ts); break;
-    case SCAN: sim_scan(ts); break;
-    case LINK: sim_link(ts); break;
+    case IDLE: sim_idle(ts, dsec); break;
+    case SCAN: sim_scan(ts, dsec); break;
+    case LINK: sim_link(ts, dsec); break;
     }
 
     return m_state;
 }
 
 // idle
-void LinkSim::sim_idle(const Time* ts)
+void LinkSim::sim_idle(const Time* ts, int& dsec)
 {
-    int diff = second(ts) - second(&m_hist);
+    dsec = second(ts) - second(&m_hist);
     int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    if (diff < svcIntv) {
+    if (dsec < svcIntv) {
         return;
     }
 
@@ -72,25 +72,25 @@ void LinkSim::sim_idle(const Time* ts)
 }
 
 // scan
-void LinkSim::sim_scan(const Time* ts)
+void LinkSim::sim_scan(const Time* ts, int& dsec)
 {
-    int diff = second(ts) - second(&m_hist);
+    dsec = second(ts) - second(&m_hist);
     int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
-    if (diff < scanIntv) {
+    if (dsec < scanIntv) {
         return;
     }
 
     m_hist = *ts;
     int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
-    m_hist.sec += 10 + qrand() % svcIntv;
+    m_hist.sec += ABS(10 + qrand() % svcIntv);
     m_state = LINK;
 }
 
 // link
-void LinkSim::sim_link(const Time* ts)
+void LinkSim::sim_link(const Time* ts, int& dsec)
 {
-    int diff = second(ts) - second(&m_hist);
-    if (diff < 0) {
+    dsec = second(ts) - second(&m_hist);
+    if (dsec < 0) {
         return;
     }
 
