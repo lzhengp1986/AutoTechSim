@@ -55,8 +55,6 @@ public:
     ~WEnv(void);
 
     /* api */
-    static int glb2freq(int glbChId);
-
     /*! @brief 根据dialog选择的Model读出DB月份数据 */
     int setup(int month, int maxband, const QString& fn);
 
@@ -72,11 +70,5 @@ private:
     DbMonth m_dbMonth; /* 月DB模型 */
     RandMng m_rand; /* 随机数发生器 */
 };
-
-/* inline */
-inline int WEnv::glb2freq(int glbChId)
-{
-    return (glbChId * ONE_CHN_BW + MIN_CHN_FREQ);
-}
 
 #endif // WENV_H

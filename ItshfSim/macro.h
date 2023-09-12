@@ -18,5 +18,6 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define ABS(a) ((a) > 0 ? (a) : -(a))
+#define GLB2FREQ(g) ((g) * ONE_CHN_BW + MIN_CHN_FREQ)
 
 #endif // MACRO_H

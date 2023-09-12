@@ -28,7 +28,6 @@ public:
 
 private:
     QString int2str(int value);
-    int glb2freq(int glbChId);
 
 private:
     QList<QLabel*> m_label;

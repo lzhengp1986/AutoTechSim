@@ -47,7 +47,7 @@ private slots:
 signals:
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
-    void new_chan(int glbChId, int snr, int n0);
+    void new_chan(float hour, int glbChId, int snr, int n0);
 
 public:
     /* 仿真配置 */

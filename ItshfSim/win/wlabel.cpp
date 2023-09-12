@@ -42,14 +42,14 @@ WLabel::WLabel(void)
     m_label.at(SNR_VALUE)->setStyleSheet("color:red");
     m_label.at(SNR_VALUE)->setMinimumWidth(30);
     m_label.at(SNR_UNIT)->setText("dB");
-    set_ratio(-10);
+    set_ratio(MIN_SNR);
 
     /* Noise */
     m_label.at(NOISE_NAME)->setText("N0");
     m_label.at(NOISE_VALUE)->setStyleSheet("color:red");
     m_label.at(NOISE_VALUE)->setMinimumWidth(30);
     m_label.at(NOISE_UNIT)->setText("dBm");
-    set_noise(-120);
+    set_noise(MIN_PN0);
 }
 
 WLabel::~WLabel(void)
@@ -112,7 +112,7 @@ void WLabel::set_state(int state, int dsec)
 
 void WLabel::set_channel(int glbChId)
 {
-    int fc = glb2freq(glbChId);
+    int fc = GLB2FREQ(glbChId);
     m_label.at(FREQ_VALUE)->setText(int2str(fc));
     m_label.at(CHAN_VALUE)->setText(int2str(glbChId));
 }
@@ -125,11 +125,6 @@ void WLabel::set_ratio(int snr)
 void WLabel::set_noise(int n0)
 {
     m_label.at(NOISE_VALUE)->setText(int2str(n0));
-}
-
-int WLabel::glb2freq(int glbChId)
-{
-    return (glbChId * ONE_CHN_BW + MIN_CHN_FREQ);
 }
 
 QString WLabel::int2str(int value)

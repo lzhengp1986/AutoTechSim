@@ -193,16 +193,16 @@ int LinkSim::sim_idle(int& dsec)
     FreqRsp* rsp = &m_rsp;
     rsp->head.type = MSG_FREQ_RSP;
     rsp->total = RSP_FREQ_NUM;
-    rsp->glb[0] = 50;
-    rsp->glb[1] = 1800;
-    rsp->glb[2] = 2400;
-    rsp->glb[3] = 3200;
-    rsp->glb[4] = 5000;
-    rsp->glb[5] = 250;
-    rsp->glb[6] = 4800;
-    rsp->glb[7] = 7400;
-    rsp->glb[8] = 2200;
-    rsp->glb[9] = 8000;
+    rsp->glb[0] = qrand() % MAX_GLB_CHN;
+    rsp->glb[1] = qrand() % MAX_GLB_CHN;
+    rsp->glb[2] = qrand() % MAX_GLB_CHN;
+    rsp->glb[3] = qrand() % MAX_GLB_CHN;
+    rsp->glb[4] = qrand() % MAX_GLB_CHN;
+    rsp->glb[5] = qrand() % MAX_GLB_CHN;
+    rsp->glb[6] = qrand() % MAX_GLB_CHN;
+    rsp->glb[7] = qrand() % MAX_GLB_CHN;
+    rsp->glb[8] = qrand() % MAX_GLB_CHN;
+    rsp->glb[9] = qrand() % MAX_GLB_CHN;
 
     /* 切换状态 */
     stamp(1);
@@ -235,7 +235,8 @@ int LinkSim::sim_scan(int& dsec)
         int flag = m_env->env(in, out);
 
         /* 将scan结果发到MainWin */
-        emit new_chan(glbChId, out.snr, out.n0);
+        float hour = m_stamp->hour + m_stamp->min / 60.0f;
+        emit new_chan(hour, glbChId, out.snr, out.n0);
 
         /* TODO 将scan结果发到alg */
 
@@ -276,9 +277,11 @@ int LinkSim::sim_link(int& dsec)
         int flag = m_env->env(in, out);
         if ((flag == ENV_OK) && (out.flag == true)) {
             /* 将link结果发到MainWin */
-            emit new_chan(glbChId, out.snr, out.n0);
+            float hour = m_stamp->hour + m_stamp->min / 60.0f;
+            emit new_chan(hour, glbChId, out.snr, out.n0);
 
             /* TODO 将link结果发到alg */
+
         } else { /* 断链 */
             stamp();
             return IDLE;

@@ -9,8 +9,8 @@ MainWin::MainWin(QWidget *parent)
     , ui(new Ui::MainWin)
 {
     ui->setupUi(this);
-    setup_win();
     setup_model();
+    setup_win();
     setup_sim();
 
     /* 更新参数 */
@@ -23,8 +23,8 @@ MainWin::MainWin(QWidget *parent)
 MainWin::~MainWin()
 {
     free_sim();
-    free_model();
     free_win();
+    free_model();
     delete ui;
 }
 
@@ -112,7 +112,7 @@ void MainWin::setup_sim(void)
     /* 信号连接 */
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_chan(int, int, int)), this, SLOT(on_new_chan(int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(float, int, int, int)), this, SLOT(on_new_chan(float, int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
@@ -136,9 +136,11 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_chan(int glbChId, int snr, int n0)
+void MainWin::on_new_chan(float hour, int glbChId, int snr, int n0)
 {
-    /* TODO 绘图 */
+    /* 绘图 */
+    float fc = GLB2FREQ(glbChId) / 1000.0f;
+    m_chart->plot(hour, fc, snr);
 
     /* 状态栏显示 */
     m_label->set_channel(glbChId);

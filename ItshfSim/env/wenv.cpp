@@ -123,7 +123,7 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
 
     /* 是否在可通频带 */
     int glbChId = in.glbChId;
-    int fc = glb2freq(glbChId);
+    int fc = GLB2FREQ(glbChId);
     if ((fc < min) || (fc > max)) {
         return ENV_INV_GLB;
     }
