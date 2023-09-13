@@ -113,6 +113,7 @@ void MainWin::setup_sim(void)
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
     connect(m_sim, SIGNAL(new_chan(float, int, int, int)), this, SLOT(on_new_chan(float, int, int, int)));
+    connect(m_sim, SIGNAL(new_sts(int, int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
@@ -148,6 +149,14 @@ void MainWin::on_new_chan(float hour, int glbChId, int snr, int n0)
     m_label->set_noise(n0);
 }
 
+void MainWin::on_new_sts(int scanTry, int scanNum, int linkNum, int testNum)
+{
+    ui->avgScanTry->setText(QString::number(scanTry));
+    ui->totalScanNum->setText(QString::number(scanNum));
+    ui->totalLinkNum->setText(QString::number(linkNum));
+    ui->totalTestNum->setText(QString::number(testNum));
+}
+
 void MainWin::on_actModel_triggered(void)
 {
     m_sim->stop();
@@ -178,27 +187,18 @@ void MainWin::on_actModel_triggered(void)
     delete dlg;
 }
 
-void MainWin::on_actRequest_triggered(void)
+void MainWin::on_actStrategy_triggered(void)
 {
+    /* 配置参数 */
     LinkDlg* dlg = new LinkDlg(this);
     dlg->para2dlg(m_sim->m_link);
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
         dlg->dlg2para(m_sim->m_link);
-    }
-}
 
-void MainWin::on_actStrategy_triggered(void)
-{
-    AutoDlg* dlg = new AutoDlg(this);
-    dlg->para2dlg(m_sim->m_auto);
-    int ret = dlg->exec();
-    if (ret == QDialog::Accepted) {
-        dlg->dlg2para(m_sim->m_auto);
+        /* 启动仿真 */
+        m_sim->trigger();
     }
-
-    /* 启动仿真 */
-    m_sim->trigger();
 }
 
 void MainWin::on_actDatabase_triggered(void)

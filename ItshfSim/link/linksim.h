@@ -5,7 +5,7 @@
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"
-#include "auto/autodlg.h"
+#include "auto/autosim.h"
 #include <QThread>
 #include <QTimer>
 
@@ -36,10 +36,7 @@ private:
     int sim_scan(int& dsec);
     int sim_link(int& dsec);
     int second(const Time* ts);
-
-    /*! @brief 超时时戳 */
     void stamp(int plus);
-    void stamp(void);
 
 private slots:
     void on_timer_timeout(void);
@@ -48,12 +45,13 @@ signals:
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
     void new_chan(float hour, int glbChId, int snr, int n0);
+    void new_sts(int scanTry, int scanNum, int linkNum, int testNum);
 
 public:
     /* 仿真配置 */
     WEnv *m_env;
     LinkCfg *m_link;
-    AutoCfg *m_auto;
+    AutoSim *m_auto;
 
 private:
     /* 定时器线程 */
@@ -66,6 +64,12 @@ private:
     FreqRsp m_rsp;
     Time m_hist;
     int m_state;
+
+    /* 统计值 */
+    unsigned m_linkNum; /* 建链总次数 */
+    unsigned m_scanFrq; /* 总扫频频点数 */
+    unsigned m_scanNum; /* 扫频总次数 */
+    unsigned m_testNum; /* 测试总次数 */
 };
 
 #endif // LINKSIM_H

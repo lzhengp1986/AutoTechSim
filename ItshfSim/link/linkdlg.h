@@ -10,9 +10,11 @@ class LinkDlg;
 
 typedef struct {
     int tmrSpeedIndex; /* 定时速度 */
+    int idleIntvIndex; /* 业务间隔 */
     int scanIntvIndex; /* 扫频间隔 */
     int svcIntvIndex; /* 业务间隔 */
     int fcNumIndex; /* 单次请求频点个数 */
+    int algIndex; /* 算法索引 */
 } LinkCfg;
 
 class LinkDlg : public QDialog
@@ -28,6 +30,7 @@ public:
     void para2dlg(const LinkCfg* cfg);
 
     static int timerSpeed(int index);
+    static int idleIntv(int index);
     static int scanIntv(int index);
     static int svcIntv(int index);
     static int fcNum(int index);
@@ -66,16 +69,38 @@ inline int LinkDlg::svcIntv(int index)
 {
     int svcIntv = 0;
     switch (index) {
-    case 1: svcIntv = 2; break;
-    case 2: svcIntv = 5; break;
-    case 3: svcIntv = 10; break;
-    case 4: svcIntv = 20; break;
-    case 5: svcIntv = 30; break;
-    case 6: svcIntv = 60; break;
-    case 7: svcIntv = 120; break;
-    default: svcIntv = ABS(qrand() % 10 + 1); break;
+    case 0: svcIntv = ABS(qrand() % 5 + 1); break;
+    case 1: svcIntv = ABS(qrand() % 10 + 1); break;
+    case 2: svcIntv = 2; break;
+    case 3: svcIntv = 5; break;
+    case 4: svcIntv = 10; break;
+    case 5: svcIntv = 20; break;
+    case 6: svcIntv = 30; break;
+    case 7: svcIntv = 60; break;
+    case 8: svcIntv = 120; break;
+    default: svcIntv = 2; break;
     }
     return (svcIntv * 60);
+}
+
+inline int LinkDlg::idleIntv(int index)
+{
+    int idleIntv = 0;
+    switch (index) {
+    case 0: idleIntv = ABS(qrand() % 5 + 1); break;
+    case 1: idleIntv = ABS(qrand() % 10 + 1); break;
+    case 2: idleIntv = 1; break;
+    case 3: idleIntv = 2; break;
+    case 4: idleIntv = 5; break;
+    case 5: idleIntv = 10; break;
+    case 6: idleIntv = 20; break;
+    case 7: idleIntv = 30; break;
+    case 8: idleIntv = 60; break;
+    case 9: idleIntv = 120; break;
+    case 10: idleIntv = 240; break;
+    default: idleIntv = 1; break;
+    }
+    return (idleIntv * 60);
 }
 
 inline int LinkDlg::fcNum(int index)

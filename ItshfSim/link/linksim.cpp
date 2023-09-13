@@ -5,6 +5,7 @@ LinkSim::LinkSim(QObject *parent)
 {
     /* ITS仿真环境 */
     m_env = new WEnv;
+    m_state = WAIT;
 
     /* link */
     m_link = new LinkCfg;
@@ -12,11 +13,17 @@ LinkSim::LinkSim(QObject *parent)
     m_link->tmrSpeedIndex = 0; /* x1 */
     m_link->scanIntvIndex = 0; /* 2sec */
     m_link->svcIntvIndex = 0; /* random */
+    m_link->idleIntvIndex = 0; /* random */
+    m_link->algIndex = 0; /* random */
 
     /* auto */
-    m_auto = new AutoCfg;
-    m_auto->algId = 0;
-    m_state = WAIT;
+    m_auto = new AutoSim;
+
+    /* 统计值 */
+    m_linkNum = 0;
+    m_scanNum = 0;
+    m_scanFrq = 0;
+    m_testNum = 0;
 
     /* 定时器 */
     setup_time();
@@ -183,6 +190,10 @@ int LinkSim::sim_idle(int& dsec)
         return IDLE;
     }
 
+    /* 更新统计 */
+    int tryFcNum = (m_scanFrq + m_scanNum - 1) / m_scanNum;
+    emit new_sts(tryFcNum, m_scanNum, m_linkNum, m_testNum);
+
     /* 构造频率请求消息 */
     FreqReq* req = &m_req;
     int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
@@ -206,6 +217,7 @@ int LinkSim::sim_idle(int& dsec)
 
     /* 切换状态 */
     stamp(1);
+    m_testNum++;
     m_rsp.used = 0;
     return SCAN;
 }
@@ -242,6 +254,12 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 状态切换: LINK or SCAN */
         if ((flag == ENV_OK) && (out.flag == true)) {
+            /* 统计 */
+            m_scanFrq += (rsp->used + 1);
+            m_scanNum++;
+            m_linkNum++;
+
+            /* 超时打点 */
             int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
             stamp(svcIntv);
             return LINK;
@@ -251,7 +269,13 @@ int LinkSim::sim_scan(int& dsec)
             return SCAN;
         }
     } else {
-        stamp();
+        /* 统计 */
+        m_scanFrq += (rsp->used + 1);
+        m_scanNum++;
+
+        /* 超时打点 */
+        int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+        stamp(idleIntv);
         return IDLE;
     }
 }
@@ -283,7 +307,8 @@ int LinkSim::sim_link(int& dsec)
             /* TODO 将link结果发到alg */
 
         } else { /* 断链 */
-            stamp();
+            int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+            stamp(idleIntv);
             return IDLE;
         }
     }
@@ -292,7 +317,8 @@ int LinkSim::sim_link(int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
-        stamp();
+        int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+        stamp(idleIntv);
         return IDLE;
     }
 }
@@ -307,18 +333,10 @@ int LinkSim::second(const Time* ts)
     return sec;
 }
 
-// 打时戳
+// 超时时戳
 void LinkSim::stamp(int plus)
 {
     m_hist = *m_stamp;
     m_hist.sec += plus;
-}
-
-// 为idle打时戳
-void LinkSim::stamp(void)
-{
-    m_hist = *m_stamp;
-    int min = MAX(1, qrand() % 10);
-    m_hist.sec += min * 60;
 }
 

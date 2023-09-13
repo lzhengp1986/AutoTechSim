@@ -73,10 +73,46 @@
          <string>Statistic</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="scanLabel">
+         <item row="5" column="1">
+          <widget class="QLabel" name="totalTestNum">
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
-            <string>avg SCAN try</string>
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="totalScanLabel">
+           <property name="text">
+            <string>total SCAN</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="totalLinkLabel">
+           <property name="text">
+            <string>total LINK</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="totalTestLabel">
+           <property name="text">
+            <string>total TEST</string>
            </property>
           </widget>
          </item>
@@ -95,19 +131,22 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="linkLabel">
+         <item row="0" column="0">
+          <widget class="QLabel" name="scanLabel">
            <property name="text">
-            <string>avg LINK suc</string>
+            <string>avg SCAN try</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="avgLinkSuc">
+         <item row="3" column="1">
+          <widget class="QLabel" name="totalScanNum">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -121,7 +160,32 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="totalLinkNum">
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -141,19 +205,13 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuEnv">
-    <property name="title">
-     <string>&amp;Env</string>
-    </property>
-    <addaction name="actModel"/>
-    <addaction name="actDatabase"/>
-   </widget>
    <widget class="QMenu" name="menuSim">
     <property name="title">
      <string>&amp;Sim</string>
     </property>
-    <addaction name="actRequest"/>
+    <addaction name="actModel"/>
     <addaction name="actStrategy"/>
+    <addaction name="actDatabase"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -162,7 +220,6 @@
     <addaction name="actContent"/>
     <addaction name="actCopyright"/>
    </widget>
-   <addaction name="menuEnv"/>
    <addaction name="menuSim"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -198,9 +255,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actRequest"/>
-   <addaction name="actStrategy"/>
    <addaction name="actModel"/>
+   <addaction name="actStrategy"/>
    <addaction name="actDatabase"/>
    <addaction name="actContent"/>
   </widget>
@@ -210,17 +266,6 @@
    </property>
    <property name="shortcut">
     <string>Alt+M</string>
-   </property>
-  </action>
-  <action name="actRequest">
-   <property name="text">
-    <string>&amp;Request</string>
-   </property>
-   <property name="toolTip">
-    <string>Link Request</string>
-   </property>
-   <property name="shortcut">
-    <string>Alt+R</string>
    </property>
   </action>
   <action name="actStrategy">

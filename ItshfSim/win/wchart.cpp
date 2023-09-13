@@ -6,6 +6,7 @@ WChart::WChart(void)
 {
     /* step1.建立chart */
     QChart* chart = new QChart();
+    chart->removeAllSeries();
     m_chart = chart;
 
     /* step2.设置散点 */
