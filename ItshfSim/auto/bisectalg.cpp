@@ -18,10 +18,15 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
     int n = req.num;
     set_head(n);
 
-    int glbChId;
-    for (int i = 0; i < n; i++) {
+    /* 附近选点 */
+    rsp->glb[0] = align(m_prvGlbChId);
+    int glbChId = m_prvGlbChId + qrand() % 100 - 50;
+    rsp->glb[1] = align(MIN(MAX(glbChId, 0), MAX_GLB_CHN));
+
+    /* 二分搜索 */
+    for (int i = 2; i < n; i++) {
         glbChId = bisect();
-        rsp->glb[i] = glbChId;
+        rsp->glb[i] = align(glbChId);
     }
 
     return m_rsp;
@@ -94,5 +99,5 @@ int BisectAlg::bisect(bool dir)
         glbChId = (start + stop) >> 1;
     }
 
-    return align(glbChId);
+    return glbChId;
 }

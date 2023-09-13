@@ -10,7 +10,7 @@ public:
     BisectAlg(void);
 
     /* api */
-    void restart(void);
+    virtual void restart(void);
     virtual const FreqRsp& bandit(const FreqReq& req);
     virtual void notify(bool flag, int glbChId, int snr);
 

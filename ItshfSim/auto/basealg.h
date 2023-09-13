@@ -7,8 +7,11 @@ class BaseAlg
 {
 public:
     /* 算法调度 */
+    virtual void restart(void) {}
     virtual const FreqRsp& bandit(const FreqReq& req);
     virtual void notify(bool flag, int glbChId, int snr);
+
+protected:
     static int align(int glbChId);
     void set_head(int n);
 
