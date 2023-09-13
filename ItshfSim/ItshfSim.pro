@@ -27,6 +27,7 @@ SOURCES += \
     env/wenv.cpp \
     link/linkdlg.cpp \
     link/linksim.cpp \
+    auto/basealg.cpp \
     auto/autosim.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     env/modeldlg.h \
     env/randmng.h \
     env/wenv.h \
+    auto/basealg.h \
     auto/autosim.h \
     link/linkdlg.h \
     link/linksim.h \

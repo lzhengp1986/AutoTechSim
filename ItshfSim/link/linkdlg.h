@@ -35,6 +35,16 @@ public:
     static int svcIntv(int index);
     static int fcNum(int index);
 
+    /* 算法类型 */
+    enum {
+        RANDOM_SEARCH,
+        BISECTING_SEARCH,
+        MONTE_CARLO_TREE,
+        ITS_HF_PROPAGATION
+    };
+
+    static int algorithm(int index);
+
 private:
     Ui::LinkDlg *ui;
 };
@@ -113,6 +123,19 @@ inline int LinkDlg::fcNum(int index)
     default: fcNum = 10; break;
     }
     return fcNum;
+}
+
+inline int LinkDlg::algorithm(int index)
+{
+    int alg;
+    switch (index) {
+    case 0: alg = RANDOM_SEARCH; break;
+    case 1: alg = BISECTING_SEARCH; break;
+    case 2: alg = MONTE_CARLO_TREE; break;
+    case 3: alg = ITS_HF_PROPAGATION; break;
+    default: alg = RANDOM_SEARCH; break;
+    }
+    return alg;
 }
 
 #endif // LINKDLG_H

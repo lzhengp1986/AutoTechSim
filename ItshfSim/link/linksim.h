@@ -51,7 +51,6 @@ public:
     /* 仿真配置 */
     WEnv *m_env;
     LinkCfg *m_link;
-    AutoSim *m_auto;
 
 private:
     /* 定时器线程 */

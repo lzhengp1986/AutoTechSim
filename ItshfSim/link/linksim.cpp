@@ -16,9 +16,6 @@ LinkSim::LinkSim(QObject *parent)
     m_link->idleIntvIndex = 0; /* random */
     m_link->algIndex = 0; /* random */
 
-    /* auto */
-    m_auto = new AutoSim;
-
     /* 统计值 */
     m_linkNum = 0;
     m_scanNum = 0;
@@ -34,10 +31,8 @@ LinkSim::~LinkSim(void)
     free_time();
     delete m_env;
     delete m_link;
-    delete m_auto;
     m_env = nullptr;
     m_link = nullptr;
-    m_auto = nullptr;
 }
 
 void LinkSim::stop(void)
@@ -201,24 +196,11 @@ int LinkSim::sim_idle(int& dsec)
     req->num = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
-    FreqRsp* rsp = &m_rsp;
-    rsp->head.type = MSG_FREQ_RSP;
-    rsp->total = RSP_FREQ_NUM;
-    rsp->glb[0] = qrand() % MAX_GLB_CHN;
-    rsp->glb[1] = qrand() % MAX_GLB_CHN;
-    rsp->glb[2] = qrand() % MAX_GLB_CHN;
-    rsp->glb[3] = qrand() % MAX_GLB_CHN;
-    rsp->glb[4] = qrand() % MAX_GLB_CHN;
-    rsp->glb[5] = qrand() % MAX_GLB_CHN;
-    rsp->glb[6] = qrand() % MAX_GLB_CHN;
-    rsp->glb[7] = qrand() % MAX_GLB_CHN;
-    rsp->glb[8] = qrand() % MAX_GLB_CHN;
-    rsp->glb[9] = qrand() % MAX_GLB_CHN;
+    m_rsp = alg_sche(m_link->algIndex, m_req);
 
     /* 切换状态 */
     stamp(1);
     m_testNum++;
-    m_rsp.used = 0;
     return SCAN;
 }
 
@@ -238,6 +220,7 @@ int LinkSim::sim_scan(int& dsec)
         EnvIn in;
         EnvOut out;
         int glbChId = rsp->glb[rsp->used];
+        m_scanFrq++;
 
         /* 调用环境模型 */
         in.year = m_stamp->year;
@@ -255,7 +238,6 @@ int LinkSim::sim_scan(int& dsec)
         /* 状态切换: LINK or SCAN */
         if ((flag == ENV_OK) && (out.flag == true)) {
             /* 统计 */
-            m_scanFrq += (rsp->used + 1);
             m_scanNum++;
             m_linkNum++;
 
@@ -270,7 +252,6 @@ int LinkSim::sim_scan(int& dsec)
         }
     } else {
         /* 统计 */
-        m_scanFrq += (rsp->used + 1);
         m_scanNum++;
 
         /* 超时打点 */
