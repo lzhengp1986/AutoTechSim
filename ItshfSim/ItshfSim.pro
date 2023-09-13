@@ -28,6 +28,9 @@ SOURCES += \
     link/linkdlg.cpp \
     link/linksim.cpp \
     auto/basealg.cpp \
+    auto/bisectalg.cpp \
+    auto/itsalg.cpp \
+    auto/montealg.cpp \
     auto/autosim.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
@@ -43,6 +46,9 @@ HEADERS += \
     env/randmng.h \
     env/wenv.h \
     auto/basealg.h \
+    auto/bisectalg.h \
+    auto/itsalg.h \
+    auto/montealg.h \
     auto/autosim.h \
     link/linkdlg.h \
     link/linksim.h \

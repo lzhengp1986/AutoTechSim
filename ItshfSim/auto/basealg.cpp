@@ -2,7 +2,7 @@
 #include <QtGlobal>
 
 // 默认随机搜索
-const FreqRsp& BaseAlg::sche(const FreqReq& req)
+const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 {
     FreqRsp* rsp = &m_rsp;
     int n = req.num;
@@ -15,4 +15,10 @@ const FreqRsp& BaseAlg::sche(const FreqReq& req)
     }
 
     return m_rsp;
+}
+
+// 信息
+void BaseAlg::notify(int glbChId, int snr)
+{
+    Q_UNUSED(glbChId); Q_UNUSED(snr);
 }

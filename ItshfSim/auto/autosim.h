@@ -1,9 +1,10 @@
 #ifndef AUTOSIM_H
 #define AUTOSIM_H
 
-#include "basealg.h"
+#include "type.h"
 
 /* api */
-extern const FreqRsp& alg_sche(int algId, const FreqReq& req);
+extern const FreqRsp& recommender(int algId, const FreqReq& req);
+extern void notification(int algId, int glbChId, int snr);
 
 #endif // AUTOSIM_H

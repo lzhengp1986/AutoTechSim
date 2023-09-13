@@ -1,4 +1,5 @@
 #include "linksim.h"
+#include "auto/autosim.h"
 
 LinkSim::LinkSim(QObject *parent)
     : QThread(parent)
@@ -196,7 +197,7 @@ int LinkSim::sim_idle(int& dsec)
     req->num = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
-    m_rsp = alg_sche(m_link->algIndex, m_req);
+    m_rsp = recommender(m_link->algIndex, m_req);
 
     /* 切换状态 */
     stamp(1);
@@ -233,7 +234,8 @@ int LinkSim::sim_scan(int& dsec)
         float hour = m_stamp->hour + m_stamp->min / 60.0f;
         emit new_chan(hour, glbChId, out.snr, out.n0);
 
-        /* TODO 将scan结果发到alg */
+        /* 将scan结果发到alg */
+        notification(m_link->algIndex, glbChId, out.snr);
 
         /* 状态切换: LINK or SCAN */
         if ((flag == ENV_OK) && (out.flag == true)) {
@@ -285,8 +287,8 @@ int LinkSim::sim_link(int& dsec)
             float hour = m_stamp->hour + m_stamp->min / 60.0f;
             emit new_chan(hour, glbChId, out.snr, out.n0);
 
-            /* TODO 将link结果发到alg */
-
+            /* 将link结果发到alg */
+            notification(m_link->algIndex, glbChId, out.snr);
         } else { /* 断链 */
             int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);

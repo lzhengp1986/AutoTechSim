@@ -5,7 +5,6 @@
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"
-#include "auto/autosim.h"
 #include <QThread>
 #include <QTimer>
 
