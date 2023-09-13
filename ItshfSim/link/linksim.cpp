@@ -234,20 +234,21 @@ int LinkSim::sim_scan(int& dsec)
         float hour = m_stamp->hour + m_stamp->min / 60.0f;
         emit new_chan(hour, glbChId, out.snr, out.n0);
 
-        /* 将scan结果发到alg */
-        notification(m_link->algIndex, glbChId, out.snr);
-
         /* 状态切换: LINK or SCAN */
-        if ((flag == ENV_OK) && (out.flag == true)) {
+        if ((flag == ENV_OK) && (out.flag == true)) {            
             /* 统计 */
             m_scanNum++;
             m_linkNum++;
 
-            /* 超时打点 */
+            /* 将scan结果发到alg */
+            notification(m_link->algIndex, true, glbChId, out.snr);
+
+            /* 切换到link */
             int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
             stamp(svcIntv);
             return LINK;
         } else {
+            notification(m_link->algIndex, false, glbChId, out.snr);
             stamp(scanIntv);
             rsp->used++;
             return SCAN;
@@ -288,7 +289,7 @@ int LinkSim::sim_link(int& dsec)
             emit new_chan(hour, glbChId, out.snr, out.n0);
 
             /* 将link结果发到alg */
-            notification(m_link->algIndex, glbChId, out.snr);
+            notification(m_link->algIndex, true, glbChId, out.snr);
         } else { /* 断链 */
             int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);

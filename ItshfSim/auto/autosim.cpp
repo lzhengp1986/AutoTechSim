@@ -15,10 +15,10 @@ const FreqRsp& recommender(int algId, const FreqReq& req)
 }
 
 // 信息知会
-void notification(int algId, int glbChId, int snr)
+void notification(int algId, bool flag, int glbChId, int snr)
 {
     if (algId == LinkDlg::RANDOM_SEARCH) {
-         g_random_search.notify(glbChId, snr);
+         g_random_search.notify(flag, glbChId, snr);
     } else if (algId == LinkDlg::BISECTING_SEARCH) {
     }
 }

@@ -5,6 +5,6 @@
 
 /* api */
 extern const FreqRsp& recommender(int algId, const FreqReq& req);
-extern void notification(int algId, int glbChId, int snr);
+extern void notification(int algId, bool flag, int glbChId, int snr);
 
 #endif // AUTOSIM_H

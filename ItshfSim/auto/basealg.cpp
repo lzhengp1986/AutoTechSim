@@ -6,19 +6,19 @@ const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 {
     FreqRsp* rsp = &m_rsp;
     int n = req.num;
-    rsp->head.type = MSG_FREQ_RSP;
-    rsp->used = 0;
-    rsp->total = n;
+    set_head(n);
 
+    int glbChId;
     for (int i = 0; i < n; i++) {
-        rsp->glb[i] = qrand() % MAX_GLB_CHN;
+        glbChId = qrand() % MAX_GLB_CHN;
+        rsp->glb[i] = align(glbChId);
     }
 
     return m_rsp;
 }
 
 // 信息
-void BaseAlg::notify(int glbChId, int snr)
+void BaseAlg::notify(bool flag, int glbChId, int snr)
 {
-    Q_UNUSED(glbChId); Q_UNUSED(snr);
+    Q_UNUSED(flag); Q_UNUSED(glbChId); Q_UNUSED(snr);
 }
