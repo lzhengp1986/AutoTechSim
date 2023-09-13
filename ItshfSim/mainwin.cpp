@@ -113,7 +113,7 @@ void MainWin::setup_sim(void)
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
     connect(m_sim, SIGNAL(new_chan(float, int, int, int)), this, SLOT(on_new_chan(float, int, int, int)));
-    connect(m_sim, SIGNAL(new_sts(int, int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int, int)));
+    connect(m_sim, SIGNAL(new_sts(int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
