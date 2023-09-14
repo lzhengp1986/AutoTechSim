@@ -108,11 +108,12 @@ void MainWin::setup_sim(void)
 {
     /* 构造sim */
     m_sim = new LinkSim(this);
+    m_time = new Time;
 
     /* 信号连接 */
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_chan(float, int, int, int)), this, SLOT(on_new_chan(float, int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(int, int, int)), this, SLOT(on_new_chan(int, int, int)));
     connect(m_sim, SIGNAL(new_sts(int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int)));
 
     /* 启动线程 */
@@ -123,12 +124,15 @@ void MainWin::free_sim(void)
 {
     m_sim->stop();
     m_sim->quit();
+    delete m_time;
     delete m_sim;
     m_sim = nullptr;
+    m_time = nullptr;
 }
 
 void MainWin::on_new_time(const Time* ts)
 {
+    *m_time = *ts;
     m_label->set_time(ts);
 }
 
@@ -137,9 +141,12 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_chan(float hour, int glbChId, int snr, int n0)
+void MainWin::on_new_chan(int glbChId, int snr, int n0)
 {
     /* 绘图 */
+    float fm = m_time->min / 60.0f;
+    float fs = m_time->sec / 3600.0f;
+    float hour = m_time->hour + fm + fs;
     float fc = GLB2FREQ(glbChId) / 1000.0f;
     m_chart->plot(hour, fc, snr);
 

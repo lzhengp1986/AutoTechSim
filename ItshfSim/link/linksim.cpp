@@ -264,11 +264,10 @@ int LinkSim::sim_scan(int& dsec)
         int flag = m_env->env(in, out);
 
         /* 将scan结果发到MainWin */
-        float hour = m_stamp->hour + m_stamp->min / 60.0f;
-        emit new_chan(hour, glbChId, out.snr, out.n0);
+        emit new_chan(glbChId, out.snr, out.n0);
 
         /* 状态切换: LINK or SCAN */
-        if ((flag == ENV_OK) && (out.flag == true)) {            
+        if ((flag == ENV_OK) && (out.flag == true)) {
             /* 统计 */
             m_scanNum++;
             m_linkNum++;
@@ -334,8 +333,7 @@ int LinkSim::sim_link(int& dsec)
         int flag = m_env->env(in, out);
         if ((flag == ENV_OK) && (out.flag == true)) {
             /* 将link结果发到MainWin */
-            float hour = m_stamp->hour + m_stamp->min / 60.0f;
-            emit new_chan(hour, glbChId, out.snr, out.n0);
+            emit new_chan(glbChId, out.snr, out.n0);
 
             /* 将link结果发到alg */
             if (algId == LinkDlg::BISECTING_SEARCH) {
