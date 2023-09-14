@@ -31,6 +31,15 @@ private slots:
     void on_actContent_triggered(void);
     void on_actCopyright_triggered(void);
 
+    void on_scanBlack_clicked(void);
+    void on_scanBlue_clicked(void);
+    void on_scanCyan_clicked(void);
+    void on_scanMagenta_clicked(void);
+    void on_linkBlack_clicked(void);
+    void on_linkBlue_clicked(void);
+    void on_linkCyan_clicked(void);
+    void on_linkMagenta_clicked(void);
+
 private:
     void setup_win(void);
     void free_win(void);

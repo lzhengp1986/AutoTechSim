@@ -235,3 +235,43 @@ void MainWin::on_actCopyright_triggered(void)
 {
 
 }
+
+void MainWin::on_scanBlack_clicked(void)
+{
+    m_chart->set_scan_color(Qt::black);
+}
+
+void MainWin::on_scanBlue_clicked(void)
+{
+    m_chart->set_scan_color(Qt::blue);
+}
+
+void MainWin::on_scanCyan_clicked(void)
+{
+    m_chart->set_scan_color(Qt::cyan);
+}
+
+void MainWin::on_scanMagenta_clicked(void)
+{
+    m_chart->set_scan_color(Qt::magenta);
+}
+
+void MainWin::on_linkBlack_clicked(void)
+{
+    m_chart->set_link_color(Qt::black);
+}
+
+void MainWin::on_linkBlue_clicked(void)
+{
+    m_chart->set_link_color(Qt::blue);
+}
+
+void MainWin::on_linkCyan_clicked(void)
+{
+    m_chart->set_link_color(Qt::cyan);
+}
+
+void MainWin::on_linkMagenta_clicked(void)
+{
+    m_chart->set_link_color(Qt::magenta);
+}

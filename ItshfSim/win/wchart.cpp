@@ -74,6 +74,18 @@ WChart::~WChart(void)
     delete m_chart;
 }
 
+void WChart::set_scan_color(QColor color)
+{
+    m_scan->setBorderColor(color);
+    m_scan->setBrush(QBrush(color));
+}
+
+void WChart::set_link_color(QColor color)
+{
+    m_link->setBorderColor(color);
+    m_link->setBrush(QBrush(color));
+}
+
 QChart* WChart::get_chart(void) const
 {
     return m_chart;

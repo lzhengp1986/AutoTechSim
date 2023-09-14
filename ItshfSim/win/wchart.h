@@ -11,6 +11,8 @@ public:
     ~WChart(void);
 
     /* api */
+    void set_scan_color(QColor color);
+    void set_link_color(QColor color);
     QChart* get_chart(void) const;
     void plot(float hour, float fc, int snr);
     void clear(void);
