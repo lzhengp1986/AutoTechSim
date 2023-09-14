@@ -13,6 +13,7 @@ public:
     /* api */
     QChart* get_chart(void) const;
     void plot(float hour, float fc, int snr);
+    void clear(void);
 
 private:
     QChart* m_chart;

@@ -20,8 +20,12 @@ LinkSim::LinkSim(QObject *parent)
     /* 统计值 */
     m_linkNum = 0;
     m_scanNum = 0;
+    m_scanNok = 0;
     m_scanFrq = 0;
     m_testNum = 0;
+
+    /* 算法实例化 */
+    setup_alg();
 
     /* 定时器 */
     setup_time();
@@ -30,6 +34,7 @@ LinkSim::LinkSim(QObject *parent)
 LinkSim::~LinkSim(void)
 {
     free_time();
+    free_alg();
     delete m_env;
     delete m_link;
     m_env = nullptr;
@@ -67,6 +72,28 @@ void LinkSim::setup_time(void)
     m_timer->start(TIMER_INTERVAL_MS);
     m_timer->moveToThread(m_subthr);
     m_subthr->start();
+}
+
+// 算法实例化
+void LinkSim::setup_alg(void)
+{
+    m_rand = new BaseAlg;
+    m_sect = new BisectAlg;
+    m_itshf = new ItshfAlg;
+    m_mont = new MonteAlg;
+}
+
+// 释放算法
+void LinkSim::free_alg(void)
+{
+    delete m_rand;
+    delete m_sect;
+    delete m_itshf;
+    delete m_mont;
+    m_rand = nullptr;
+    m_sect = nullptr;
+    m_itshf = nullptr;
+    m_mont = nullptr;
 }
 
 // 更新Time += msec
@@ -197,7 +224,12 @@ int LinkSim::sim_idle(int& dsec)
     req->num = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
-    m_rsp = recommender(m_link->algIndex, m_req);
+    int algId = m_link->algIndex;
+    if (algId == LinkDlg::RANDOM_SEARCH) {
+        m_rsp = m_rand->bandit(m_req);
+    } else if (algId == LinkDlg::BISECTING_SEARCH) {
+        m_rsp = m_sect->bandit(m_req);
+    }
 
     /* 切换状态 */
     stamp(1);
@@ -217,6 +249,7 @@ int LinkSim::sim_scan(int& dsec)
 
     /* 处理1个频率 */
     FreqRsp* rsp = &m_rsp;
+    int algId = m_link->algIndex;
     if (rsp->used < rsp->total) {
         EnvIn in;
         EnvOut out;
@@ -241,14 +274,20 @@ int LinkSim::sim_scan(int& dsec)
             m_linkNum++;
 
             /* 将scan结果发到alg */
-            notification(m_link->algIndex, true, glbChId, out.snr);
+            if (algId == LinkDlg::BISECTING_SEARCH) {
+                m_sect->notify(true, glbChId, out.snr);
+            }
 
             /* 切换到link */
             int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
             stamp(svcIntv);
             return LINK;
         } else {
-            notification(m_link->algIndex, false, glbChId, out.snr);
+            /* 将scan结果发到alg */
+            if (algId == LinkDlg::MONTE_CARLO_TREE) {
+                // todo
+            }
+
             stamp(scanIntv);
             rsp->used++;
             return SCAN;
@@ -256,6 +295,15 @@ int LinkSim::sim_scan(int& dsec)
     } else {
         /* 统计 */
         m_scanNum++;
+        m_scanNok++;
+
+        /* 失败次数过多，复位状态 */
+        if (m_scanNok > MAX_SCAN_FAIL_THR) {
+            if (algId == LinkDlg::BISECTING_SEARCH) {
+                m_sect->reset();
+            }
+            m_scanNok = 0;
+        }
 
         /* 超时打点 */
         int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
@@ -271,6 +319,7 @@ int LinkSim::sim_link(int& dsec)
     dsec = ABS(diff);
 
     /* 每分钟上报link信息 */
+    int algId = m_link->algIndex;
     if (dsec % 60 == 0) {
         EnvIn in;
         EnvOut out;
@@ -289,7 +338,9 @@ int LinkSim::sim_link(int& dsec)
             emit new_chan(hour, glbChId, out.snr, out.n0);
 
             /* 将link结果发到alg */
-            notification(m_link->algIndex, true, glbChId, out.snr);
+            if (algId == LinkDlg::BISECTING_SEARCH) {
+                m_sect->notify(true, glbChId, out.snr);
+            }
         } else { /* 断链 */
             int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);
@@ -301,6 +352,11 @@ int LinkSim::sim_link(int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
+        /* 重启推荐 */
+        if (algId == LinkDlg::BISECTING_SEARCH) {
+            m_sect->restart();
+        }
+
         int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
         stamp(idleIntv);
         return IDLE;

@@ -87,3 +87,9 @@ void WChart::plot(float hour, float fc, int snr)
     }
     m_chart->show();
 }
+
+void WChart::clear(void)
+{
+    m_scan->clear();
+    m_link->clear();
+}

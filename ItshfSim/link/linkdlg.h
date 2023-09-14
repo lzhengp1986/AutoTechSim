@@ -37,7 +37,7 @@ public:
 
     /* 算法类型 */
     enum {
-        RANDOM_SEARCH,
+        RANDOM_SEARCH = 0,
         BISECTING_SEARCH,
         MONTE_CARLO_TREE,
         ITS_HF_PROPAGATION
@@ -59,7 +59,8 @@ inline int LinkDlg::timerSpeed(int index)
     case 3: speed = 16; break;
     case 4: speed = 32; break;
     case 5: speed = 64; break;
-    default: speed = 64; break;
+    case 6: speed = 128; break;
+    default: speed = 16; break;
     }
     return speed;
 }

@@ -3,10 +3,10 @@
 
 #include "basealg.h"
 
-class ItsAlg : public BaseAlg
+class ItshfAlg : public BaseAlg
 {
 public:
-    ItsAlg();
+    ItshfAlg();
 };
 
 #endif // ITSALG_H

@@ -160,6 +160,7 @@ void MainWin::on_new_sts(int scanTry, int scanNum, int linkNum, int testNum)
 void MainWin::on_actModel_triggered(void)
 {
     m_sim->stop();
+    m_chart->clear();
     ModelDlg* dlg = new ModelDlg(this);
     dlg->para2dlg(m_model);
 

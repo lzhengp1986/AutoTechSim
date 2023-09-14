@@ -16,9 +16,3 @@ const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 
     return m_rsp;
 }
-
-// 信息
-void BaseAlg::notify(bool flag, int glbChId, int snr)
-{
-    Q_UNUSED(flag); Q_UNUSED(glbChId); Q_UNUSED(snr);
-}

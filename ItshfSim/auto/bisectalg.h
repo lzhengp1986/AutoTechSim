@@ -1,6 +1,7 @@
 #ifndef BISECTALG_H
 #define BISECTALG_H
 
+#include "macro.h"
 #include "basealg.h"
 #include <string.h>
 
@@ -10,13 +11,14 @@ public:
     BisectAlg(void);
 
     /* api */
-    virtual void restart(void);
+    void reset(void);
+    void restart(void);
     virtual const FreqRsp& bandit(const FreqReq& req);
-    virtual void notify(bool flag, int glbChId, int snr);
+    void notify(bool flag, int glbChId, int snr);
 
 private:
-    enum {DOWN, UP};
-    int bisect(bool dir = UP);
+    /*! @brief 根据band二分搜索 */
+    bool bisect(int schband, int& glbChId);
 
 private:
     int m_prvSnr;
@@ -30,6 +32,7 @@ inline void BisectAlg::restart(void)
 {
     memset(m_valid, 0, sizeof(m_valid));
     m_valid[m_prvGlbChId] = true;
+    m_prvSnr = MIN_SNR;
 }
 
 #endif // BISECTALG_H

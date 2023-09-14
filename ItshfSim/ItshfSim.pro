@@ -29,9 +29,8 @@ SOURCES += \
     link/linksim.cpp \
     auto/basealg.cpp \
     auto/bisectalg.cpp \
-    auto/itsalg.cpp \
+    auto/itshfalg.cpp \
     auto/montealg.cpp \
-    auto/autosim.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
     mainwin.cpp \
@@ -47,7 +46,7 @@ HEADERS += \
     env/wenv.h \
     auto/basealg.h \
     auto/bisectalg.h \
-    auto/itsalg.h \
+    auto/itshfalg.h \
     auto/montealg.h \
     auto/autosim.h \
     link/linkdlg.h \

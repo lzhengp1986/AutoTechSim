@@ -1,10 +1,8 @@
 #ifndef AUTOSIM_H
 #define AUTOSIM_H
 
-#include "type.h"
-
-/* api */
-extern const FreqRsp& recommender(int algId, const FreqReq& req);
-extern void notification(int algId, bool flag, int glbChId, int snr);
+#include "auto/bisectalg.h"
+#include "auto/itshfalg.h"
+#include "auto/montealg.h"
 
 #endif // AUTOSIM_H

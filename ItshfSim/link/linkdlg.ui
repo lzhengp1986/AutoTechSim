@@ -202,6 +202,11 @@
        <string>x64</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>x128</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="2" column="5">
