@@ -218,9 +218,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="styleSheet">
             <string notr="true">b</string>
@@ -240,9 +246,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -262,9 +274,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -281,9 +299,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -337,9 +361,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -356,9 +386,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -378,9 +414,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
@@ -397,9 +439,15 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>16</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
            </property>
            <property name="text">
             <string/>
