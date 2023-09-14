@@ -43,7 +43,19 @@ LinkSim::~LinkSim(void)
 
 void LinkSim::stop(void)
 {
+    /* 统计值 */
+    m_linkNum = 0;
+    m_scanNum = 0;
+    m_scanNok = 0;
+    m_scanFrq = 0;
+    m_testNum = 0;
     m_state = WAIT;
+
+    /* 算法复位 */
+    m_sect->reset();
+
+    /* 统计值复位 */
+    emit new_sts(0, 0, 0, 0);
 }
 
 void LinkSim::trigger(void)
@@ -59,7 +71,7 @@ void LinkSim::setup_time(void)
     m_stamp->year = 2023;
     m_stamp->month = 1;
     m_stamp->day = 1;
-    m_stamp->hour = 1;
+    m_stamp->hour = 0;
     m_stamp->min = 0;
     m_stamp->sec = 0;
     m_stamp->msec = 0;
@@ -132,11 +144,11 @@ bool LinkSim::update_time(int msec)
     }
 
     /* 小时进位 */
-    if (m_stamp->hour > 24) {
+    if (m_stamp->hour >= 24) {
         do {
             m_stamp->hour -= 24;
             m_stamp->day++;
-        } while (m_stamp->hour > 24);
+        } while (m_stamp->hour >= 24);
     } else {
         goto UPDATE_LABEL;
     }
@@ -152,7 +164,7 @@ void LinkSim::set_time(int year, int month)
     m_stamp->year = year;
     m_stamp->month = month;
     m_stamp->day = 1;
-    m_stamp->hour = 1;
+    m_stamp->hour = 0;
     m_stamp->min = 0;
     m_stamp->sec = 0;
     m_stamp->msec = 0;

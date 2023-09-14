@@ -16,6 +16,7 @@ typedef struct {
 /* 出参 */
 typedef struct {
     bool flag;
+    int muf;
     int snr;
     int n0;
 } EnvOut;

@@ -81,7 +81,7 @@ int WEnv::check(const EnvIn& in)
     int hour = in.hour;
     int month = in.month;
     int glbChId = in.glbChId;
-    if ((hour <= 0) || (hour > MAX_HOUR_NUM)
+    if ((hour < 0) || (hour >= MAX_HOUR_NUM)
         || (month < 0) || (month > MAX_MONTH_NUM)
         || (glbChId < 0) || (glbChId > MAX_GLB_CHN)) {
         return ENV_INV_PARA; /* 参数非法 */
@@ -94,9 +94,10 @@ int WEnv::check(const EnvIn& in)
 int WEnv::env(const EnvIn& in, EnvOut& out)
 {
     /* 初始化 */
-    out.snr = MIN_SNR;
     out.flag = false;
     out.n0 = MIN_PN0;
+    out.snr = MIN_SNR;
+    out.muf = MIN_CHN_FREQ;
 
     /* 时间检查 */
     int ret = check(in);
@@ -113,13 +114,14 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
 int WEnv::calc(const EnvIn& in, EnvOut& out)
 {
     /* 获取Hour信息 */
-    DbHour* dh = &m_dbMonth.hr[in.hour - 1];
+    DbHour* dh = &m_dbMonth.hr[in.hour];
 
     /* 计算可通频率范围 */
     int muf = dh->fc[0].freq;
     int halfband = m_maxband / 2;
     int min = MAX(muf - halfband, MIN_CHN_FREQ);
-    int max = MIN(muf + halfband, MAX_CHN_FREQ);
+    int max = MIN(min + m_maxband, MAX_CHN_FREQ);
+    out.muf = muf;
 
     /* 是否在可通频带 */
     int glbChId = in.glbChId;
