@@ -142,13 +142,21 @@ void MainWin::on_new_state(int state, int dsec)
 }
 
 void MainWin::on_new_chan(int glbChId, int snr, int n0)
-{
+{    
     /* 绘图 */
     float fm = m_time->min / 60.0f;
     float fs = m_time->sec / 3600.0f;
     float hour = m_time->hour + fm + fs;
     float fc = GLB2FREQ(glbChId) / 1000.0f;
     m_chart->plot(hour, fc, snr);
+
+    /* 日志 */
+    QString text = QString("%1 %2 %3 %4")
+            .arg(hour, 4, 'f', 2)
+            .arg(glbChId, 5, 10, QLatin1Char(' '))
+            .arg(snr, 5, 10, QLatin1Char(' '))
+            .arg(n0, 5, 10, QLatin1Char(' '));
+    ui->logText->appendPlainText(text);
 
     /* 状态栏显示 */
     m_label->set_channel(glbChId);
