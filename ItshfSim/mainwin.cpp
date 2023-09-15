@@ -164,10 +164,10 @@ void MainWin::on_new_chan(int glbChId, int snr, int n0)
     m_label->set_noise(n0);
 }
 
-void MainWin::on_new_sts(int scanTry, int scanNum, int linkNum, int testNum)
+void MainWin::on_new_sts(int scanTry, int scanFrq, int linkNum, int testNum)
 {
     ui->avgScanTry->setText(QString::number(scanTry));
-    ui->totalScanNum->setText(QString::number(scanNum));
+    ui->totalScanNum->setText(QString::number(scanFrq));
     ui->totalLinkNum->setText(QString::number(linkNum));
     ui->totalTestNum->setText(QString::number(testNum));
 }

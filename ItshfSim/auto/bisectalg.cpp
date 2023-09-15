@@ -19,7 +19,7 @@ void BisectAlg::reset(void)
 const FreqRsp& BisectAlg::bandit(const FreqReq& req)
 {
     FreqRsp* rsp = &m_rsp;
-    int n = req.num;
+    int n = req.fcNum;
 
     /* 300KHz附近选点 */
     int rnd = qrand() % 100;
@@ -76,8 +76,11 @@ void BisectAlg::notify(bool flag, int glbChId, int snr)
 
     /* 保存最好的信道 */
     if (snr > m_prvSnr) {
-        m_prvGlbChId = glbChId;
-        m_prvSnr = snr;
+        int diff = ABS(glbChId - m_prvGlbChId);
+        if (diff < 3000) {
+            m_prvGlbChId = glbChId;
+            m_prvSnr = snr;
+        }
     }
 }
 

@@ -6,77 +6,76 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>120</height>
+    <width>258</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>420</width>
-    <height>120</height>
+    <width>258</width>
+    <height>200</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>500</width>
-    <height>120</height>
+    <width>258</width>
+    <height>200</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="5">
-    <widget class="QComboBox" name="reqFcNum">
+   <item row="3" column="5">
+    <widget class="QComboBox" name="linkInterval">
      <item>
       <property name="text">
-       <string>10</string>
+       <string>rand5</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>5</string>
+       <string>rand10</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>1</string>
+       <string>2min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>10min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>20min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1hour</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2hour</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="idleLabel">
-     <property name="text">
-      <string>Idle Interval</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2" colspan="4">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QComboBox" name="scanInterval">
-     <item>
-      <property name="text">
-       <string>2sec</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>1sec</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="3">
+   <item row="1" column="5">
     <widget class="QComboBox" name="idleInterval">
      <item>
       <property name="text">
@@ -135,66 +134,161 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="2">
+   <item row="0" column="2">
+    <widget class="QLabel" name="daysLabel">
+     <property name="text">
+      <string>Days</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="reqFcLabel">
+     <property name="text">
+      <string>FcNum</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
     <widget class="QLabel" name="scanLabel">
      <property name="text">
-      <string>Scan Interval</string>
+      <string>Scan</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="4">
-    <widget class="QLabel" name="svcLabel">
+   <item row="1" column="4">
+    <widget class="QLabel" name="idleLabel">
      <property name="text">
-      <string>Service Interval</string>
+      <string>Idle</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="speedLabel">
-     <property name="text">
-      <string>Timer Speed</string>
-     </property>
+   <item row="5" column="3">
+    <widget class="QComboBox" name="fromFreq">
+     <item>
+      <property name="text">
+       <string>2MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>8MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>14MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>20MHz</string>
+      </property>
+     </item>
     </widget>
    </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="fcLabel">
-     <property name="text">
-      <string>Query fc Num</string>
-     </property>
+   <item row="5" column="5">
+    <widget class="QComboBox" name="bwLen">
+     <item>
+      <property name="text">
+       <string>Unlimit</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>24MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>12MHz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>6MHz</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="3" column="4">
-    <widget class="QLabel" name="algLabel">
+    <widget class="QLabel" name="linkLabel">
      <property name="text">
-      <string>Auto Algorithm</string>
+      <string>Link</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QLabel" name="bwLabel">
+     <property name="text">
+      <string>BW</string>
      </property>
     </widget>
    </item>
    <item row="0" column="3">
+    <widget class="QComboBox" name="simDay">
+     <item>
+      <property name="text">
+       <string>1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>15</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="7" column="2" colspan="4">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QComboBox" name="reqFcNum">
+     <item>
+      <property name="text">
+       <string>10</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLabel" name="fromLabel">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
     <widget class="QComboBox" name="tmrSpeed">
      <item>
       <property name="text">
-       <string>x1</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>x4</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>x8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>x16</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>x32</string>
+       <string>x128</string>
       </property>
      </item>
      <item>
@@ -204,61 +298,60 @@
      </item>
      <item>
       <property name="text">
-       <string>x128</string>
+       <string>x32</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>x16</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>x8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>x4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>x1</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="2" column="5">
-    <widget class="QComboBox" name="svcInterval">
+   <item row="0" column="4">
+    <widget class="QLabel" name="speedLabel">
+     <property name="text">
+      <string>Timer</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QComboBox" name="scanInterval">
      <item>
       <property name="text">
-       <string>rand5</string>
+       <string>2sec</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>rand10</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2min</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>5min</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10min</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>20min</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>30min</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>1hour</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2hour</string>
+       <string>1sec</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="3" column="5">
+   <item row="6" column="2">
+    <widget class="QLabel" name="algLabel">
+     <property name="text">
+      <string>Algo</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3" colspan="3">
     <widget class="QComboBox" name="alg">
      <item>
       <property name="text">

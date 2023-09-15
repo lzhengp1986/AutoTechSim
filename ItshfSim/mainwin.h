@@ -23,7 +23,7 @@ private slots:
     void on_new_time(const Time* ts);
     void on_new_state(int state, int dsec);
     void on_new_chan(int glbChId, int snr, int n0);
-    void on_new_sts(int scanTry, int scanNum, int linkNum, int testNum);
+    void on_new_sts(int scanTry, int scanFrq, int linkNum, int testNum);
 
     void on_actModel_triggered(void);
     void on_actStrategy_triggered(void);

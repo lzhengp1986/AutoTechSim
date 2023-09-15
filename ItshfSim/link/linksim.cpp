@@ -191,13 +191,21 @@ void LinkSim::on_timer_timeout(void)
     int speedIndex = m_link->tmrSpeedIndex;
     int speed = LinkDlg::timerSpeed(speedIndex);
     bool flag = update_time(speed * TIMER_INTERVAL_MS);
+    if (flag == false) {
+        return;
+    }
+
+    /* 判断仿真天数 */
+    int dayIndex = m_link->simDayIndex;
+    int days = LinkDlg::simDays(dayIndex);
+    if (m_stamp->day > days) {
+        stop();
+    }
 
     /* 建链仿真 */
-    if (flag == true) {
-        int dsec = 0;
-        int state = simulate(dsec);
-        emit new_state(state, dsec);
-    }
+    int dsec = 0;
+    int state = simulate(dsec);
+    emit new_state(state, dsec);
 }
 
 // 主调度函数
@@ -227,13 +235,13 @@ int LinkSim::sim_idle(int& dsec)
 
     /* 更新统计 */
     int tryFcNum = (m_scanFrq + m_scanNum) / (m_scanNum + 1);
-    emit new_sts(tryFcNum, m_scanNum, m_linkNum, m_testNum);
+    emit new_sts(tryFcNum, m_scanFrq, m_linkNum, m_testNum);
 
     /* 构造频率请求消息 */
     FreqReq* req = &m_req;
     int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
     req->head.type = MSG_FREQ_REQ;
-    req->num = MIN(fcNum, REQ_FREQ_NUM);
+    req->fcNum = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
     int algId = m_link->algIndex;
@@ -351,7 +359,13 @@ int LinkSim::sim_link(int& dsec)
             if (algId == LinkDlg::BISECTING_SEARCH) {
                 m_sect->notify(true, glbChId, out.snr);
             }
-        } else { /* 断链 */
+        } else {
+            /* 重启推荐 */
+            if (algId == LinkDlg::BISECTING_SEARCH) {
+                m_sect->restart();
+            }
+
+            /* 断链 */
             int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);
             return IDLE;

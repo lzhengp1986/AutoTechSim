@@ -5,7 +5,7 @@
 const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 {
     FreqRsp* rsp = &m_rsp;
-    int n = req.num;
+    int n = req.fcNum;
     set_head(n);
 
     int glbChId;
