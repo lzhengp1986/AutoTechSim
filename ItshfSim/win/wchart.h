@@ -2,6 +2,7 @@
 #define QWCHART_H
 
 #include <qchart.h>
+#include <QLineSeries>
 #include <QScatterSeries>
 using namespace QtCharts;
 
@@ -15,12 +16,14 @@ public:
     void set_link_color(QColor color);
     QChart* get_chart(void) const;
     void plot(float hour, float fc, int snr);
+    void plot(bool withNoise);
     void clear(void);
 
 private:
-    QChart* m_chart;
-    QScatterSeries* m_scan;
-    QScatterSeries* m_link;
+    QChart *m_chart;
+    QLineSeries *m_noise;
+    QScatterSeries *m_scan;
+    QScatterSeries *m_link;
 };
 
 #endif // QWCHART_H

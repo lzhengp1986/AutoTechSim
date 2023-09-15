@@ -40,7 +40,7 @@ WLabel::WLabel(void)
     /* SNR */
     m_label.at(SNR_NAME)->setText("SNR");
     m_label.at(SNR_VALUE)->setStyleSheet("color:red");
-    m_label.at(SNR_VALUE)->setMinimumWidth(30);
+    m_label.at(SNR_VALUE)->setMinimumWidth(20);
     m_label.at(SNR_UNIT)->setText("dB");
     set_ratio(MIN_SNR);
 

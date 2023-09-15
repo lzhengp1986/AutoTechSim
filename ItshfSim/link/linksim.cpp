@@ -10,12 +10,6 @@ LinkSim::LinkSim(QObject *parent)
 
     /* link */
     m_link = new LinkCfg;
-    m_link->fcNumIndex = 0; /* 10 */
-    m_link->tmrSpeedIndex = 0; /* x1 */
-    m_link->scanIntvIndex = 0; /* 2sec */
-    m_link->svcIntvIndex = 0; /* random */
-    m_link->idleIntvIndex = 0; /* random */
-    m_link->algIndex = 0; /* random */
 
     /* 统计值 */
     m_linkNum = 0;
@@ -189,7 +183,7 @@ void LinkSim::on_timer_timeout(void)
 {
     /* 更新时间 */
     int speedIndex = m_link->tmrSpeedIndex;
-    int speed = LinkDlg::timerSpeed(speedIndex);
+    int speed = LinkCfg::timerSpeed(speedIndex);
     bool flag = update_time(speed * TIMER_INTERVAL_MS);
     if (flag == false) {
         return;
@@ -197,7 +191,7 @@ void LinkSim::on_timer_timeout(void)
 
     /* 判断仿真天数 */
     int dayIndex = m_link->simDayIndex;
-    int days = LinkDlg::simDays(dayIndex);
+    int days = LinkCfg::simDays(dayIndex);
     if (m_stamp->day > days) {
         stop();
     }
@@ -239,15 +233,15 @@ int LinkSim::sim_idle(int& dsec)
 
     /* 构造频率请求消息 */
     FreqReq* req = &m_req;
-    int fcNum = LinkDlg::fcNum(m_link->fcNumIndex);
+    int fcNum = LinkCfg::fcNum(m_link->fcNumIndex);
     req->head.type = MSG_FREQ_REQ;
     req->fcNum = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
     int algId = m_link->algIndex;
-    if (algId == LinkDlg::RANDOM_SEARCH) {
+    if (algId == LinkCfg::RANDOM_SEARCH) {
         m_rsp = m_rand->bandit(m_req);
-    } else if (algId == LinkDlg::BISECTING_SEARCH) {
+    } else if (algId == LinkCfg::BISECTING_SEARCH) {
         m_rsp = m_sect->bandit(m_req);
     }
 
@@ -261,7 +255,7 @@ int LinkSim::sim_idle(int& dsec)
 int LinkSim::sim_scan(int& dsec)
 {
     int diff = second(m_stamp) - second(&m_hist);
-    int scanIntv = LinkDlg::scanIntv(m_link->scanIntvIndex);
+    int scanIntv = LinkCfg::scanIntv(m_link->scanIntvIndex);
     dsec = ABS(scanIntv - diff);
     if (diff < scanIntv) {
         return SCAN;
@@ -293,17 +287,17 @@ int LinkSim::sim_scan(int& dsec)
             m_linkNum++;
 
             /* 将scan结果发到alg */
-            if (algId == LinkDlg::BISECTING_SEARCH) {
+            if (algId == LinkCfg::BISECTING_SEARCH) {
                 m_sect->notify(true, glbChId, out.snr);
             }
 
             /* 切换到link */
-            int svcIntv = LinkDlg::svcIntv(m_link->svcIntvIndex);
+            int svcIntv = LinkCfg::svcIntv(m_link->svcIntvIndex);
             stamp(svcIntv);
             return LINK;
         } else {
             /* 将scan结果发到alg */
-            if (algId == LinkDlg::MONTE_CARLO_TREE) {
+            if (algId == LinkCfg::MONTE_CARLO_TREE) {
                 // todo
             }
 
@@ -318,14 +312,14 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 失败次数过多，复位状态 */
         if (m_scanNok > MAX_SCAN_FAIL_THR) {
-            if (algId == LinkDlg::BISECTING_SEARCH) {
+            if (algId == LinkCfg::BISECTING_SEARCH) {
                 m_sect->reset();
             }
             m_scanNok = 0;
         }
 
         /* 超时打点 */
-        int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+        int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
         stamp(idleIntv);
         return IDLE;
     }
@@ -356,17 +350,17 @@ int LinkSim::sim_link(int& dsec)
             emit new_chan(glbChId, out.snr, out.n0);
 
             /* 将link结果发到alg */
-            if (algId == LinkDlg::BISECTING_SEARCH) {
+            if (algId == LinkCfg::BISECTING_SEARCH) {
                 m_sect->notify(true, glbChId, out.snr);
             }
         } else {
             /* 重启推荐 */
-            if (algId == LinkDlg::BISECTING_SEARCH) {
+            if (algId == LinkCfg::BISECTING_SEARCH) {
                 m_sect->restart();
             }
 
             /* 断链 */
-            int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+            int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);
             return IDLE;
         }
@@ -377,11 +371,11 @@ int LinkSim::sim_link(int& dsec)
         return LINK;
     } else {
         /* 重启推荐 */
-        if (algId == LinkDlg::BISECTING_SEARCH) {
+        if (algId == LinkCfg::BISECTING_SEARCH) {
             m_sect->restart();
         }
 
-        int idleIntv = LinkDlg::idleIntv(m_link->idleIntvIndex);
+        int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
         stamp(idleIntv);
         return IDLE;
     }

@@ -57,15 +57,6 @@ void MainWin::free_win(void)
 void MainWin::setup_model(void)
 {
     m_model = new ModelCfg;
-    m_model->month = 1;
-    m_model->year = 2023;
-    m_model->dbDesc
-            << "成都市区-乐山沐川"
-            << "成都市区-陕西西安"
-            << "成都市区-海南三亚";
-
-    m_model->dbIndex = 0;
-    m_model->bandIndex = 0;
 }
 
 // 更新Model
@@ -83,12 +74,15 @@ int MainWin::update_model(const ModelCfg* cfg)
 
     /* 更新数据库 */
     QString dbFile = prefix + "/voacapx.db";
-    int maxband = ModelDlg::get_maxband(cfg->bandIndex);
+    int maxband = ModelCfg::get_maxband(cfg->bandIndex);
     int rc = m_sim->m_env->setup(month, maxband, dbFile);
     if (rc != 0) {
         QMessageBox::warning(this, "Warning", "Fail to setup model!");
         return rc;
     }
+
+    /* 更新底噪数据 */
+    m_chart->plot(cfg->withNoise);
 
     /* 更新背景图片 */
     this->setObjectName("MainWin");
@@ -142,7 +136,7 @@ void MainWin::on_new_state(int state, int dsec)
 }
 
 void MainWin::on_new_chan(int glbChId, int snr, int n0)
-{    
+{
     /* 绘图 */
     float fm = m_time->min / 60.0f;
     float fs = m_time->sec / 3600.0f;

@@ -6,16 +6,23 @@ WChart::WChart(void)
 {
     /* step1.建立chart */
     QChart* chart = new QChart();
+    foreach (auto ax, chart->axes()) {
+        chart->removeAxis(ax);
+    }
     chart->removeAllSeries();
     m_chart = chart;
 
     /* step2.设置散点 */
+    m_noise = new QLineSeries;
     m_scan = new QScatterSeries;
     m_link = new QScatterSeries;
+    chart->addSeries(m_noise);
     chart->addSeries(m_scan);
     chart->addSeries(m_link);
+    m_noise->setName("noise");
     m_scan->setName("scan");
     m_link->setName("link");
+    m_noise->setColor(Qt::red);
     m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
     m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scan->setBorderColor(Qt::black);
@@ -47,31 +54,49 @@ WChart::WChart(void)
     y0->setMinorGridLineVisible(false);
     y0->setGridLineVisible(false);
 
+    /* 设置y1坐标轴 */
+    QValueAxis *y1 = new QValueAxis;
+    y1->setTitleText("N0/dB");
+    y1->setRange(-140, 0);
+    y1->setTickCount(8);
+    y1->setMinorTickCount(1);
+    y1->setLabelFormat("%d");
+    y1->setTitleVisible(false);
+    y1->setMinorGridLineVisible(false);
+    y1->setGridLineVisible(false);
+
     /* step4.添加坐标轴 */
     chart->addAxis(x, Qt::AlignLeft);
     chart->addAxis(y0, Qt::AlignBottom);
+    chart->addAxis(y1, Qt::AlignTop);
     m_scan->attachAxis(x);
     m_scan->attachAxis(y0);
     m_link->attachAxis(x);
     m_link->attachAxis(y0);
+    m_noise->attachAxis(x);
+    m_noise->attachAxis(y1);
 
     /* 设置图形区域 */
-    bool flag = false;
+    bool flag = true;
     x->setVisible(flag);
     y0->setVisible(flag);
+    y1->setVisible(flag);
     x->setLabelsVisible(flag);
     y0->setLabelsVisible(flag);
+    y1->setLabelsVisible(flag);
     QRect rect(47, 92, 544, 409);
     chart->setPlotArea(rect);
 
     /* 设置chartview透明 */
     chart->setBackgroundVisible(true);
     chart->legend()->setVisible(false);
+    chart->show();
 }
 
 WChart::~WChart(void)
 {
     delete m_chart;
+    m_chart = nullptr;
 }
 
 void WChart::set_scan_color(QColor color)
@@ -97,11 +122,30 @@ void WChart::plot(float hour, float fc, int snr)
     if (snr > MIN_SNR) {
         m_link->append(hour, fc);
     }
-    m_chart->show();
+    m_chart->update();
+}
+
+void WChart::plot(bool withNoise)
+{
+    static int s_noise[640] = {
+        #include "noise.txt"
+    };
+
+    m_noise->clear();
+    if (withNoise == true) {
+        int i, j;
+        for (i = j = 0; i < MAX_GLB_CHN; i += 15, j++) {
+            qreal k = GLB2FREQ(i) / 1000.0;
+            m_noise->append(k, s_noise[j]);
+        }
+    }
+    m_chart->update();
 }
 
 void WChart::clear(void)
 {
+    m_noise->clear();
     m_scan->clear();
     m_link->clear();
+    m_chart->update();
 }

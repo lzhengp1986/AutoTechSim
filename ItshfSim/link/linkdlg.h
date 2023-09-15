@@ -8,27 +8,9 @@ namespace Ui {
 class LinkDlg;
 }
 
-typedef struct {
-    int simDayIndex; /* 仿真天数 */
-    int tmrSpeedIndex; /* 定时速度 */
-    int idleIntvIndex; /* 业务间隔 */
-    int scanIntvIndex; /* 扫频间隔 */
-    int svcIntvIndex; /* 业务间隔 */
-    int fcNumIndex; /* 单次请求频点个数 */
-    int algIndex; /* 算法索引 */
-} LinkCfg;
-
-class LinkDlg : public QDialog
-{
-    Q_OBJECT
-
+class LinkCfg {
 public:
-    explicit LinkDlg(QWidget *parent = nullptr);
-    ~LinkDlg();
-
-    /* api */
-    void dlg2para(LinkCfg* cfg);
-    void para2dlg(const LinkCfg* cfg);
+    LinkCfg(void);
 
     static int simDays(int index);
     static int timerSpeed(int index);
@@ -46,11 +28,17 @@ public:
         ITS_HF_PROPAGATION
     };
 
-private:
-    Ui::LinkDlg *ui;
+public:
+    int simDayIndex; /* 仿真天数 */
+    int tmrSpeedIndex; /* 定时速度 */
+    int idleIntvIndex; /* 业务间隔 */
+    int scanIntvIndex; /* 扫频间隔 */
+    int svcIntvIndex; /* 业务间隔 */
+    int fcNumIndex; /* 单次请求频点个数 */
+    int algIndex; /* 算法索引 */
 };
 
-inline int LinkDlg::simDays(int index)
+inline int LinkCfg::simDays(int index)
 {
     int days = 0;
     switch (index) {
@@ -64,23 +52,23 @@ inline int LinkDlg::simDays(int index)
     return days;
 }
 
-inline int LinkDlg::timerSpeed(int index)
+inline int LinkCfg::timerSpeed(int index)
 {
     int speed = 0;
     switch (index) {
-    case 0: speed = 1; break;
-    case 1: speed = 4; break;
-    case 2: speed = 8; break;
+    case 6: speed = 1; break;
+    case 5: speed = 4; break;
+    case 4: speed = 8; break;
     case 3: speed = 16; break;
-    case 4: speed = 32; break;
-    case 5: speed = 64; break;
-    case 6: speed = 128; break;
+    case 2: speed = 32; break;
+    case 1: speed = 64; break;
+    case 0: speed = 128; break;
     default: speed = 16; break;
     }
     return speed;
 }
 
-inline int LinkDlg::scanIntv(int index)
+inline int LinkCfg::scanIntv(int index)
 {
     int scanIntv = 0;
     switch (index) {
@@ -91,7 +79,7 @@ inline int LinkDlg::scanIntv(int index)
     return scanIntv;
 }
 
-inline int LinkDlg::svcIntv(int index)
+inline int LinkCfg::svcIntv(int index)
 {
     int svcIntv = 0;
     switch (index) {
@@ -109,7 +97,7 @@ inline int LinkDlg::svcIntv(int index)
     return (svcIntv * 60);
 }
 
-inline int LinkDlg::idleIntv(int index)
+inline int LinkCfg::idleIntv(int index)
 {
     int idleIntv = 0;
     switch (index) {
@@ -129,19 +117,18 @@ inline int LinkDlg::idleIntv(int index)
     return (idleIntv * 60);
 }
 
-inline int LinkDlg::fcNum(int index)
+inline int LinkCfg::fcNum(int index)
 {
     int fcNum = 0;
     switch (index) {
     case 0: fcNum = 10; break;
     case 1: fcNum = 5; break;
-    case 2: fcNum = 1; break;
     default: fcNum = 10; break;
     }
     return fcNum;
 }
 
-inline int LinkDlg::algorithm(int index)
+inline int LinkCfg::algorithm(int index)
 {
     int alg;
     switch (index) {
@@ -153,5 +140,21 @@ inline int LinkDlg::algorithm(int index)
     }
     return alg;
 }
+
+class LinkDlg : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit LinkDlg(QWidget *parent = nullptr);
+    ~LinkDlg();
+
+    /* api */
+    void dlg2para(LinkCfg* cfg);
+    void para2dlg(const LinkCfg* cfg);
+
+private:
+    Ui::LinkDlg *ui;
+};
 
 #endif // LINKDLG_H

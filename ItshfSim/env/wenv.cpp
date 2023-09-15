@@ -96,7 +96,7 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
     /* 初始化 */
     out.flag = false;
     out.n0 = MIN_PN0;
-    out.snr = MIN_SNR;
+    out.snr = MIN_SNR - 1;
     out.muf = MIN_CHN_FREQ;
 
     /* 时间检查 */

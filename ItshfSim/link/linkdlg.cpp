@@ -1,6 +1,17 @@
 #include "linkdlg.h"
 #include "ui_linkdlg.h"
 
+LinkCfg::LinkCfg(void)
+{
+    simDayIndex = 0; /* 1 */
+    fcNumIndex = 0; /* 10 */
+    tmrSpeedIndex = 0; /* x128 */
+    scanIntvIndex = 0; /* 2sec */
+    svcIntvIndex = 0; /* random */
+    idleIntvIndex = 0; /* random */
+    algIndex = 0; /* random */
+}
+
 LinkDlg::LinkDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LinkDlg)
