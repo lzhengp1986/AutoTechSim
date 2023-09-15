@@ -34,8 +34,6 @@ typedef struct {
 typedef struct {
     MsgHead head;
     int fcNum; /* 请求频点个数 */
-    int minChId; /* 最小信道号 */
-    int maxChId; /* 最大信道号 */
 } FreqReq;
 
 // 频率响应

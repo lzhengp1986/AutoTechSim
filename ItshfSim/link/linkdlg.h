@@ -16,8 +16,6 @@ typedef struct {
     int svcIntvIndex; /* 业务间隔 */
     int fcNumIndex; /* 单次请求频点个数 */
     int algIndex; /* 算法索引 */
-    int fromIndex; /* 搜索起始 */
-    int bwIndex; /* 搜索带宽 */
 } LinkCfg;
 
 class LinkDlg : public QDialog
@@ -39,8 +37,6 @@ public:
     static int svcIntv(int index);
     static int fcNum(int index);
     static int algorithm(int index);
-    static int from(int index);
-    static int bandwith(int index);
 
     /* 算法类型 */
     enum {
@@ -156,32 +152,6 @@ inline int LinkDlg::algorithm(int index)
     default: alg = RANDOM_SEARCH; break;
     }
     return alg;
-}
-
-inline int LinkDlg::from(int index)
-{
-    int start;
-    switch (index) {
-    case 0: start = 0; break;
-    case 1: start = 2000; break;
-    case 2: start = 4000; break;
-    case 3: start = 6000; break;
-    default: start = 0; break;
-    }
-    return start;
-}
-
-inline int LinkDlg::bandwith(int index)
-{
-    int bw;
-    switch (index) {
-    case 0: bw = MAX_GLB_CHN; break;
-    case 1: bw = 8000; break;
-    case 2: bw = 4000; break;
-    case 3: bw = 2000; break;
-    default: bw = MAX_GLB_CHN; break;
-    }
-    return bw;
 }
 
 #endif // LINKDLG_H

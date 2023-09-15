@@ -22,8 +22,6 @@ void LinkDlg::dlg2para(LinkCfg* cfg)
     cfg->svcIntvIndex = ui->linkInterval->currentIndex();
     cfg->idleIntvIndex = ui->idleInterval->currentIndex();
     cfg->algIndex = ui->alg->currentIndex();
-    cfg->fromIndex = ui->fromFreq->currentIndex();
-    cfg->bwIndex = ui->bwLen->currentIndex();
 }
 
 void LinkDlg::para2dlg(const LinkCfg* cfg)
@@ -35,6 +33,4 @@ void LinkDlg::para2dlg(const LinkCfg* cfg)
     ui->linkInterval->setCurrentIndex(cfg->svcIntvIndex);
     ui->idleInterval->setCurrentIndex(cfg->idleIntvIndex);
     ui->alg->setCurrentIndex(cfg->algIndex);
-    ui->fromFreq->setCurrentIndex(cfg->fromIndex);
-    ui->bwLen->setCurrentIndex(cfg->bwIndex);
 }
