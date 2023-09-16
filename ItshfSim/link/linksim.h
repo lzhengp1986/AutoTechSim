@@ -38,6 +38,7 @@ private:
     int sim_idle(int& dsec);
     int sim_scan(int& dsec);
     int sim_link(int& dsec);
+    void sim_reset(void);
     bool isExpired(void);
     void expire(int days);
     void stamp(int plus);
@@ -58,6 +59,7 @@ public:
 
 private:
     /* 定时器线程 */
+    bool m_daily;
     Time *m_stamp;
     Time *m_expire;
     QTimer *m_timer;

@@ -58,16 +58,7 @@ void LinkSim::trigger(void)
     emit new_sts(0, 0, 0, 0);
 
     /* step3.算法复位 */
-    int algId = m_link->algIndex;
-    if (algId == LinkCfg::RANDOM_SEARCH) {
-        m_rand->reset();
-    } else if (algId == LinkCfg::BISECTING_SEARCH) {
-        m_sect->reset();
-    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-        m_mont->reset();
-    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-        m_itshf->reset();
-    }
+    sim_reset();
 
     /* step4.倒计时 */
     m_state = IDLE;
@@ -77,6 +68,7 @@ void LinkSim::trigger(void)
 // 设置time
 void LinkSim::setup_time(void)
 {
+    m_daily = false;
     m_stamp = new Time;
     m_to = new Time;
 
@@ -186,6 +178,7 @@ void LinkSim::on_timeout(void)
     }
     m_stamp->hour -= MAX_HOUR_NUM;
     m_stamp->day++;
+    m_daily = true;
 
     /* 月进位 */
     if (m_stamp->day <= md) {
@@ -209,6 +202,12 @@ SIMULATE:
 // 主调度函数
 void LinkSim::simulate(void)
 {
+    /* 每日操作 */
+    if (m_daily == true) {
+        m_daily = false;
+        sim_reset();
+    }
+
     /* 算法仿真 */
     int dsec = 0;
     switch (m_state) {
@@ -218,13 +217,13 @@ void LinkSim::simulate(void)
     default: break;
     }
 
-    /* 更新界面状态 */
-    emit new_state(m_state, dsec);
-
     /* 判断过期 */
     if (isExpired()) {
         stop();
     }
+
+    /* 更新界面状态 */
+    emit new_state(m_state, dsec);
 }
 
 // idle
@@ -409,6 +408,21 @@ int LinkSim::sim_link(int& dsec)
     } else {
         stamp(idleIntv);
         return IDLE;
+    }
+}
+
+// 每天重置算法
+void LinkSim::sim_reset(void)
+{
+    int algId = m_link->algIndex;
+    if (algId == LinkCfg::RANDOM_SEARCH) {
+        m_rand->reset();
+    } else if (algId == LinkCfg::BISECTING_SEARCH) {
+        m_sect->reset();
+    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+        m_mont->reset();
+    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+        m_itshf->reset();
     }
 }
 
