@@ -82,7 +82,10 @@ int MainWin::update_model(const ModelCfg* cfg)
     }
 
     /* 更新底噪数据 */
-    m_chart->plot(cfg->withNoise);
+    if (cfg->withNoise == true) {
+        const int* pnoise = WEnv::noise();
+        m_chart->plot(pnoise, NOISE_NUM);
+    }
 
     /* 更新背景图片 */
     this->setObjectName("MainWin");

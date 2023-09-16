@@ -16,7 +16,7 @@ public:
     void set_link_color(QColor color);
     QChart* get_chart(void) const;
     void plot(float hour, float fc, int snr);
-    void plot(bool withNoise);
+    void plot(const int* noise, int n);
     void clear(void);
 
 private:

@@ -49,6 +49,9 @@ typedef struct {
 #define ENV_INV_PARA 1 /* 参数非法 */
 #define ENV_INV_GLB  2 /* glbChId非法 */
 
+/* 底噪数据长度 */
+#define NOISE_NUM 640
+
 class WEnv
 {
 public:
@@ -61,6 +64,9 @@ public:
 
     /*! @brief 根据时戳和信道号结合Model计算可用标志和SNR估计值 */
     int env(const EnvIn& in, EnvOut& out);
+
+    /*! @brief 根据信道号获取底噪 */
+    static const int* noise(void);
 
 private:
     int check(const EnvIn& in);

@@ -8,7 +8,7 @@ RandMng::RandMng(void)
     qsrand((uint)msec);
 
     /* 用随机值初始化种子 */
-    for (int i = 0; i < MAX_GLB_CHN + 2; i++) {
+    for (int i = 0; i <= MAX_GLB_CHN; i++) {
         m_iseed[i] = qrand();
         m_fseed[i] = qrand();
     }

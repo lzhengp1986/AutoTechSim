@@ -70,7 +70,7 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
     /* 300KHz附近选点 */
     int rnd = qrand() % 100;
     int glbChId = m_prvGlbChId + rnd - 50;
-    rsp->glb[0] = align(MIN(MAX(glbChId, 0), MAX_GLB_CHN));
+    rsp->glb[0] = align(MIN(MAX(glbChId, 0), MAX_GLB_CHN - 1));
     rsp->glb[1] = align(m_prvGlbChId);
 
     /* 搜索带宽3M/6M/9M */
@@ -137,10 +137,10 @@ bool BisectAlg::bisect(int schband, int& glbChId)
 {
     /* 限制搜索范围2M */
     int minGlbId = 0;
-    int maxGlbId = MAX_GLB_CHN;
+    int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
         minGlbId = MAX(m_prvGlbChId - schband / 2, 0);
-        maxGlbId = MIN(minGlbId + schband, MAX_GLB_CHN);
+        maxGlbId = MIN(minGlbId + schband, MAX_GLB_CHN - 1);
     }
 
     /* 二分搜索 */

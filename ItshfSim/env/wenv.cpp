@@ -83,7 +83,7 @@ int WEnv::check(const EnvIn& in)
     int glbChId = in.glbChId;
     if ((hour < 0) || (hour >= MAX_HOUR_NUM)
         || (month < 0) || (month > MAX_MONTH_NUM)
-        || (glbChId < 0) || (glbChId > MAX_GLB_CHN)) {
+        || (glbChId < 0) || (glbChId >= MAX_GLB_CHN)) {
         return ENV_INV_PARA; /* 参数非法 */
     }
 
@@ -113,6 +113,13 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
 // 根据时戳和信道号结合Model计算可用标志和SNR估计值
 int WEnv::calc(const EnvIn& in, EnvOut& out)
 {
+    /* 获取底噪 */
+    const int* pnoise = noise();
+    int glbChId = in.glbChId;
+    int locChId = glbChId / CHN_SCAN_STEP;
+    int subId = locChId / 3; /* 3个信道压缩 */
+    out.n0 = pnoise[subId];
+
     /* 获取Hour信息 */
     DbHour* dh = &m_dbMonth.hr[in.hour];
 
@@ -124,7 +131,6 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
     out.muf = muf;
 
     /* 是否在可通频带 */
-    int glbChId = in.glbChId;
     int fc = GLB2FREQ(glbChId);
     if ((fc < min) || (fc > max)) {
         return ENV_INV_GLB;
@@ -155,3 +161,14 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
     out.snr = expSnr;
     return ENV_OK;
 }
+
+// 根据信道号获取底噪
+const int* WEnv::noise(void)
+{
+    static int s_noise[NOISE_NUM] = {
+    #include "noise.txt"
+    };
+
+    return s_noise;
+}
+

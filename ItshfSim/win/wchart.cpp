@@ -128,19 +128,13 @@ void WChart::plot(float hour, float fc, int snr)
     m_chart->update();
 }
 
-void WChart::plot(bool withNoise)
+void WChart::plot(const int* noise, int n)
 {
-    static int s_noise[640] = {
-        #include "noise.txt"
-    };
-
+    int i, j;
     m_noise->clear();
-    if (withNoise == true) {
-        int i, j;
-        for (i = j = 0; i < MAX_GLB_CHN; i += 15, j++) {
-            qreal k = GLB2FREQ(i) / 1000.0;
-            m_noise->append(s_noise[j], k);
-        }
+    for (i = j = 0; j < n; i += 15, j++) {
+        qreal k = GLB2FREQ(i) / 1000.0;
+        m_noise->append(noise[j], k);
     }
     m_chart->update();
 }
