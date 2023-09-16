@@ -20,7 +20,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    env/sqlite3.c \
+    sql/simsql.cpp \
+    sql/sqlite3.c \
     env/dbdlg.cpp \
     env/modeldlg.cpp \
     env/randmng.cpp \
@@ -40,7 +41,8 @@ SOURCES += \
 HEADERS += \
     macro.h \
     type.h \
-    env/sqlite3.h \
+    sql/simsql.h \
+    sql/sqlite3.h \
     env/dbdlg.h \
     env/modeldlg.h \
     env/randmng.h \

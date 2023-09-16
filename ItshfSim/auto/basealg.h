@@ -3,6 +3,7 @@
 
 #include "type.h"
 #include "env/wenv.h"
+#include "sql/sqlite3.h"
 
 class BaseAlg
 {

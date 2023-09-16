@@ -1,5 +1,5 @@
 #include "wenv.h"
-#include "sqlite3.h"
+#include "sql/sqlite3.h"
 #include <QMessageBox>
 
 // 构造
