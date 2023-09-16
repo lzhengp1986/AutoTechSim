@@ -234,7 +234,12 @@ int LinkSim::sim_idle(int& dsec)
     }
 
     /* 更新统计 */
-    int tryFcNum = (m_scanFrq + m_scanNum) / (m_scanNum + 1);
+    int tryFcNum = 0;
+    if (m_scanNum > 0) {
+        /* 向上取整 */
+        int pad = m_scanNum - 1;
+        tryFcNum = (m_scanFrq + pad) / m_scanNum;
+    }
     emit new_sts(tryFcNum, m_scanFrq, m_linkNum, m_testNum);
 
     /* 构造频率请求消息 */
