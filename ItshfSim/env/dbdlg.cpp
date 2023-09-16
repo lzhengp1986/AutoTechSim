@@ -300,7 +300,7 @@ bool DbDlg::db_open(sqlite3** db)
 
     /* 打开db */
     int ret = sqlite3_open_v2(file, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-    if (ret) {
+    if (ret != SQLITE_OK) {
         QMessageBox::warning(this, "Warning", "Can not open database file.");
         return false;
     }
@@ -317,7 +317,7 @@ bool DbDlg::db_open(sqlite3** db)
     }
 
     /* 创建表格 */
-    const char *sql2 = "CREATE TABLE  IF NOT EXISTS ITU(year INTEGER, month INTEGER, ssn INTEGER, hour INTEGER,"
+    const char *sql2 = "CREATE TABLE IF NOT EXISTS ITU(year INTEGER, month INTEGER, ssn INTEGER, hour INTEGER,"
                        "freq INTEGER, mufday INTEGER, dbu INTEGER, snr INTEGER, rel INTEGER, sprb INTEGER,"
                        "UNIQUE(year, month, ssn, hour, freq) ON CONFLICT IGNORE)";
     int rc2 = sqlite3_exec(*db, sql2, 0, 0, &errMsg);

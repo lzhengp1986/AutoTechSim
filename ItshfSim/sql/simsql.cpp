@@ -4,12 +4,13 @@
 // 构造
 SimSql::SimSql(void)
 {
-    /* 打开DB */
-    sqlite3* db;
-    const char* file = "sim.db";
-    int rc = sqlite3_open_v2(file, &db, SQLITE_OPEN_READONLY, NULL);
-    if (rc != SQLITE_OK) {
-        m_handle = nullptr;
+    sqlite3 *db;
+    m_handle = nullptr;
+    const char* path = "./png/sim.db";
+    int ret = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+    if (ret != SQLITE_OK) {
+        printf("err: open DB\n");
+        fflush(stdout);
         return;
     }
 
@@ -29,6 +30,7 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
 {
     if (m_handle == nullptr) {
         printf("err: null DB handle\n");
+        fflush(stdout);
         return SQLITE_ERROR;
     }
 
@@ -41,6 +43,8 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
     if (rc != SQLITE_OK) {
         printf("err: insert %s failure %s\n", tlist[tab], errMsg);
         sqlite3_free(errMsg);
+        sqlite3_free(sql);
+        fflush(stdout);
         return rc;
     }
     sqlite3_free(sql);
@@ -52,6 +56,7 @@ int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
 {
     if (m_handle == nullptr) {
         printf("err: null DB handle\n");
+        fflush(stdout);
         return SQLITE_ERROR;
     }
 
@@ -83,9 +88,11 @@ int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
                                 minDay, minHr, minHr, minMin, maxDay, maxHr, maxHr, maxMin);
     int rc = sqlite3_prepare_v2(m_handle, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
+        sqlite3_free(sql);
         sqlite3_close(m_handle);
         return rc;
     }
+    sqlite3_free(sql);
 
     /* 循环读数据 */
     FreqInfo info;
@@ -109,17 +116,36 @@ void SimSql::drop(int tab)
 {
     if (m_handle == nullptr) {
         printf("err: null DB handle\n");
+        fflush(stdout);
         return;
     }
 
+    /* 删除表格 */
     char* errMsg = nullptr;
     const char* tlist[] = {"SCAN", "LINK"};
-    char* sql = sqlite3_mprintf("drop table if exists %s", tlist[tab]);
-    int rc = sqlite3_exec(m_handle, sql, 0, 0, &errMsg);
+    char* sql1 = sqlite3_mprintf("drop table if exists %s", tlist[tab]);
+    int rc = sqlite3_exec(m_handle, sql1, 0, 0, &errMsg);
     if (rc != SQLITE_OK) {
         printf("err: drop %s failure %s\n", tlist[tab], errMsg);
         sqlite3_free(errMsg);
+        sqlite3_free(sql1);
+        fflush(stdout);
+        return;
     }
+    sqlite3_free(sql1);
+
+    /* 重建表格 */
+    char *sql2 = sqlite3_mprintf("create table if not exists %s(year INTEGER, month INTEGER, day INTEGER, hour INTEGER,"
+                                 "min INTEGER, sec INTEGER, valid INTEGER, glbChId INTEGER, snr INTEGER, noise INTEGER,"
+                                 "UNIQUE(year, month, day, hour, min, sec, glbChId) ON CONFLICT REPLACE)", tlist[tab]);
+    rc = sqlite3_exec(m_handle, sql2, 0, 0, &errMsg);
+    if (rc != SQLITE_OK) {
+        printf("err: create SCAN failure %s\n", errMsg);
+        sqlite3_free(errMsg);
+        sqlite3_free(sql2);
+        return;
+    }
+    sqlite3_free(sql2);
 
     /* 释放内存 */
     sqlite3_exec(m_handle, "VACUUM", 0, 0, NULL);
