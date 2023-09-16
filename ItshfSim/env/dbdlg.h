@@ -1,7 +1,7 @@
 #ifndef DBDLG_H
 #define DBDLG_H
 
-#include "sqlite3.h"
+#include "sql/sqlite3.h"
 #include <QDialog>
 
 namespace Ui {

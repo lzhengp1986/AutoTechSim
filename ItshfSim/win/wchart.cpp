@@ -90,7 +90,7 @@ WChart::WChart(void)
 
     /* step4.添加坐标轴 */
     chart->addAxis(x0, Qt::AlignLeft);
-    chart->addAxis(x1, Qt::AlignLeft);
+    chart->addAxis(x1, Qt::AlignRight);
     chart->addAxis(y0, Qt::AlignBottom);
     chart->addAxis(y1, Qt::AlignTop);
     m_scan->attachAxis(x0);
@@ -178,7 +178,7 @@ void WChart::plot(const int* noise, int n)
 
 void WChart::clear(void)
 {
-    m_noise->clear();
+    /* 不要清除噪声 */
     m_regret->clear();
     m_scan->clear();
     m_link->clear();
