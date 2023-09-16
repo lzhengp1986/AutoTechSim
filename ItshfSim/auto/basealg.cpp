@@ -3,29 +3,26 @@
 #include <QTime>
 
 // 实例化
-SimSql* BaseAlg::m_sql;
+SimSql BaseAlg::m_sql;
 
 // 构造
 BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
-    m_sql = new SimSql;
 }
 
 // 析构
 BaseAlg::~BaseAlg(void)
 {
-    delete m_sql;
-    m_sql = nullptr;
 }
 
 // 复位函数
 void BaseAlg::reset(void)
 {
     m_regret = 0;
-    m_sql->drop(SMPL_SCAN);
-    m_sql->drop(SMPL_LINK);
+    m_sql.drop(SMPL_SCAN);
+    m_sql.drop(SMPL_LINK);
 }
 
 // 算法状态重置
@@ -80,7 +77,7 @@ int BaseAlg::notify(int type, const Time* ts, int glbChId, const EnvOut& out)
     int mufSnr = out.mufSnr;
 
     /* 记录到sql */
-    int ret = m_sql->insert(type, ts, frqVld, glbChId, frqSnr, out.n0);
+    int ret = m_sql.insert(type, ts, frqVld, glbChId, frqSnr, out.n0);
     if (ret != SQLITE_OK) {
         /* nothing-to-do */
     }

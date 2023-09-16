@@ -34,7 +34,7 @@ protected:
 protected:
     FreqRsp m_rsp;
     unsigned m_regret;
-    static SimSql *m_sql;
+    static SimSql m_sql;
 };
 
 // 填写消息头

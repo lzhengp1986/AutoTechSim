@@ -159,7 +159,7 @@ void WChart::plot(float hour, float fc, int snr, int regret)
     qreal max = m_axisX1->max();
     if (regret > max) {
         qreal min = m_axisX1->min();
-        m_axisX1->setRange(min, max * 2);
+        m_axisX1->setRange(min, max * 1.2f);
     }
 
     m_chart->update();

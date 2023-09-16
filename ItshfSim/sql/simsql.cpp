@@ -27,6 +27,11 @@ SimSql::~SimSql(void)
 // 插入数据
 int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int noise)
 {
+    if (m_handle == nullptr) {
+        printf("err: null DB handle\n");
+        return SQLITE_ERROR;
+    }
+
     char* errMsg = nullptr;
     const char* tlist[] = {"SCAN", "LINK"};
     char* sql = sqlite3_mprintf("insert into %s values(%d,%d,%d,%d,%d, %d,%d,%d,%d,%d)", tlist[tab],
@@ -45,6 +50,11 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
 // 筛选数据
 int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
 {
+    if (m_handle == nullptr) {
+        printf("err: null DB handle\n");
+        return SQLITE_ERROR;
+    }
+
     int minDay, minHr, minMin;
     int maxDay, maxHr, maxMin;
 
@@ -97,6 +107,11 @@ int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
 // 丢弃所有数据
 void SimSql::drop(int tab)
 {
+    if (m_handle == nullptr) {
+        printf("err: null DB handle\n");
+        return;
+    }
+
     char* errMsg = nullptr;
     const char* tlist[] = {"SCAN", "LINK"};
     char* sql = sqlite3_mprintf("drop table if exists %s", tlist[tab]);
