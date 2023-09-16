@@ -209,16 +209,16 @@ void MainWin::on_reg_color(Qt::GlobalColor color)
 
 void MainWin::on_actModel_triggered(void)
 {
-    /* 停止仿真 */
-    m_sim->stop();
-    m_chart->clear();
-
     /* 界面初始化 */
     ModelDlg* dlg = new ModelDlg(this);
     dlg->para2dlg(m_model);
 
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
+        /* 停止仿真 */
+        m_sim->stop();
+        m_chart->clear();
+
         /* 获取模型参数 */
         ModelCfg cfg = *m_model;
         dlg->dlg2para(&cfg);
@@ -243,19 +243,21 @@ void MainWin::on_actModel_triggered(void)
 
 void MainWin::on_actStrategy_triggered(void)
 {
-    /* 停止仿真 */
-    m_sim->stop();
-    m_chart->clear();
-
-    /* 配置参数 */
     LinkDlg* dlg = new LinkDlg(this);
     dlg->para2dlg(m_sim->m_link);
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
+        /* 停止仿真 */
+        m_sim->stop();
+        m_chart->clear();
+
+        /* 配置参数 */
         dlg->dlg2para(m_sim->m_link);
 
         /* 启动仿真 */
-        m_sim->trigger();
+        int dayIndex = m_sim->m_link->simDayIndex;
+        int days = LinkCfg::simDays(dayIndex);
+        m_sim->trigger(days);
     }
 }
 

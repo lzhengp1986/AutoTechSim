@@ -49,10 +49,13 @@ void LinkSim::stop(void)
     m_sect->reset();
 }
 
-void LinkSim::trigger(void)
+void LinkSim::trigger(int days)
 {
     /* 统计值复位 */
     emit new_sts(0, 0, 0, 0);
+
+    /* 失效天数 */
+    expire(days);
 
     /* 倒计时 */
     stamp(10);
@@ -63,14 +66,11 @@ void LinkSim::trigger(void)
 void LinkSim::setup_time(void)
 {
     m_stamp = new Time;
-    m_stamp->year = 2023;
-    m_stamp->month = 1;
-    m_stamp->day = 15;
-    m_stamp->hour = 0;
-    m_stamp->min = 0;
-    m_stamp->sec = 0;
-    m_stamp->msec = 0;
-    m_hist = *m_stamp;
+    m_to = new Time;
+
+    /* 默认仿真1天 */
+    m_expire = new Time;
+    expire(1);
 
     /* 定时器子线程 */
     m_timer = new QTimer;
@@ -88,6 +88,7 @@ void LinkSim::setup_alg(void)
     m_sect = new BisectAlg;
     m_itshf = new ItshfAlg;
     m_mont = new MonteAlg;
+    m_sql = new SimSql;
 }
 
 // 释放算法
@@ -97,10 +98,12 @@ void LinkSim::free_alg(void)
     delete m_sect;
     delete m_itshf;
     delete m_mont;
+    delete m_sql;
     m_rand = nullptr;
     m_sect = nullptr;
     m_itshf = nullptr;
     m_mont = nullptr;
+    m_sql = nullptr;
 }
 
 // 更新Time += msec
@@ -108,7 +111,7 @@ bool LinkSim::update_time(int msec)
 {
     m_stamp->msec += msec;
 
-    /* 毫秒进位 */
+    /* 秒进位 */
     if (m_stamp->msec >= 1000) {
         do {
             m_stamp->msec -= 1000;
@@ -118,7 +121,8 @@ bool LinkSim::update_time(int msec)
         return false;
     }
 
-    /* 秒进位 */
+    /* 分进位 */
+    int md = m_stamp->mdays();
     if (m_stamp->sec >= 60) {
         do {
             m_stamp->sec -= 60;
@@ -128,7 +132,7 @@ bool LinkSim::update_time(int msec)
         goto UPDATE_LABEL;
     }
 
-    /* 分钟进位 */
+    /* 时进位 */
     if (m_stamp->min >= 60) {
         do {
             m_stamp->min -= 60;
@@ -138,12 +142,28 @@ bool LinkSim::update_time(int msec)
         goto UPDATE_LABEL;
     }
 
-    /* 小时进位 */
+    /* 天进位 */
     if (m_stamp->hour >= 24) {
         do {
             m_stamp->hour -= 24;
             m_stamp->day++;
         } while (m_stamp->hour >= 24);
+    } else {
+        goto UPDATE_LABEL;
+    }
+
+    /* 月进位 */
+    if (m_stamp->day > md) {
+        m_stamp->day -= md;
+        m_stamp->month++;
+    } else {
+        goto UPDATE_LABEL;
+    }
+
+    /* 年进位 */
+    if (m_stamp->month > MAX_MONTH_NUM) {
+        m_stamp->month -= MAX_MONTH_NUM;
+        m_stamp->year++;
     } else {
         goto UPDATE_LABEL;
     }
@@ -158,11 +178,6 @@ void LinkSim::set_time(int year, int month)
 {
     m_stamp->year = year;
     m_stamp->month = month;
-    m_stamp->day = 15;
-    m_stamp->hour = 0;
-    m_stamp->min = 0;
-    m_stamp->sec = 0;
-    m_stamp->msec = 0;
     emit new_time(m_stamp);
 }
 
@@ -174,9 +189,13 @@ void LinkSim::free_time(void)
     delete m_timer;
     delete m_subthr;
     delete m_stamp;
+    delete m_expire;
+    delete m_to;
     m_timer = nullptr;
     m_subthr = nullptr;
     m_stamp = nullptr;
+    m_expire = nullptr;
+    m_to = nullptr;
 }
 
 // 定时器超时处理
@@ -196,9 +215,11 @@ void LinkSim::on_timer_timeout(void)
     }
 
     /* 判断仿真天数 */
-    int dayIndex = m_link->simDayIndex;
-    int days = LinkCfg::simDays(dayIndex);
-    if (m_stamp->day > days) {
+    if (m_stamp->year > m_expire->year) {
+        stop();
+    } else if (m_stamp->month > m_expire->month) {
+        stop();
+    } else if (m_stamp->day > m_expire->day) {
         stop();
     }
 
@@ -227,7 +248,7 @@ int LinkSim::simulate(int& dsec)
 // idle
 int LinkSim::sim_idle(int& dsec)
 {
-    int diff = second(&m_hist) - second(m_stamp);
+    int diff = m_to->second() - m_stamp->second();
     dsec = ABS(diff);
     if (diff > 0) {
         return IDLE;
@@ -267,7 +288,7 @@ int LinkSim::sim_scan(int& dsec)
 {
     int scanIndex = m_link->scanIntvIndex;
     int scanIntv = LinkCfg::scanIntv(scanIndex);
-    int diff = second(m_stamp) - second(&m_hist);
+    int diff = m_stamp->second() - m_to->second();
     dsec = ABS(scanIntv - diff);
     if (diff < scanIntv) {
         return SCAN;
@@ -350,7 +371,7 @@ int LinkSim::sim_scan(int& dsec)
 // link
 int LinkSim::sim_link(int& dsec)
 {
-    int diff = second(&m_hist) - second(m_stamp);
+    int diff = m_to->second() - m_stamp->second();
     dsec = ABS(diff);
 
     int algId = m_link->algIndex;
@@ -406,29 +427,28 @@ int LinkSim::sim_link(int& dsec)
     }
 }
 
-// 秒计数
-int LinkSim::second(const Time* ts)
+// 在当前定时上加days
+void LinkSim::expire(int days)
 {
-    /* 润年 */
-    int year = ts->year;
-    int leap = (((year % 100 != 0) && (year % 4 == 0)) || (year % 400 == 0));
+    *m_expire = *m_stamp;
+    m_expire->day += days;
 
-    /* 月天 */
-    int tab[MAX_MONTH_NUM] = {31, 30, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int mday = tab[ts->month];
-
-    /* 秒数 */
-    int day = (year - 2020) * (365 + leap) + ts->month * mday + ts->day;
-    int hour = day * 24 + ts->hour;
-    int min = hour * 60 + ts->min;
-    int sec = min * 60 + ts->sec;
-    return sec;
+    /* 进位判断 */
+    int md = m_stamp->mdays();
+    if (m_expire->day > md) {
+        m_expire->day -= md;
+        m_expire->month++;
+    }
+    if (m_expire->month > MAX_MONTH_NUM) {
+        m_expire->month -= MAX_MONTH_NUM;
+        m_expire->year++;
+    }
 }
 
 // 超时时戳
 void LinkSim::stamp(int plus)
 {
-    m_hist = *m_stamp;
-    m_hist.sec += plus;
+    *m_to = *m_stamp;
+    m_to->sec += plus;
 }
 

@@ -5,6 +5,7 @@
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"
+#include "sql/simsql.h"
 #include "auto/autosim.h"
 
 #include <QThread>
@@ -23,7 +24,7 @@ public:
 
     /* api */
     void stop(void);
-    void trigger(void);
+    void trigger(int days);
     void set_time(int year, int month);
     int simulate(int& dsec);
 
@@ -39,7 +40,7 @@ private:
     int sim_idle(int& dsec);
     int sim_scan(int& dsec);
     int sim_link(int& dsec);
-    int second(const Time* ts);
+    void expire(int days);
     void stamp(int plus);
 
 private slots:
@@ -59,6 +60,7 @@ public:
 private:
     /* 定时器线程 */
     Time *m_stamp;
+    Time *m_expire;
     QTimer *m_timer;
     QThread *m_subthr;
 
@@ -67,12 +69,13 @@ private:
     BisectAlg *m_sect;
     ItshfAlg *m_itshf;
     MonteAlg *m_mont;
+    SimSql *m_sql;
 
     /* 状态机 */
     FreqReq m_req;
     FreqRsp m_rsp;
-    Time m_hist;
     int m_state;
+    Time *m_to;
 
     /* 统计值 */
     unsigned m_linkNum; /* 建链总次数 */

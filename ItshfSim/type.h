@@ -4,7 +4,13 @@
 #include "macro.h"
 
 // 时间戳
-typedef struct {
+class Time {
+public:
+    Time(void);
+    int mdays(void);
+    int second(void);
+
+public:
     int year; /* 年(2023~) */
     int month; /* 月(1~12) */
     int day; /* 天(1~31) */
@@ -12,7 +18,7 @@ typedef struct {
     int min; /* 分(0~59) */
     int sec; /* 秒(0~59) */
     int msec; /* 毫秒 */
-} Time;
+};
 
 // 状态机
 typedef enum {
