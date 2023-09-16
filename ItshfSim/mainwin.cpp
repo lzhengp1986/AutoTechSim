@@ -87,6 +87,8 @@ int MainWin::update_model(const ModelCfg* cfg)
     if (cfg->withNoise == true) {
         const int* pnoise = WEnv::noise();
         m_chart->plot(pnoise, NOISE_NUM);
+    } else {
+        m_chart->clear_noise();
     }
 
     /* 更新背景图片 */

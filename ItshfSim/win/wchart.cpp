@@ -176,6 +176,12 @@ void WChart::plot(const int* noise, int n)
     m_chart->update();
 }
 
+void WChart::clear_noise(void)
+{
+    m_noise->clear();
+    m_chart->update();
+}
+
 void WChart::clear(void)
 {
     /* 不要清除噪声 */

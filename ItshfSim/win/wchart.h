@@ -20,6 +20,7 @@ public:
     QChart* get_chart(void) const;
     void plot(float hour, float fc, int snr, int regret);
     void plot(const int* noise, int n);
+    void clear_noise(void);
     void clear(void);
 
 private:
