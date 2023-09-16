@@ -65,7 +65,7 @@ void LinkSim::setup_time(void)
     m_stamp = new Time;
     m_stamp->year = 2023;
     m_stamp->month = 1;
-    m_stamp->day = 1;
+    m_stamp->day = 15;
     m_stamp->hour = 0;
     m_stamp->min = 0;
     m_stamp->sec = 0;
@@ -158,7 +158,7 @@ void LinkSim::set_time(int year, int month)
 {
     m_stamp->year = year;
     m_stamp->month = month;
-    m_stamp->day = 1;
+    m_stamp->day = 15;
     m_stamp->hour = 0;
     m_stamp->min = 0;
     m_stamp->sec = 0;
@@ -409,7 +409,16 @@ int LinkSim::sim_link(int& dsec)
 // 秒计数
 int LinkSim::second(const Time* ts)
 {
-    int day = (ts->year - 2020) * 366 + ts->month * 31 + ts->day;
+    /* 润年 */
+    int year = ts->year;
+    int leap = (((year % 100 != 0) && (year % 4 == 0)) || (year % 400 == 0));
+
+    /* 月天 */
+    int tab[MAX_MONTH_NUM] = {31, 30, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int mday = tab[ts->month];
+
+    /* 秒数 */
+    int day = (year - 2020) * (365 + leap) + ts->month * mday + ts->day;
     int hour = day * 24 + ts->hour;
     int min = hour * 60 + ts->min;
     int sec = min * 60 + ts->sec;

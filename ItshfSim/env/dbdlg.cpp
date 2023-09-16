@@ -350,5 +350,6 @@ void DbDlg::db_insert(sqlite3* db, int year, int month, int ssn, int hour,
 void DbDlg::db_close(sqlite3* db)
 {
     sqlite3_exec(db, "END TRANSACTION", 0, 0, NULL);
+    sqlite3_exec(db, "VACUUM", 0, 0, NULL);
     sqlite3_close(db);
 }
