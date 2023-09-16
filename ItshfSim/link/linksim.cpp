@@ -119,59 +119,53 @@ void LinkSim::free_alg(void)
 bool LinkSim::update_time(int msec)
 {
     m_stamp->msec += msec;
+    if (m_stamp->msec < 1000) {
+        return false;
+    }
+    int md = m_stamp->mdays();
 
     /* 秒进位 */
-    if (m_stamp->msec >= 1000) {
-        do {
-            m_stamp->msec -= 1000;
-            m_stamp->sec++;
-        } while (m_stamp->msec >= 1000);
-    } else {
-        return false;
+    while (m_stamp->msec >= 1000) {
+        m_stamp->msec -= 1000;
+        m_stamp->sec++;
     }
 
     /* 分进位 */
-    int md = m_stamp->mdays();
-    if (m_stamp->sec >= 60) {
-        do {
-            m_stamp->sec -= 60;
-            m_stamp->min++;
-        } while (m_stamp->sec >= 60);
-    } else {
+    if (m_stamp->sec < 60) {
         goto UPDATE_LABEL;
+    }
+    while (m_stamp->sec >= 60) {
+        m_stamp->sec -= 60;
+        m_stamp->min++;
     }
 
     /* 时进位 */
-    if (m_stamp->min >= 60) {
-        m_stamp->min -= 60;
-        m_stamp->hour++;
-    } else {
+    if (m_stamp->min < 60) {
         goto UPDATE_LABEL;
     }
+    m_stamp->min -= 60;
+    m_stamp->hour++;
 
     /* 天进位 */
-    if (m_stamp->hour >= MAX_HOUR_NUM) {
-        m_stamp->hour -= MAX_HOUR_NUM;
-        m_stamp->day++;
-    } else {
+    if (m_stamp->hour < MAX_HOUR_NUM) {
         goto UPDATE_LABEL;
     }
+    m_stamp->hour -= MAX_HOUR_NUM;
+    m_stamp->day++;
 
     /* 月进位 */
-    if (m_stamp->day > md) {
-        m_stamp->day -= md;
-        m_stamp->month++;
-    } else {
+    if (m_stamp->day <= md) {
         goto UPDATE_LABEL;
     }
+    m_stamp->day -= md;
+    m_stamp->month++;
 
     /* 年进位 */
-    if (m_stamp->month > MAX_MONTH_NUM) {
-        m_stamp->month -= MAX_MONTH_NUM;
-        m_stamp->year++;
-    } else {
+    if (m_stamp->month <= MAX_MONTH_NUM) {
         goto UPDATE_LABEL;
     }
+    m_stamp->month -= MAX_MONTH_NUM;
+    m_stamp->year++;
 
 UPDATE_LABEL:
     emit new_time(m_stamp);

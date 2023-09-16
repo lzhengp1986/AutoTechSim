@@ -11,7 +11,7 @@
 #include <QTimer>
 
 /* 定时器最小精度 */
-#define TIMER_INTERVAL_MS 10
+#define TIMER_INTERVAL_MS 2
 
 class LinkSim : public QThread
 {

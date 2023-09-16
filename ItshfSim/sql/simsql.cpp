@@ -81,10 +81,10 @@ int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
     /* 参数准备 */
     sqlite3_stmt* stmt;
     const char* tlist[] = {"SCAN", "LINK"};
-    char* sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
+    char* sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and valid=%d"
                                 " and (day=%d and hour>%d or (hour=%d and min>=%d))" /* 最早时刻 */
                                 " and (day=%d and hour<%d or (hour=%d and min<=%d))" /* 最新时刻 */
-                                " order by snr desc", tlist[tab], ts->year, ts->month,
+                                " order by snr desc", tlist[tab], ts->year, ts->month, true,
                                 minDay, minHr, minHr, minMin, maxDay, maxHr, maxHr, maxMin);
     int rc = sqlite3_prepare_v2(m_handle, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
