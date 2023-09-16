@@ -119,7 +119,7 @@ QChart* WChart::get_chart(void) const
     return m_chart;
 }
 
-void WChart::plot(float hour, float fc, int snr)
+void WChart::plot(float hour, float fc, int snr, int regret)
 {
     m_scan->append(hour, fc);
     if (snr > MIN_SNR) {

@@ -260,8 +260,9 @@ int LinkSim::sim_idle(int& dsec)
 // scan
 int LinkSim::sim_scan(int& dsec)
 {
+    int scanIndex = m_link->scanIntvIndex;
+    int scanIntv = LinkCfg::scanIntv(scanIndex);
     int diff = second(m_stamp) - second(&m_hist);
-    int scanIntv = LinkCfg::scanIntv(m_link->scanIntvIndex);
     dsec = ABS(scanIntv - diff);
     if (diff < scanIntv) {
         return SCAN;
@@ -283,11 +284,25 @@ int LinkSim::sim_scan(int& dsec)
         in.glbChId = glbChId;
         int flag = m_env->env(in, out);
         if (flag != ENV_OK) {
-            /* nothing to do */
+            stamp(scanIntv);
+            rsp->used++;
+            return SCAN;
+        }
+
+        /* 将scan结果发到alg */
+        int regret = 0;
+        if (algId == LinkCfg::RANDOM_SEARCH) {
+            regret = m_rand->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::BISECTING_SEARCH) {
+            regret = m_sect->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+            regret = m_mont->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+            regret = m_itshf->notify(m_stamp, glbChId, out);
         }
 
         /* 将scan结果发到MainWin */
-        emit new_chan(glbChId, out.snr, out.n0);
+        emit new_chan(glbChId, out.snr, out.n0, regret);
 
         /* 状态切换: LINK or SCAN */
         if (out.isValid == true) {
@@ -295,21 +310,13 @@ int LinkSim::sim_scan(int& dsec)
             m_scanNum++;
             m_linkNum++;
 
-            /* 将scan结果发到alg */
-            if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->notify(true, glbChId, out.snr);
-            }
-
             /* 切换到link */
-            int svcIntv = LinkCfg::svcIntv(m_link->svcIntvIndex);
+            int svcIndex = m_link->svcIntvIndex;
+            int svcIntv = LinkCfg::svcIntv(svcIndex);
             stamp(svcIntv);
             return LINK;
         } else {
-            /* 将scan结果发到alg */
-            if (algId == LinkCfg::MONTE_CARLO_TREE) {
-                // todo
-            }
-
+            /* 继续scan */
             stamp(scanIntv);
             rsp->used++;
             return SCAN;
@@ -328,7 +335,8 @@ int LinkSim::sim_scan(int& dsec)
         }
 
         /* 超时打点 */
-        int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
+        int idleIndex = m_link->idleIntvIndex;
+        int idleIntv = LinkCfg::idleIntv(idleIndex);
         stamp(idleIntv);
         return IDLE;
     }
@@ -340,8 +348,11 @@ int LinkSim::sim_link(int& dsec)
     int diff = second(&m_hist) - second(m_stamp);
     dsec = ABS(diff);
 
-    /* 每分钟上报link信息 */
     int algId = m_link->algIndex;
+    int idleIndex = m_link->idleIntvIndex;
+    int idleIntv = LinkCfg::idleIntv(idleIndex);
+
+    /* 每分钟上报link信息 */
     if (dsec % 60 == 0) {
         EnvIn in;
         EnvOut out;
@@ -355,20 +366,27 @@ int LinkSim::sim_link(int& dsec)
         in.glbChId = glbChId;
         int flag = m_env->env(in, out);
         if (flag != ENV_OK) {
-            /* nothing to do */
+            stamp(idleIntv);
+            return IDLE;
         }
 
-        if (out.isValid == true) {
-            /* 将link结果发到MainWin */
-            emit new_chan(glbChId, out.snr, out.n0);
+        /* 将link结果发到alg */
+        int regret = 0;
+        if (algId == LinkCfg::RANDOM_SEARCH) {
+            regret = m_rand->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::BISECTING_SEARCH) {
+            regret = m_sect->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+            regret = m_mont->notify(m_stamp, glbChId, out);
+        } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+            regret = m_itshf->notify(m_stamp, glbChId, out);
+        }
 
-            /* 将link结果发到alg */
-            if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->notify(true, glbChId, out.snr);
-            }
-        } else {
-            /* 断链 */
-            int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
+        /* 将link结果发到MainWin */
+        emit new_chan(glbChId, out.snr, out.n0, regret);
+
+        /* 信道恶化断链 */
+        if (out.isValid != true) {
             stamp(idleIntv);
             return IDLE;
         }
@@ -378,7 +396,6 @@ int LinkSim::sim_link(int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
-        int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
         stamp(idleIntv);
         return IDLE;
     }

@@ -19,7 +19,7 @@ public:
     void reset(void);
     void restart(void);
     virtual const FreqRsp& bandit(const FreqReq& req);
-    void notify(bool flag, int glbChId, int snr);
+    virtual int notify(const Time* ts, int glbChId, const EnvOut& out);
 
 private:
     /*! @brief 根据band二分搜索 */

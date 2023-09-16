@@ -110,7 +110,7 @@ void MainWin::setup_sim(void)
     /* 信号连接 */
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_chan(int, int, int)), this, SLOT(on_new_chan(int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int)));
     connect(m_sim, SIGNAL(new_sts(int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int)));
 
     /* 启动线程 */
@@ -138,14 +138,14 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_chan(int glbChId, int snr, int n0)
+void MainWin::on_new_chan(int glbChId, int snr, int n0, int regret)
 {
     /* 绘图 */
     float fm = m_time->min / 60.0f;
     float fs = m_time->sec / 3600.0f;
     float hour = m_time->hour + fm + fs;
     float fc = GLB2FREQ(glbChId) / 1000.0f;
-    m_chart->plot(hour, fc, snr);
+    m_chart->plot(hour, fc, snr, regret);
 
     /* 日志 */
     QString text = QString("%1 %2 %3 %4")

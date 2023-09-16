@@ -16,6 +16,7 @@ void BisectAlg::reset(void)
     m_firstStage = true;
 
     /* 统计清零 */
+    m_regret = 0;
     memset(m_snrNum, 0, sizeof(m_snrNum));
     memset(m_snrSum, 0, sizeof(m_snrSum));
     memset(m_vldNum, 0, sizeof(m_vldNum));
@@ -112,25 +113,32 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
     return m_rsp;
 }
 
-void BisectAlg::notify(bool flag, int glbChId, int snr)
+int BisectAlg::notify(const Time* ts, int glbChId, const EnvOut& out)
 {
     if (glbChId >= MAX_GLB_CHN) {
-        return;
+        return m_regret;
     }
 
+    /* 能效评估 */
+    BaseAlg::notify(ts, glbChId, out);
+
+    /* 捕获失败则返回 */
+    bool flag = out.isValid;
     if (flag == false) {
         m_invNum[glbChId]++;
-        return;
+        return m_regret;
     }
 
-    /* 统计 */
+    /* 统计捕获信息 */
+    int snr = out.snr;
     m_snrSum[glbChId] += snr;
     m_snrNum[glbChId] ++;
     m_vldNum[glbChId] ++;
     m_prvGlbChId = best();
 
-    /* 捕获成功则切换状态 */
+    /* 切换状态 */
     m_firstStage = false;
+    return m_regret;
 }
 
 bool BisectAlg::bisect(int schband, int& glbChId)
