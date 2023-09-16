@@ -25,13 +25,17 @@ const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 }
 
 // snr差值分段
-int BaseAlg::level(int snrDelta)
+int BaseAlg::level(int delta)
 {
     int lev;
-    if (snrDelta > 3) {
+    if (delta < -10) {
+        lev = -5;
+    } else if (delta < -5) {
+        lev = -3;
+    } else if (delta < 0) {
         lev = -1;
     } else {
-        lev = -snrDelta;
+        lev = delta;
     }
 
     return lev;
@@ -51,9 +55,9 @@ int BaseAlg::notify(const Time* ts, int glbChId, const EnvOut& out)
     /* 性能差异比较 */
     int delta;
     if ((frqVld == true) && (mufVld == true)) {
-        delta = frqSnr - mufSnr;
+        delta = mufSnr - frqSnr;
     } else if ((frqVld == true) && (mufVld == false)) {
-        delta = frqSnr;
+        delta = -frqSnr;
     } else if ((frqVld == false) && (mufVld == true)) {
         delta = mufSnr;
     } else {
