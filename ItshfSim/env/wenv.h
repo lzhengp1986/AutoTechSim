@@ -52,6 +52,7 @@ typedef struct {
 #define ENV_OK 0
 #define ENV_INV_PARA 1 /* 参数非法 */
 #define ENV_INV_GLB  2 /* glbChId非法 */
+#define ENV_PROB_LO  3 /* 可用概率太低 */
 
 /* 底噪数据长度 */
 #define NOISE_NUM 640
@@ -78,7 +79,7 @@ public:
 
 private:
     int check(const EnvIn& in);
-    int calc(const EnvIn& in, EnvOut& out);
+    int estimate(const EnvIn& in, EnvOut& out);
 
 private:
     int m_maxband; /* 最大可通带宽 */

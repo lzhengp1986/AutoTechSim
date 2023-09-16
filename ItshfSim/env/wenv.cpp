@@ -106,12 +106,12 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
     }
 
     /* 计算可用标志 */
-    int flag = calc(in, out);
+    int flag = estimate(in, out);
     return flag;
 }
 
 // 根据时戳和信道号结合Model计算可用标志和SNR估计值
-int WEnv::calc(const EnvIn& in, EnvOut& out)
+int WEnv::estimate(const EnvIn& in, EnvOut& out)
 {
     /* 获取底噪 */
     const int* pnoise = noise();
@@ -133,7 +133,7 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
     int mufSnr = dh->fc[0].snr;
     int mufMufday = dh->fc[0].mufday;
     int mufRnd = m_mufRnd.rab(glbChId, 0, 100);
-    if (mufRnd <= mufMufday) {
+    if (mufRnd < mufMufday) {
         int u = GRN_U(mufSnr);
         int g = GRN_G(mufSnr);
         int expSnr = m_mufRnd.grn(glbChId, u, g);
@@ -159,9 +159,14 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
         }
     }
 
+    /* 可用概率太低 */
+    if (mufday < 5) {
+        return ENV_PROB_LO;
+    }
+
     /* 随机数拟合MUFday/SNR */
     int rnd = m_frqRnd.rab(glbChId, 0, 100);
-    if (rnd <= mufday) {
+    if (rnd < mufday) {
         int u = GRN_U(snr);
         int g = GRN_G(snr);
         int expSnr = m_frqRnd.grn(glbChId, u, g);
