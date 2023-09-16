@@ -1,6 +1,7 @@
 #ifndef WENV_H
 #define WENV_H
 
+#include "macro.h"
 #include "modeldlg.h"
 #include "randmng.h"
 #include <QStringList>
@@ -15,10 +16,13 @@ typedef struct {
 
 /* 出参 */
 typedef struct {
-    bool flag;
-    int muf;
-    int snr;
-    int n0;
+    bool isValid; /* 可用标志 */
+    int snr; /* 预估SNR */
+    int n0; /* 预估底噪 */
+
+    /* 策略评估 */
+    bool mufVld; /* 最优标志 */
+    int mufSnr; /* 最优SNR */
 } EnvOut;
 
 /* DB频点信息 */
@@ -52,6 +56,10 @@ typedef struct {
 /* 底噪数据长度 */
 #define NOISE_NUM 640
 
+/* grn函数的入参模型 */
+#define GRN_U(snr) (((snr) - 60) / 10)
+#define GRN_G(snr) (5 + ABS((snr) - 50) / 10)
+
 class WEnv
 {
 public:
@@ -75,7 +83,8 @@ private:
 private:
     int m_maxband; /* 最大可通带宽 */
     DbMonth m_dbMonth; /* 月DB模型 */
-    RandMng m_rand; /* 随机数发生器 */
+    RandMng m_frqRnd; /* 使用频点的随机数发生器 */
+    RandMng m_mufRnd; /* MUF的随机数发生器 */
 };
 
 #endif // WENV_H

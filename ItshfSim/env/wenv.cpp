@@ -1,5 +1,4 @@
 #include "wenv.h"
-#include "macro.h"
 #include "sqlite3.h"
 #include <QMessageBox>
 
@@ -94,14 +93,15 @@ int WEnv::check(const EnvIn& in)
 int WEnv::env(const EnvIn& in, EnvOut& out)
 {
     /* 初始化 */
-    out.flag = false;
-    out.n0 = MIN_PN0;
+    out.isValid = false;
+    out.mufVld = false;
     out.snr = MIN_SNR - 1;
-    out.muf = MIN_CHN_FREQ;
+    out.mufSnr = MIN_SNR - 1;
+    out.n0 = MIN_PN0;
 
     /* 时间检查 */
     int ret = check(in);
-    if (ret != 0) {
+    if (ret != ENV_OK) {
         return ret;
     }
 
@@ -128,8 +128,20 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
     int halfband = m_maxband / 2;
     int min = MAX(muf - halfband, MIN_CHN_FREQ);
     int max = MIN(min + m_maxband, MAX_CHN_FREQ);
-    out.muf = muf;
 
+    /* === step1.估计MUF频点的性能 === */
+    int mufSnr = dh->fc[0].snr;
+    int mufMufday = dh->fc[0].mufday;
+    int mufRnd = m_mufRnd.rab(glbChId, 0, 100);
+    if (mufRnd <= mufMufday) {
+        int u = GRN_U(mufSnr);
+        int g = GRN_G(mufSnr);
+        int expSnr = m_mufRnd.grn(glbChId, u, g);
+        out.mufVld = (expSnr > MIN_SNR);
+        out.mufSnr = expSnr;
+    }
+
+    /* === step2.估计当前频点的性能 === */
     /* 是否在可通频带 */
     int fc = GLB2FREQ(glbChId);
     if ((fc < min) || (fc > max)) {
@@ -137,8 +149,8 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
     }
 
     /* 找MUFday/SNR */
-    int snr = dh->fc[0].snr;
-    int mufday = dh->fc[0].mufday;
+    int snr = mufSnr;
+    int mufday = mufMufday;
     for (int i = 1; i < MAX_FREQ_NUM; i++) {
         if (dh->fc[i].freq >= fc) {
             mufday = dh->fc[i].mufday;
@@ -147,18 +159,16 @@ int WEnv::calc(const EnvIn& in, EnvOut& out)
         }
     }
 
-    /* 随机数拟合MUFday */
-    int rnd = m_rand.rab(glbChId, 0, 100);
-    if (rnd > mufday) {
-        return ENV_OK;
+    /* 随机数拟合MUFday/SNR */
+    int rnd = m_frqRnd.rab(glbChId, 0, 100);
+    if (rnd <= mufday) {
+        int u = GRN_U(snr);
+        int g = GRN_G(snr);
+        int expSnr = m_frqRnd.grn(glbChId, u, g);
+        out.isValid = (expSnr > MIN_SNR);
+        out.snr = expSnr;
     }
 
-    /* 随机数拟合SNR */
-    int u = (snr - 60) / 10;
-    int g = 5 + ABS(snr - 50) / 10;
-    int expSnr = m_rand.grn(glbChId, u, g);
-    out.flag = (expSnr > MIN_SNR);
-    out.snr = expSnr;
     return ENV_OK;
 }
 
