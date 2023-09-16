@@ -3,6 +3,11 @@
 // 构造
 Time::Time(void)
 {
+    reset();
+}
+
+void Time::reset(void)
+{
     year = 2023;
     month = 1;
     day = 15;

@@ -1,11 +1,38 @@
 #include "basealg.h"
 #include <QtGlobal>
+#include <QTime>
+
+// 实例化
+SimSql* BaseAlg::m_sql;
 
 // 构造
 BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
+    m_sql = new SimSql;
+}
+
+// 析构
+BaseAlg::~BaseAlg(void)
+{
+    delete m_sql;
+    m_sql = nullptr;
+}
+
+// 复位函数
+void BaseAlg::reset(void)
+{
+    m_regret = 0;
+    m_sql->drop(SMPL_SCAN);
+    m_sql->drop(SMPL_LINK);
+}
+
+// 算法状态重置
+void BaseAlg::restart(void)
+{
+    int msec = QTime::currentTime().msecsSinceStartOfDay();
+    qsrand((uint)msec);
 }
 
 // 随机搜索
@@ -42,7 +69,7 @@ int BaseAlg::level(int delta)
 }
 
 // 能效评估
-int BaseAlg::notify(const Time* ts, int glbChId, const EnvOut& out)
+int BaseAlg::notify(int type, const Time* ts, int glbChId, const EnvOut& out)
 {
     Q_UNUSED(ts);
     Q_UNUSED(glbChId);
@@ -51,6 +78,12 @@ int BaseAlg::notify(const Time* ts, int glbChId, const EnvOut& out)
     bool frqVld = out.isValid;
     bool mufVld = out.mufVld;
     int mufSnr = out.mufSnr;
+
+    /* 记录到sql */
+    int ret = m_sql->insert(type, ts, frqVld, glbChId, frqSnr, out.n0);
+    if (ret != SQLITE_OK) {
+        /* nothing-to-do */
+    }
 
     /* 性能差异比较 */
     int delta;

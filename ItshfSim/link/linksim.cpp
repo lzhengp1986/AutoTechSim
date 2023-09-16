@@ -44,22 +44,34 @@ void LinkSim::stop(void)
     m_scanFrq = 0;
     m_testNum = 0;
     m_state = WAIT;
-
-    /* 算法复位 */
-    m_sect->reset();
 }
 
-void LinkSim::trigger(int days)
+void LinkSim::trigger(void)
 {
-    /* 统计值复位 */
-    emit new_sts(0, 0, 0, 0);
-
-    /* 失效天数 */
+    /* step1.时间复位 */
+    m_stamp->reset();
+    int dayIndex = m_link->simDayIndex;
+    int days = LinkCfg::simDays(dayIndex);
     expire(days);
 
-    /* 倒计时 */
-    stamp(10);
+    /* step2.统计值复位 */
+    emit new_sts(0, 0, 0, 0);
+
+    /* step3.算法复位 */
+    int algId = m_link->algIndex;
+    if (algId == LinkCfg::RANDOM_SEARCH) {
+        m_rand->reset();
+    } else if (algId == LinkCfg::BISECTING_SEARCH) {
+        m_sect->reset();
+    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+        m_mont->reset();
+    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+        m_itshf->reset();
+    }
+
+    /* step4.倒计时 */
     m_state = IDLE;
+    stamp(10);
 }
 
 // 设置time
@@ -88,7 +100,6 @@ void LinkSim::setup_alg(void)
     m_sect = new BisectAlg;
     m_itshf = new ItshfAlg;
     m_mont = new MonteAlg;
-    m_sql = new SimSql;
 }
 
 // 释放算法
@@ -98,12 +109,10 @@ void LinkSim::free_alg(void)
     delete m_sect;
     delete m_itshf;
     delete m_mont;
-    delete m_sql;
     m_rand = nullptr;
     m_sect = nullptr;
     m_itshf = nullptr;
     m_mont = nullptr;
-    m_sql = nullptr;
 }
 
 // 更新Time += msec
@@ -275,6 +284,10 @@ int LinkSim::sim_idle(int& dsec)
         m_rsp = m_rand->bandit(m_req);
     } else if (algId == LinkCfg::BISECTING_SEARCH) {
         m_rsp = m_sect->bandit(m_req);
+    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+        // todo
+    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+        // todo
     }
 
     /* 切换状态 */
@@ -312,14 +325,15 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 将scan结果发到alg */
         int regret = 0;
+        int type = BaseAlg::SMPL_SCAN;
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(m_stamp, glbChId, out);
+            regret = m_rand->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(m_stamp, glbChId, out);
+            regret = m_sect->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(m_stamp, glbChId, out);
+            regret = m_mont->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(m_stamp, glbChId, out);
+            regret = m_itshf->notify(type, m_stamp, glbChId, out);
         }
 
         /* 将scan结果发到MainWin */
@@ -395,14 +409,15 @@ int LinkSim::sim_link(int& dsec)
 
         /* 将link结果发到alg */
         int regret = 0;
+        int type = BaseAlg::SMPL_LINK;
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(m_stamp, glbChId, out);
+            regret = m_rand->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(m_stamp, glbChId, out);
+            regret = m_sect->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(m_stamp, glbChId, out);
+            regret = m_mont->notify(type, m_stamp, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(m_stamp, glbChId, out);
+            regret = m_itshf->notify(type, m_stamp, glbChId, out);
         }
 
         /* 将link结果发到MainWin */

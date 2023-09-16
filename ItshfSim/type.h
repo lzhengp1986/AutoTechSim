@@ -7,6 +7,7 @@
 class Time {
 public:
     Time(void);
+    void reset(void);
     int mdays(void);
     int second(void);
 

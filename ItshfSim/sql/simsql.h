@@ -21,7 +21,6 @@ public:
     ~SimSql(void);
 
     /* SQL操作 */
-    enum {TAB_SCAN = 0, TAB_LINK};
     /*! @brief 插入信道样本 */
     int insert(int tab, const Time* ts, int valid, int glbChId, int snr, int noise);
     /*! @brief 筛选历史记录，min表示往前多少分钟 */

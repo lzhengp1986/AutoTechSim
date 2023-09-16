@@ -5,7 +5,6 @@
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"
-#include "sql/simsql.h"
 #include "auto/autosim.h"
 
 #include <QThread>
@@ -24,7 +23,7 @@ public:
 
     /* api */
     void stop(void);
-    void trigger(int days);
+    void trigger(void);
     void set_time(int year, int month);
     int simulate(int& dsec);
 
@@ -69,7 +68,6 @@ private:
     BisectAlg *m_sect;
     ItshfAlg *m_itshf;
     MonteAlg *m_mont;
-    SimSql *m_sql;
 
     /* 状态机 */
     FreqReq m_req;

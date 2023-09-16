@@ -105,5 +105,8 @@ void SimSql::drop(int tab)
         printf("err: drop %s failure %s\n", tlist[tab], errMsg);
         sqlite3_free(errMsg);
     }
+
+    /* 释放内存 */
+    sqlite3_exec(m_handle, "VACUUM", 0, 0, NULL);
 }
 

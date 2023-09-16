@@ -255,9 +255,7 @@ void MainWin::on_actStrategy_triggered(void)
         dlg->dlg2para(m_sim->m_link);
 
         /* 启动仿真 */
-        int dayIndex = m_sim->m_link->simDayIndex;
-        int days = LinkCfg::simDays(dayIndex);
-        m_sim->trigger(days);
+        m_sim->trigger();
     }
 }
 

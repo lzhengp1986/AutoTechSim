@@ -16,10 +16,10 @@ public:
     BisectAlg(void);
 
     /* api */
-    void reset(void);
-    void restart(void);
+    virtual void reset(void);
+    virtual void restart(void);
     virtual const FreqRsp& bandit(const FreqReq& req);
-    virtual int notify(const Time* ts, int glbChId, const EnvOut& out);
+    virtual int notify(int type, const Time* ts, int glbChId, const EnvOut& out);
 
 private:
     /*! @brief 根据band二分搜索 */

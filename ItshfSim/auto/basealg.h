@@ -3,19 +3,28 @@
 
 #include "type.h"
 #include "env/wenv.h"
-#include "sql/sqlite3.h"
+#include "sql/simsql.h"
 
 class BaseAlg
 {
 public:
     BaseAlg(void);
-    virtual ~BaseAlg(void) {}
+    virtual ~BaseAlg(void);
 
-    /* 算法调度 */
+    /*! @brief 复位函数 */
+    virtual void reset(void);
+
+    /*! @brief 算法状态重置 */
+    virtual void restart(void);
+
+    /*! @brief 推荐算法调度 */
     virtual const FreqRsp& bandit(const FreqReq& req);
 
-    /* 状态调整+性能评估 */
-    virtual int notify(const Time* ts, int glbChId, const EnvOut& out);
+    /*! @brief 状态调整+性能评估 */
+    virtual int notify(int type, const Time* ts, int glbChId, const EnvOut& out);
+
+    /*! @brief 样本类型  */
+    enum {SMPL_SCAN = 0, SMPL_LINK};
 
 protected:
     static int level(int snrDelta);
@@ -25,6 +34,7 @@ protected:
 protected:
     FreqRsp m_rsp;
     unsigned m_regret;
+    static SimSql *m_sql;
 };
 
 // 填写消息头

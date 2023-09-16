@@ -8,6 +8,9 @@ BisectAlg::BisectAlg(void)
 
 void BisectAlg::reset(void)
 {
+    /* 基类重置 */
+    BaseAlg::reset();
+
     /* 初始中心 */
     int half = MAX_GLB_CHN / 2;
     int win = BASIC_SEARCH_WIN / ONE_CHN_BW;
@@ -16,40 +19,10 @@ void BisectAlg::reset(void)
     m_firstStage = true;
 
     /* 统计清零 */
-    m_regret = 0;
     memset(m_snrNum, 0, sizeof(m_snrNum));
     memset(m_snrSum, 0, sizeof(m_snrSum));
     memset(m_vldNum, 0, sizeof(m_vldNum));
     memset(m_invNum, 0, sizeof(m_invNum));
-}
-
-// 找最好的中心
-int BisectAlg::best(void)
-{
-    /* 最大均值 */
-    int maxIdx = 0;
-    float maxAvg = avgSnr(0);
-    for (int i = 1; i < MAX_GLB_CHN; i++) {
-        float snr = avgSnr(i);
-        if (snr > maxAvg) {
-            maxAvg = snr;
-            maxIdx = i;
-        }
-    }
-
-    return maxIdx;
-}
-
-// 平均snr
-float BisectAlg::avgSnr(int i)
-{
-    float avg = 0;
-    if (m_snrNum[i] <= 0) {
-        return avg;
-    }
-
-    avg = (float)m_snrSum[i] / m_snrNum[i];
-    return avg;
 }
 
 // 重新找中心点
@@ -113,14 +86,14 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
     return m_rsp;
 }
 
-int BisectAlg::notify(const Time* ts, int glbChId, const EnvOut& out)
+int BisectAlg::notify(int type, const Time* ts, int glbChId, const EnvOut& out)
 {
     if (glbChId >= MAX_GLB_CHN) {
         return m_regret;
     }
 
     /* 能效评估 */
-    BaseAlg::notify(ts, glbChId, out);
+    BaseAlg::notify(type, ts, glbChId, out);
 
     /* 捕获失败则返回 */
     bool flag = out.isValid;
@@ -202,3 +175,33 @@ bool BisectAlg::bisect(int schband, int& glbChId)
     m_valid[glbChId] = true;
     return true;
 }
+
+// 找最好的中心
+int BisectAlg::best(void)
+{
+    /* 最大均值 */
+    int maxIdx = 0;
+    float maxAvg = avgSnr(0);
+    for (int i = 1; i < MAX_GLB_CHN; i++) {
+        float snr = avgSnr(i);
+        if (snr > maxAvg) {
+            maxAvg = snr;
+            maxIdx = i;
+        }
+    }
+
+    return maxIdx;
+}
+
+// 平均snr
+float BisectAlg::avgSnr(int i)
+{
+    float avg = 0;
+    if (m_snrNum[i] <= 0) {
+        return avg;
+    }
+
+    avg = (float)m_snrSum[i] / m_snrNum[i];
+    return avg;
+}
+
