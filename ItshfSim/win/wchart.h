@@ -27,6 +27,10 @@ private:
     QChart *m_chart;
     QValueAxis *m_axisX1;
 
+    /* 24小时切换 */
+    bool m_init;
+    int m_prvHour;
+
     /* 数据点 */
     QLineSeries *m_noise;
     QLineSeries *m_regret;

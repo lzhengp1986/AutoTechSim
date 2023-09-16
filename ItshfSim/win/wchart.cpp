@@ -117,6 +117,10 @@ WChart::WChart(void)
     chart->setBackgroundVisible(false);
     chart->legend()->setVisible(false);
     chart->show();
+
+    /* 24小时切换 */
+    m_init = false;
+    m_prvHour = 0;
 }
 
 WChart::~WChart(void)
@@ -149,6 +153,17 @@ QChart* WChart::get_chart(void) const
 
 void WChart::plot(float hour, float fc, int snr, int regret)
 {
+    /* 初始化小时值 */
+    if (m_init == false) {
+        m_prvHour = hour;
+    }
+
+    /* 判断24小时切换 */
+    if (m_prvHour > hour) {
+        clear();
+    }
+
+    /* 添加数据点 */
     m_scan->append(hour, fc);
     m_regret->append(hour, regret);
     if (snr > MIN_SNR) {
