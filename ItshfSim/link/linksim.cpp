@@ -143,20 +143,16 @@ bool LinkSim::update_time(int msec)
 
     /* 时进位 */
     if (m_stamp->min >= 60) {
-        do {
-            m_stamp->min -= 60;
-            m_stamp->hour++;
-        } while (m_stamp->min >= 60);
+        m_stamp->min -= 60;
+        m_stamp->hour++;
     } else {
         goto UPDATE_LABEL;
     }
 
     /* 天进位 */
-    if (m_stamp->hour >= 24) {
-        do {
-            m_stamp->hour -= 24;
-            m_stamp->day++;
-        } while (m_stamp->hour >= 24);
+    if (m_stamp->hour >= MAX_HOUR_NUM) {
+        m_stamp->hour -= MAX_HOUR_NUM;
+        m_stamp->day++;
     } else {
         goto UPDATE_LABEL;
     }
@@ -228,7 +224,7 @@ void LinkSim::on_timer_timeout(void)
         stop();
     } else if (m_stamp->month > m_expire->month) {
         stop();
-    } else if (m_stamp->day > m_expire->day) {
+    } else if (m_stamp->day >= m_expire->day) {
         stop();
     }
 
