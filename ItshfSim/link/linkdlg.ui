@@ -89,7 +89,7 @@
        <widget class="QComboBox" name="tmrSpeed">
         <item>
          <property name="text">
-          <string>x512</string>
+          <string>x256</string>
          </property>
         </item>
         <item>

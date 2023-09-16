@@ -87,7 +87,7 @@ void LinkSim::setup_time(void)
     /* 定时器子线程 */
     m_timer = new QTimer;
     m_subthr = new QThread(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(on_timer_timeout()));
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(on_timeout()));
     m_timer->start(TIMER_INTERVAL_MS);
     m_timer->moveToThread(m_subthr);
     m_subthr->start();
@@ -113,63 +113,6 @@ void LinkSim::free_alg(void)
     m_sect = nullptr;
     m_itshf = nullptr;
     m_mont = nullptr;
-}
-
-// 更新Time += msec
-bool LinkSim::update_time(int msec)
-{
-    m_stamp->msec += msec;
-    if (m_stamp->msec < 1000) {
-        return false;
-    }
-    int md = m_stamp->mdays();
-
-    /* 秒进位 */
-    while (m_stamp->msec >= 1000) {
-        m_stamp->msec -= 1000;
-        m_stamp->sec++;
-    }
-
-    /* 分进位 */
-    if (m_stamp->sec < 60) {
-        goto UPDATE_LABEL;
-    }
-    while (m_stamp->sec >= 60) {
-        m_stamp->sec -= 60;
-        m_stamp->min++;
-    }
-
-    /* 时进位 */
-    if (m_stamp->min < 60) {
-        goto UPDATE_LABEL;
-    }
-    m_stamp->min -= 60;
-    m_stamp->hour++;
-
-    /* 天进位 */
-    if (m_stamp->hour < MAX_HOUR_NUM) {
-        goto UPDATE_LABEL;
-    }
-    m_stamp->hour -= MAX_HOUR_NUM;
-    m_stamp->day++;
-
-    /* 月进位 */
-    if (m_stamp->day <= md) {
-        goto UPDATE_LABEL;
-    }
-    m_stamp->day -= md;
-    m_stamp->month++;
-
-    /* 年进位 */
-    if (m_stamp->month <= MAX_MONTH_NUM) {
-        goto UPDATE_LABEL;
-    }
-    m_stamp->month -= MAX_MONTH_NUM;
-    m_stamp->year++;
-
-UPDATE_LABEL:
-    emit new_time(m_stamp);
-    return true;
 }
 
 // 更新Time
@@ -198,50 +141,90 @@ void LinkSim::free_time(void)
 }
 
 // 定时器超时处理
-void LinkSim::on_timer_timeout(void)
+void LinkSim::on_timeout(void)
 {
     /* 控制速度 */
-    int speed = 1;
+    int msec = TIMER_INTERVAL_MS;
     if (m_state != WAIT) {
         int speedIndex = m_link->tmrSpeedIndex;
-        speed = LinkCfg::timerSpeed(speedIndex);
+        int speed = LinkCfg::timerSpeed(speedIndex);
+        msec = speed * TIMER_INTERVAL_MS;
     }
 
-    /* 更新时间 */
-    bool flag = update_time(speed * TIMER_INTERVAL_MS);
-    if (flag == false) {
+    /* 秒数不变则返回 */
+    m_stamp->msec += msec;
+    if (m_stamp->msec < 1000) {
         return;
     }
+    int md = m_stamp->mdays();
 
-    /* 判断仿真天数 */
-    if (m_stamp->year > m_expire->year) {
-        stop();
-    } else if (m_stamp->month > m_expire->month) {
-        stop();
-    } else if (m_stamp->day >= m_expire->day) {
-        stop();
+    /* 秒进位 */
+    while (m_stamp->msec >= 1000) {
+        m_stamp->msec -= 1000;
+        m_stamp->sec++;
     }
 
-    /* 建链仿真 */
-    int dsec = 0;
-    int state = simulate(dsec);
-    emit new_state(state, dsec);
+    /* 分进位 */
+    if (m_stamp->sec < 60) {
+        goto SIMULATE;
+    }
+    while (m_stamp->sec >= 60) {
+        m_stamp->sec -= 60;
+        m_stamp->min++;
+    }
+
+    /* 时进位 */
+    if (m_stamp->min < 60) {
+        goto SIMULATE;
+    }
+    m_stamp->min -= 60;
+    m_stamp->hour++;
+
+    /* 天进位 */
+    if (m_stamp->hour < MAX_HOUR_NUM) {
+        goto SIMULATE;
+    }
+    m_stamp->hour -= MAX_HOUR_NUM;
+    m_stamp->day++;
+
+    /* 月进位 */
+    if (m_stamp->day <= md) {
+        goto SIMULATE;
+    }
+    m_stamp->day -= md;
+    m_stamp->month++;
+
+    /* 年进位 */
+    if (m_stamp->month <= MAX_MONTH_NUM) {
+        goto SIMULATE;
+    }
+    m_stamp->month -= MAX_MONTH_NUM;
+    m_stamp->year++;
+
+SIMULATE:
+    emit new_time(m_stamp);
+    simulate();
 }
 
 // 主调度函数
-int LinkSim::simulate(int& dsec)
+void LinkSim::simulate(void)
 {
-    int nxt;
-    int prv = m_state;
-    switch (prv) {
-    case IDLE: nxt = sim_idle(dsec); break;
-    case SCAN: nxt = sim_scan(dsec); break;
-    case LINK: nxt = sim_link(dsec); break;
-    default: nxt = WAIT; break;
+    /* 算法仿真 */
+    int dsec = 0;
+    switch (m_state) {
+    case IDLE: m_state = sim_idle(dsec); break;
+    case SCAN: m_state = sim_scan(dsec); break;
+    case LINK: m_state = sim_link(dsec); break;
+    default: break;
     }
 
-    m_state = nxt;
-    return prv;
+    /* 更新界面状态 */
+    emit new_state(m_state, dsec);
+
+    /* 判断过期 */
+    if (isExpired()) {
+        stop();
+    }
 }
 
 // idle
@@ -427,6 +410,20 @@ int LinkSim::sim_link(int& dsec)
         stamp(idleIntv);
         return IDLE;
     }
+}
+
+// 过期
+bool LinkSim::isExpired(void)
+{
+    bool flag = false;
+    if (m_stamp->year > m_expire->year) {
+        flag = true;
+    } else if (m_stamp->month > m_expire->month) {
+        flag = true;
+    } else if (m_stamp->day >= m_expire->day) {
+        flag = true;
+    }
+    return flag;
 }
 
 // 在当前定时上加days

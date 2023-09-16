@@ -10,6 +10,8 @@ BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
+    m_sql.drop(SMPL_SCAN);
+    m_sql.drop(SMPL_LINK);
 }
 
 // 析构
@@ -21,8 +23,6 @@ BaseAlg::~BaseAlg(void)
 void BaseAlg::reset(void)
 {
     m_regret = 0;
-    m_sql.drop(SMPL_SCAN);
-    m_sql.drop(SMPL_LINK);
 }
 
 // 算法状态重置

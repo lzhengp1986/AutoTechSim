@@ -25,25 +25,25 @@ public:
     void stop(void);
     void trigger(void);
     void set_time(int year, int month);
-    int simulate(int& dsec);
 
 private:
     void setup_time(void);
-    bool update_time(int msec);
     void free_time(void);
 
     void setup_alg(void);
     void free_alg(void);
 
-    /*! @brief 各状态处理函数，返回状态倒计时 */
+    /*! @brief 算法仿真 */
+    void simulate(void);
     int sim_idle(int& dsec);
     int sim_scan(int& dsec);
     int sim_link(int& dsec);
+    bool isExpired(void);
     void expire(int days);
     void stamp(int plus);
 
 private slots:
-    void on_timer_timeout(void);
+    void on_timeout(void);
 
 signals:
     void new_time(const Time* ts);

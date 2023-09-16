@@ -56,7 +56,7 @@ inline int LinkCfg::timerSpeed(int index)
 {
     int speed = 0;
     switch (index) {
-    case 0: speed = 512; break;
+    case 0: speed = 256; break;
     case 1: speed = 128; break;
     case 2: speed = 64; break;
     case 3: speed = 8; break;

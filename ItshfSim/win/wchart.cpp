@@ -162,11 +162,6 @@ void WChart::plot(float hour, float fc, int snr, int regret)
     /* 判断24小时切换 */
     qreal min, max;
     if (m_prvHour > hour) {
-        /* 修改y轴范围 */
-        max = m_axisX1->max();
-        m_axisX1->setRange(max * 0.8f, max);
-
-        /* 清样点 */
         clear();
     }
 
