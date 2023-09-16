@@ -47,13 +47,14 @@ void LinkSim::stop(void)
 
     /* 算法复位 */
     m_sect->reset();
-
-    /* 统计值复位 */
-    emit new_sts(0, 0, 0, 0);
 }
 
 void LinkSim::trigger(void)
 {
+    /* 统计值复位 */
+    emit new_sts(0, 0, 0, 0);
+
+    /* 倒计时 */
     stamp(10);
     m_state = IDLE;
 }
@@ -181,9 +182,14 @@ void LinkSim::free_time(void)
 // 定时器超时处理
 void LinkSim::on_timer_timeout(void)
 {
+    /* 控制速度 */
+    int speed = 1;
+    if (m_state != WAIT) {
+        int speedIndex = m_link->tmrSpeedIndex;
+        speed = LinkCfg::timerSpeed(speedIndex);
+    }
+
     /* 更新时间 */
-    int speedIndex = m_link->tmrSpeedIndex;
-    int speed = LinkCfg::timerSpeed(speedIndex);
     bool flag = update_time(speed * TIMER_INTERVAL_MS);
     if (flag == false) {
         return;
@@ -311,9 +317,9 @@ int LinkSim::sim_scan(int& dsec)
         m_scanNok++;
 
         /* 失败次数过多，复位状态 */
-        if (m_scanNok > MAX_SCAN_FAIL_THR) {
+        if (m_scanNok >= MAX_SCAN_FAIL_THR) {
             if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->reset();
+                m_sect->restart();
             }
             m_scanNok = 0;
         }
@@ -354,11 +360,6 @@ int LinkSim::sim_link(int& dsec)
                 m_sect->notify(true, glbChId, out.snr);
             }
         } else {
-            /* 重启推荐 */
-            if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->restart();
-            }
-
             /* 断链 */
             int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
             stamp(idleIntv);
@@ -370,11 +371,6 @@ int LinkSim::sim_link(int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
-        /* 重启推荐 */
-        if (algId == LinkCfg::BISECTING_SEARCH) {
-            m_sect->restart();
-        }
-
         int idleIntv = LinkCfg::idleIntv(m_link->idleIntvIndex);
         stamp(idleIntv);
         return IDLE;

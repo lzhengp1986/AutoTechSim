@@ -5,6 +5,11 @@
 #include "basealg.h"
 #include <string.h>
 
+/* 扫频最大失败次数 */
+#define MAX_SCAN_FAIL_THR 5
+/* 基本探索窗KHz */
+#define BASIC_SEARCH_WIN 3000
+
 class BisectAlg : public BaseAlg
 {
 public:
@@ -19,20 +24,21 @@ public:
 private:
     /*! @brief 根据band二分搜索 */
     bool bisect(int schband, int& glbChId);
+    float avgSnr(int i);
+    int best(void);
 
 private:
-    int m_prvSnr;
     int m_prvGlbChId;
     bool m_firstStage;
     bool m_valid[MAX_GLB_CHN];
-};
 
-// 重新启动
-inline void BisectAlg::restart(void)
-{
-    memset(m_valid, 0, sizeof(m_valid));
-    m_valid[m_prvGlbChId] = true;
-    m_prvSnr = MIN_SNR;
-}
+    /* SNR统计 */
+    int m_snrSum[MAX_GLB_CHN];
+    int m_snrNum[MAX_GLB_CHN];
+
+    /* thompson可用率统计 */
+    int m_vldNum[MAX_GLB_CHN];
+    int m_invNum[MAX_GLB_CHN];
+};
 
 #endif // BISECTALG_H

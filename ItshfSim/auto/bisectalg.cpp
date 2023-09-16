@@ -8,12 +8,58 @@ BisectAlg::BisectAlg(void)
 
 void BisectAlg::reset(void)
 {
-    /* 中心 */
+    /* 初始中心 */
     int half = MAX_GLB_CHN / 2;
-    int rand = qrand() % 1000 - 500;
+    int win = BASIC_SEARCH_WIN / ONE_CHN_BW;
+    int rand = qrand() % win - (win >> 1);
     m_prvGlbChId = align(half + rand);
     m_firstStage = true;
-    m_prvSnr = MIN_SNR;
+
+    /* 统计清零 */
+    memset(m_snrNum, 0, sizeof(m_snrNum));
+    memset(m_snrSum, 0, sizeof(m_snrSum));
+    memset(m_vldNum, 0, sizeof(m_vldNum));
+    memset(m_invNum, 0, sizeof(m_invNum));
+}
+
+// 找最好的中心
+int BisectAlg::best(void)
+{
+    /* 最大均值 */
+    int maxIdx = 0;
+    float maxAvg = avgSnr(0);
+    for (int i = 1; i < MAX_GLB_CHN; i++) {
+        float snr = avgSnr(i);
+        if (snr > maxAvg) {
+            maxAvg = snr;
+            maxIdx = i;
+        }
+    }
+
+    return maxIdx;
+}
+
+// 平均snr
+float BisectAlg::avgSnr(int i)
+{
+    float avg = 0;
+    if (m_snrNum[i] <= 0) {
+        return avg;
+    }
+
+    avg = (float)m_snrSum[i] / m_snrNum[i];
+    return avg;
+}
+
+// 重新找中心点
+void BisectAlg::restart(void)
+{
+    /* 找最好的中心 */
+    m_prvGlbChId = best();
+
+    /* 清状态 */
+    memset(m_valid, 0, sizeof(m_valid));
+    m_valid[m_prvGlbChId] = true;
 }
 
 const FreqRsp& BisectAlg::bandit(const FreqReq& req)
@@ -30,20 +76,21 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
     /* 搜索带宽3M/6M/9M */
     int schband;
     if (rnd < 40) { /* 40% */
-        schband = 3000;
+        schband = BASIC_SEARCH_WIN * 1;
     } else if (rnd < 60) { /* 20% */
-        schband = 6000;
+        schband = BASIC_SEARCH_WIN * 2;
     } else if (rnd < 80) { /* 20% */
-        schband = 9000;
+        schband = BASIC_SEARCH_WIN * 3;
     } else { /* 20% */
-        schband = 12000;
+        schband = BASIC_SEARCH_WIN * 4;
     }
+    int schWin = schband / ONE_CHN_BW;
 
     /* 二分搜索 */
     int i, j;
     bool flag;
     for (i = j = 2; i < n; i++) {
-        flag = bisect(schband, glbChId);
+        flag = bisect(schWin, glbChId);
         if (flag == false) {
             break;
         }
@@ -67,21 +114,23 @@ const FreqRsp& BisectAlg::bandit(const FreqReq& req)
 
 void BisectAlg::notify(bool flag, int glbChId, int snr)
 {
-    if (flag == false) {
+    if (glbChId >= MAX_GLB_CHN) {
         return;
     }
 
+    if (flag == false) {
+        m_invNum[glbChId]++;
+        return;
+    }
+
+    /* 统计 */
+    m_snrSum[glbChId] += snr;
+    m_snrNum[glbChId] ++;
+    m_vldNum[glbChId] ++;
+    m_prvGlbChId = best();
+
     /* 捕获成功则切换状态 */
     m_firstStage = false;
-
-    /* 保存最好的信道 */
-    if (snr > m_prvSnr) {
-        int diff = ABS(glbChId - m_prvGlbChId);
-        if (diff < 3000) {
-            m_prvGlbChId = glbChId;
-            m_prvSnr = snr;
-        }
-    }
 }
 
 bool BisectAlg::bisect(int schband, int& glbChId)
