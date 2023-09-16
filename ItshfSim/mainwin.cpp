@@ -173,7 +173,7 @@ void MainWin::on_new_chan(int glbChId, int snr, int n0, int regret)
             .arg(glbChId, 4, 10, QLatin1Char(' '))
             .arg(snr, 3, 10, QLatin1Char(' '))
             .arg(n0, 4, 10, QLatin1Char(' '))
-            .arg(regret, 4, 10, QLatin1Char(' '));
+            .arg(regret, 5, 10, QLatin1Char(' '));
     ui->logText->appendPlainText(text);
 
     /* 状态栏显示 */
