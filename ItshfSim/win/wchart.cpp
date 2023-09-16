@@ -37,7 +37,7 @@ WChart::WChart(void)
 
     /* 设置懊悔值 */
     m_regret = new QLineSeries;
-    m_regret->setPen(QPen(Qt::cyan, 2));
+    m_regret->setPen(QPen(Qt::cyan, 1));
     m_regret->setName("regret");
     m_regret->setOpacity(0.5);
     chart->addSeries(m_regret);
