@@ -309,11 +309,6 @@ int LinkSim::sim_scan(int& dsec)
         in.hour = m_stamp->hour;
         in.glbChId = glbChId;
         int flag = m_env->env(in, out);
-        if (flag != ENV_OK) {
-            stamp(scanIntv);
-            rsp->used++;
-            return SCAN;
-        }
 
         /* 将scan结果发到alg */
         int regret = 0;
@@ -331,21 +326,27 @@ int LinkSim::sim_scan(int& dsec)
         emit new_chan(glbChId, out.snr, out.n0, regret);
 
         /* 状态切换: LINK or SCAN */
-        if (out.isValid == true) {
-            /* 统计 */
-            m_scanNum++;
-            m_linkNum++;
-
-            /* 切换到link */
-            int svcIndex = m_link->svcIntvIndex;
-            int svcIntv = LinkCfg::svcIntv(svcIndex);
-            stamp(svcIntv);
-            return LINK;
-        } else {
-            /* 继续scan */
+        if (flag != ENV_OK) {
             stamp(scanIntv);
             rsp->used++;
             return SCAN;
+        } else {
+            if (out.isValid == true) {
+                /* 统计 */
+                m_scanNum++;
+                m_linkNum++;
+
+                /* 切换到link */
+                int svcIndex = m_link->svcIntvIndex;
+                int svcIntv = LinkCfg::svcIntv(svcIndex);
+                stamp(svcIntv);
+                return LINK;
+            } else {
+                /* 继续scan */
+                stamp(scanIntv);
+                rsp->used++;
+                return SCAN;
+            }
         }
     } else {
         /* 统计 */
@@ -391,10 +392,6 @@ int LinkSim::sim_link(int& dsec)
         in.hour = m_stamp->hour;
         in.glbChId = glbChId;
         int flag = m_env->env(in, out);
-        if (flag != ENV_OK) {
-            stamp(idleIntv);
-            return IDLE;
-        }
 
         /* 将link结果发到alg */
         int regret = 0;
@@ -411,8 +408,8 @@ int LinkSim::sim_link(int& dsec)
         /* 将link结果发到MainWin */
         emit new_chan(glbChId, out.snr, out.n0, regret);
 
-        /* 信道恶化断链 */
-        if (out.isValid != true) {
+        /* 状态切换：信道恶化断链 */
+        if ((flag != ENV_OK) || (out.isValid != true)) {
             stamp(idleIntv);
             return IDLE;
         }
