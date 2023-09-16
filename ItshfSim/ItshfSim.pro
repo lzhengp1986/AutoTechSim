@@ -33,6 +33,7 @@ SOURCES += \
     auto/montealg.cpp \
     win/wchart.cpp \
     win/wlabel.cpp \
+    colorpal.cpp \
     mainwin.cpp \
     main.cpp
 
@@ -53,6 +54,7 @@ HEADERS += \
     link/linksim.h \
     win/wchart.h \
     win/wlabel.h \
+    colorpal.h \
     mainwin.h \
     mainwin.h
 
@@ -60,6 +62,7 @@ FORMS += \
     env/dbdlg.ui \
     env/modeldlg.ui \
     link/linkdlg.ui \
+    colorpal.ui \
     mainwin.ui
 
 # 界面图标

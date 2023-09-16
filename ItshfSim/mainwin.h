@@ -1,6 +1,7 @@
 #ifndef MAINWIN_H
 #define MAINWIN_H
 
+#include "colorpal.h"
 #include "env/modeldlg.h"
 #include "link/linksim.h"
 #include "win/wlabel.h"
@@ -25,20 +26,15 @@ private slots:
     void on_new_chan(int glbChId, int snr, int n0, int regret);
     void on_new_sts(int scanTry, int scanFrq, int linkNum, int testNum);
 
+    void on_scan_color(Qt::GlobalColor color);
+    void on_link_color(Qt::GlobalColor color);
+    void on_reg_color(Qt::GlobalColor color);
+
     void on_actModel_triggered(void);
     void on_actStrategy_triggered(void);
     void on_actDatabase_triggered(void);
     void on_actContent_triggered(void);
     void on_actCopyright_triggered(void);
-
-    void on_scanBlack_clicked(void);
-    void on_scanBlue_clicked(void);
-    void on_scanCyan_clicked(void);
-    void on_scanMagenta_clicked(void);
-    void on_linkBlack_clicked(void);
-    void on_linkBlue_clicked(void);
-    void on_linkCyan_clicked(void);
-    void on_linkMagenta_clicked(void);
 
 private:
     void setup_win(void);
@@ -51,11 +47,15 @@ private:
     void setup_sim(void);
     void free_sim(void);
 
+    void setup_pal(void);
+    void free_pal(void);
+
 private:
     /* 主窗口 */
     Ui::MainWin *ui;
     WLabel *m_label;
     WChart *m_chart;
+    ColorPal *m_pal;
 
     /* ITS模型 */
     ModelCfg *m_model;

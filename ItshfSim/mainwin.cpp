@@ -12,6 +12,7 @@ MainWin::MainWin(QWidget *parent)
     setup_model();
     setup_win();
     setup_sim();
+    setup_pal();
 
     /* 更新参数 */
     int year = m_model->year;
@@ -22,6 +23,7 @@ MainWin::MainWin(QWidget *parent)
 
 MainWin::~MainWin()
 {
+    free_pal();
     free_sim();
     free_win();
     free_model();
@@ -127,6 +129,24 @@ void MainWin::free_sim(void)
     m_time = nullptr;
 }
 
+void MainWin::setup_pal(void)
+{
+    /* 添加调色板 */
+    m_pal = new ColorPal(this);
+    ui->colorLayout->addWidget(m_pal);
+
+    /* 信号连接 */
+    connect(m_pal, SIGNAL(scan_color(Qt::GlobalColor)), this, SLOT(on_scan_color(Qt::GlobalColor)));
+    connect(m_pal, SIGNAL(link_color(Qt::GlobalColor)), this, SLOT(on_link_color(Qt::GlobalColor)));
+    connect(m_pal, SIGNAL(reg_color(Qt::GlobalColor)), this, SLOT(on_reg_color(Qt::GlobalColor)));
+}
+
+void MainWin::free_pal(void)
+{
+    delete m_pal;
+    m_pal = nullptr;
+}
+
 void MainWin::on_new_time(const Time* ts)
 {
     *m_time = *ts;
@@ -148,11 +168,12 @@ void MainWin::on_new_chan(int glbChId, int snr, int n0, int regret)
     m_chart->plot(hour, fc, snr, regret);
 
     /* 日志 */
-    QString text = QString("%1 %2 %3 %4")
+    QString text = QString("%1 %2 %3 %4 %5")
             .arg(hour, 4, 'f', 2)
-            .arg(glbChId, 5, 10, QLatin1Char(' '))
-            .arg(snr, 5, 10, QLatin1Char(' '))
-            .arg(n0, 5, 10, QLatin1Char(' '));
+            .arg(glbChId, 4, 10, QLatin1Char(' '))
+            .arg(snr, 3, 10, QLatin1Char(' '))
+            .arg(n0, 4, 10, QLatin1Char(' '))
+            .arg(regret, 4, 10, QLatin1Char(' '));
     ui->logText->appendPlainText(text);
 
     /* 状态栏显示 */
@@ -167,6 +188,21 @@ void MainWin::on_new_sts(int scanTry, int scanFrq, int linkNum, int testNum)
     ui->totalScanNum->setText(QString::number(scanFrq));
     ui->totalLinkNum->setText(QString::number(linkNum));
     ui->totalTestNum->setText(QString::number(testNum));
+}
+
+void MainWin::on_scan_color(Qt::GlobalColor color)
+{
+    m_chart->set_scan_color(color);
+}
+
+void MainWin::on_link_color(Qt::GlobalColor color)
+{
+    m_chart->set_link_color(color);
+}
+
+void MainWin::on_reg_color(Qt::GlobalColor color)
+{
+    m_chart->set_regret_color(color);
 }
 
 void MainWin::on_actModel_triggered(void)
@@ -231,44 +267,4 @@ void MainWin::on_actContent_triggered(void)
 void MainWin::on_actCopyright_triggered(void)
 {
 
-}
-
-void MainWin::on_scanBlack_clicked(void)
-{
-    m_chart->set_scan_color(Qt::black);
-}
-
-void MainWin::on_scanBlue_clicked(void)
-{
-    m_chart->set_scan_color(Qt::blue);
-}
-
-void MainWin::on_scanCyan_clicked(void)
-{
-    m_chart->set_scan_color(Qt::cyan);
-}
-
-void MainWin::on_scanMagenta_clicked(void)
-{
-    m_chart->set_scan_color(Qt::magenta);
-}
-
-void MainWin::on_linkBlack_clicked(void)
-{
-    m_chart->set_link_color(Qt::black);
-}
-
-void MainWin::on_linkBlue_clicked(void)
-{
-    m_chart->set_link_color(Qt::blue);
-}
-
-void MainWin::on_linkCyan_clicked(void)
-{
-    m_chart->set_link_color(Qt::cyan);
-}
-
-void MainWin::on_linkMagenta_clicked(void)
-{
-    m_chart->set_link_color(Qt::magenta);
 }

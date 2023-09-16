@@ -27,17 +27,11 @@ const FreqRsp& BaseAlg::bandit(const FreqReq& req)
 // snr差值分段
 int BaseAlg::level(int snrDelta)
 {
-    int lev = 0;
-    if (snrDelta > 20) {
-        lev = -2;
-    } else if (snrDelta > 10) {
+    int lev;
+    if (snrDelta > 3) {
         lev = -1;
-    } else if (snrDelta > -10) {
-        lev = 0;
-    } else if (snrDelta > -20) {
-        lev = +1;
     } else {
-        lev = +2;
+        lev = -snrDelta;
     }
 
     return lev;

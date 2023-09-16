@@ -35,16 +35,36 @@ WChart::WChart(void)
     m_noise->setOpacity(0.5);
     chart->addSeries(m_noise);
 
+    /* 设置懊悔值 */
+    m_regret = new QLineSeries;
+    m_regret->setPen(QPen(Qt::cyan, 2));
+    m_regret->setName("regret");
+    m_regret->setOpacity(0.5);
+    chart->addSeries(m_regret);
+
     /* step3.设置x坐标轴 */
-    QValueAxis *x = new QValueAxis;
-    x->setTitleText("frequency/MHz");
-    x->setRange(2, 30); /* MHz */
-    x->setTickCount(15);
-    x->setMinorTickCount(1);
-    x->setLabelFormat("%u");
-    x->setTitleVisible(false);
-    x->setMinorGridLineVisible(false);
-    x->setGridLineVisible(false);
+    QValueAxis *x0 = new QValueAxis;
+    x0->setTitleText("frequency/MHz");
+    x0->setRange(2, 30); /* MHz */
+    x0->setTickCount(15);
+    x0->setMinorTickCount(1);
+    x0->setLabelFormat("%u");
+    x0->setTitleVisible(false);
+    x0->setMinorGridLineVisible(false);
+    x0->setGridLineVisible(false);
+
+    QValueAxis *x1 = new QValueAxis;
+    x1->setTitleText("regrets");
+    x1->setRange(0, 100);
+    x1->setTickCount(6);
+    x1->setMinorTickCount(1);
+    x1->setLabelFormat("%d");
+    x1->setTitleVisible(false);
+    x1->setMinorGridLineVisible(false);
+    x1->setGridLineVisible(false);
+    x1->setLabelsVisible(true);
+    x1->setVisible(true);
+    m_axisX1 = x1;
 
     /* 设置y0坐标轴 */
     QValueAxis *y0 = new QValueAxis;
@@ -69,22 +89,25 @@ WChart::WChart(void)
     y1->setGridLineVisible(false);
 
     /* step4.添加坐标轴 */
-    chart->addAxis(x, Qt::AlignLeft);
+    chart->addAxis(x0, Qt::AlignLeft);
+    chart->addAxis(x1, Qt::AlignLeft);
     chart->addAxis(y0, Qt::AlignBottom);
     chart->addAxis(y1, Qt::AlignTop);
-    m_scan->attachAxis(x);
+    m_scan->attachAxis(x0);
     m_scan->attachAxis(y0);
-    m_link->attachAxis(x);
+    m_link->attachAxis(x0);
     m_link->attachAxis(y0);
-    m_noise->attachAxis(x);
+    m_noise->attachAxis(x0);
     m_noise->attachAxis(y1);
+    m_regret->attachAxis(x1);
+    m_regret->attachAxis(y0);
 
     /* 设置图形区域 */
     bool flag = false;
-    x->setVisible(flag);
+    x0->setVisible(flag);
     y0->setVisible(flag);
     y1->setVisible(flag);
-    x->setLabelsVisible(flag);
+    x0->setLabelsVisible(flag);
     y0->setLabelsVisible(flag);
     y1->setLabelsVisible(flag);
     QRect rect(47, 92, 544, 409);
@@ -114,6 +137,11 @@ void WChart::set_link_color(QColor color)
     m_link->setBrush(QBrush(color));
 }
 
+void WChart::set_regret_color(QColor color)
+{
+    m_regret->setColor(color);
+}
+
 QChart* WChart::get_chart(void) const
 {
     return m_chart;
@@ -122,9 +150,18 @@ QChart* WChart::get_chart(void) const
 void WChart::plot(float hour, float fc, int snr, int regret)
 {
     m_scan->append(hour, fc);
+    m_regret->append(hour, regret);
     if (snr > MIN_SNR) {
         m_link->append(hour, fc);
     }
+
+    /* 懊悔值：调整坐标范围 */
+    qreal max = m_axisX1->max();
+    if (regret > max) {
+        qreal min = m_axisX1->min();
+        m_axisX1->setRange(min, max * 2);
+    }
+
     m_chart->update();
 }
 
@@ -142,6 +179,7 @@ void WChart::plot(const int* noise, int n)
 void WChart::clear(void)
 {
     m_noise->clear();
+    m_regret->clear();
     m_scan->clear();
     m_link->clear();
     m_chart->update();
