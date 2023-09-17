@@ -12,14 +12,14 @@ class LinkCfg {
 public:
     LinkCfg(void);
 
-    int simDays(void);
-    int timerSpeed(void);
-    int idleIntv(void);
-    int scanIntv(void);
-    int svcIntv(void);
-    int sqlRule(void);
-    int freqNum(void);
-    int recAlg(void);
+    int simDays(void) const;
+    int timerSpeed(void) const;
+    int idleIntv(void) const;
+    int scanIntv(void) const;
+    int svcIntv(void) const;
+    int sqlRule(void) const;
+    int freqNum(void) const;
+    int recAlg(void) const;
 
 public:
     int simDayIndex; /* 仿真天数 */
@@ -28,11 +28,11 @@ public:
     int scanIntvIndex; /* 扫频间隔 */
     int svcIntvIndex; /* 业务间隔 */
     int freqNumIndex; /* 单次请求频点个数 */
-    int sqlIntvIndex; /* SQL数据选择区间 */
+    int sqlRuleIndex; /* SQL数据选择区间 */
     int algIndex; /* 算法索引 */
 };
 
-inline int LinkCfg::simDays(void)
+inline int LinkCfg::simDays(void) const
 {
     int days = 0;
     switch (simDayIndex) {
@@ -46,7 +46,7 @@ inline int LinkCfg::simDays(void)
     return days;
 }
 
-inline int LinkCfg::timerSpeed(void)
+inline int LinkCfg::timerSpeed(void) const
 {
     int speed = 0;
     switch (tmrSpeedIndex) {
@@ -60,7 +60,7 @@ inline int LinkCfg::timerSpeed(void)
     return speed;
 }
 
-inline int LinkCfg::scanIntv(void)
+inline int LinkCfg::scanIntv(void) const
 {
     int scanIntv = 0;
     switch (scanIntvIndex) {
@@ -71,7 +71,7 @@ inline int LinkCfg::scanIntv(void)
     return scanIntv;
 }
 
-inline int LinkCfg::svcIntv(void)
+inline int LinkCfg::svcIntv(void) const
 {
     int svcIntv = 0;
     switch (svcIntvIndex) {
@@ -89,7 +89,7 @@ inline int LinkCfg::svcIntv(void)
     return (svcIntv * 60);
 }
 
-inline int LinkCfg::idleIntv(void)
+inline int LinkCfg::idleIntv(void) const
 {
     int idleIntv = 0;
     switch (idleIntvIndex) {
@@ -109,7 +109,7 @@ inline int LinkCfg::idleIntv(void)
     return (idleIntv * 60);
 }
 
-inline int LinkCfg::freqNum(void)
+inline int LinkCfg::freqNum(void) const
 {
     int fcNum = 0;
     switch (freqNumIndex) {
@@ -120,10 +120,10 @@ inline int LinkCfg::freqNum(void)
     return fcNum;
 }
 
-inline int LinkCfg::sqlRule(void)
+inline int LinkCfg::sqlRule(void) const
 {
     int rule = 0;
-    switch (sqlIntvIndex) {
+    switch (sqlRuleIndex) {
     case 0: rule = DAY_4_HOUR; break;
     case 1: rule = DAY_2_HOUR; break;
     case 2: rule = DAY_1_HOUR; break;
@@ -136,7 +136,7 @@ inline int LinkCfg::sqlRule(void)
     return rule;
 }
 
-inline int LinkCfg::recAlg(void)
+inline int LinkCfg::recAlg(void) const
 {
     int alg;
     switch (algIndex) {
@@ -158,7 +158,7 @@ public:
     ~LinkDlg();
 
     /* api */
-    void dlg2para(LinkCfg* cfg);
+    void dlg2para(LinkCfg* cfg, QString& algName, QString& sqlRule);
     void para2dlg(const LinkCfg* cfg);
 
 private:

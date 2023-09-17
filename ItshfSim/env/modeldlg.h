@@ -11,7 +11,7 @@ class ModelDlg;
 class ModelCfg {
 public:
     ModelCfg(void);
-    static int get_maxband(int bandIndex);
+    int get_maxband(void) const;
 
 public:
     int year; /* 年 */
@@ -23,7 +23,7 @@ public:
 };
 
 // inline
-inline int ModelCfg::get_maxband(int bandIndex)
+inline int ModelCfg::get_maxband(void) const
 {
     int maxband = 0;
     switch (bandIndex) {

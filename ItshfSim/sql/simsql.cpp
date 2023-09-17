@@ -57,13 +57,14 @@ char* SimSql::today(int tab, const Time* ts, int hr)
     int maxDay, maxHr;
 
     /* 计算定时 */
-    maxDay = minDay = ts->day;
-    maxHr = minHr = ts->hour;
-    if (minHr >= hr) {
-        minHr -= hr;
+    maxDay = ts->day;
+    maxHr = ts->hour;
+    if (maxHr >= hr) {
+        minHr = maxHr - hr;
+        minDay = maxDay;
     } else {
-        minHr = (minHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
-        minDay--;
+        minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
+        minDay = maxDay - 1;
     }
 
     /* 生成规则 */
@@ -149,6 +150,11 @@ int SimSql::select(int tab, const Time* ts, int rule, QList<FreqInfo>& list)
 
         /* 保存数据 */
         list.append(info);
+
+        /* 样本过大 */
+        if (list.size() >= MAX_SQL_SMPL) {
+            break;
+        }
     }
 
     sqlite3_finalize(stmt);

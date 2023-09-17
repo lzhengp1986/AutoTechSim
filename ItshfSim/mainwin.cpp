@@ -75,8 +75,8 @@ int MainWin::update_model(const ModelCfg* cfg)
     QString prefix = "./png/" + QString::number(year) + "/" + pre;
 
     /* 更新数据库 */
+    int maxband = cfg->get_maxband();
     QString dbFile = prefix + "/voacapx.db";
-    int maxband = ModelCfg::get_maxband(cfg->bandIndex);
     int rc = m_sim->m_env->setup(month, maxband, dbFile);
     if (rc != 0) {
         QMessageBox::warning(this, "Warning", "Fail to setup model!");
@@ -129,6 +129,30 @@ void MainWin::free_sim(void)
     delete m_sim;
     m_sim = nullptr;
     m_time = nullptr;
+}
+
+void MainWin::display(const QString& algName, const QString& sqlRule)
+{
+    ui->infoText->clear();
+
+    /* 模型参数 */
+    QString db = m_model->dbDesc.at(m_model->dbIndex) + QString(" %1-%2").arg(m_model->year).arg(m_model->month);
+    QString misc = QString("noise:%1 maxBW:%2").arg(m_model->withNoise).arg(m_model->get_maxband());
+    ui->infoText->appendPlainText(db);
+    ui->infoText->appendPlainText(misc);
+
+    /* 仿真参数 */
+    LinkCfg* cfg = m_sim->m_link;
+    QString tmr = QString("days%1 speed x%2").arg(cfg->simDays()).arg(cfg->timerSpeed());
+    QString intv1 = QString("idle:%1 scan:%2").arg(cfg->idleIntv()).arg(cfg->scanIntv());
+    QString intv2 = QString("link:%1 freq:%2").arg(cfg->svcIntv()).arg(cfg->freqNum());
+    QString serve = QString("idle:%1 scan:%2").arg(cfg->idleIntv()).arg(cfg->scanIntv());
+    ui->infoText->appendPlainText(tmr);
+    ui->infoText->appendPlainText(intv1);
+    ui->infoText->appendPlainText(intv2);
+    ui->infoText->appendPlainText(serve);
+    ui->infoText->appendPlainText(algName);
+    ui->infoText->appendPlainText("rule:" + sqlRule);
 }
 
 void MainWin::setup_pal(void)
@@ -243,16 +267,20 @@ void MainWin::on_actModel_triggered(void)
 
 void MainWin::on_actStrategy_triggered(void)
 {
+    LinkCfg* cfg = m_sim->m_link;
     LinkDlg* dlg = new LinkDlg(this);
-    dlg->para2dlg(m_sim->m_link);
+    dlg->para2dlg(cfg);
     int ret = dlg->exec();
+
     if (ret == QDialog::Accepted) {
         /* 停止仿真 */
         m_sim->stop();
         m_chart->clear();
 
         /* 配置参数 */
-        dlg->dlg2para(m_sim->m_link);
+        QString algName, sqlRule;
+        dlg->dlg2para(cfg, algName, sqlRule);
+        display(algName, sqlRule);
 
         /* 启动仿真 */
         m_sim->trigger();

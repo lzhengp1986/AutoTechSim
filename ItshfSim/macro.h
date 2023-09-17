@@ -3,6 +3,7 @@
 
 #define MAX_MONTH_NUM 12 /* 月数 */
 #define MAX_HOUR_NUM 24 /* 小时数 */
+#define MAX_SQL_SMPL 1024 /* 样本数 */
 
 #define ONE_CHN_BW  3 /* 信道带宽 */
 #define CHN_SCAN_STEP 5 /* 扫频步进 */

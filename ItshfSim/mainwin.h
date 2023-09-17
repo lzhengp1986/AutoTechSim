@@ -39,6 +39,8 @@ private slots:
 private:
     void setup_win(void);
     void free_win(void);
+    void setup_pal(void);
+    void free_pal(void);
 
     void setup_model(void);
     int update_model(const ModelCfg* cfg);
@@ -46,9 +48,7 @@ private:
 
     void setup_sim(void);
     void free_sim(void);
-
-    void setup_pal(void);
-    void free_pal(void);
+    void display(const QString& algName, const QString& sqlRule);
 
 private:
     /* 主窗口 */
