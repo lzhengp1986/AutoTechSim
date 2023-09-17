@@ -89,7 +89,8 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:black</string>
+         <string notr="true">background-color:black;
+border-color: rgb(0, 0, 0);</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -117,7 +118,8 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:cyan</string>
+         <string notr="true">background-color:cyan;
+border-color: rgb(0, 0, 0);</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -168,7 +170,8 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:magenta</string>
+         <string notr="true">background-color:magenta;
+border-color: rgb(0, 0, 0);</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -196,7 +199,8 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:blue</string>
+         <string notr="true">background-color:blue;
+border-color: rgb(0, 0, 0);</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
