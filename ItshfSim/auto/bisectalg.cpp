@@ -56,11 +56,11 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 搜索带宽3M/6M/9M */
     int schband;
     if (rnd < 40) { /* 40% */
-        schband = BASIC_SEARCH_WIN * 2;
+        schband = BASIC_SEARCH_WIN * 1;
     } else if (rnd < 60) { /* 20% */
-        schband = BASIC_SEARCH_WIN * 4;
+        schband = BASIC_SEARCH_WIN * 2;
     } else if (rnd < 80) { /* 20% */
-        schband = BASIC_SEARCH_WIN * 6;
+        schband = BASIC_SEARCH_WIN * 4;
     } else { /* 20% */
         schband = BASIC_SEARCH_WIN * 8;
     }
