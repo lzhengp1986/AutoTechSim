@@ -16,14 +16,17 @@ public:
     ~ColorPal();
 
 private slots:
+    void on_scanWhite_clicked(void);
     void on_scanBlack_clicked(void);
     void on_scanBlue_clicked(void);
     void on_scanCyan_clicked(void);
     void on_scanMagenta_clicked(void);
+    void on_linkWhite_clicked(void);
     void on_linkBlack_clicked(void);
     void on_linkBlue_clicked(void);
     void on_linkCyan_clicked(void);
     void on_linkMagenta_clicked(void);
+    void on_regWhite_clicked(void);
     void on_regBlack_clicked(void);
     void on_regBlue_clicked(void);
     void on_regCyan_clicked(void);

@@ -46,6 +46,12 @@ ColorPal::~ColorPal()
     delete ui;
 }
 
+void ColorPal::on_scanWhite_clicked(void)
+{
+    m_scanColor = Qt::white;
+    emit scan_color(m_scanColor);
+}
+
 void ColorPal::on_scanBlack_clicked(void)
 {
     m_scanColor = Qt::black;
@@ -70,6 +76,12 @@ void ColorPal::on_scanMagenta_clicked(void)
     emit scan_color(m_scanColor);
 }
 
+void ColorPal::on_linkWhite_clicked(void)
+{
+    m_linkColor = Qt::white;
+    emit link_color(m_linkColor);
+}
+
 void ColorPal::on_linkBlack_clicked(void)
 {
     m_linkColor = Qt::black;
@@ -92,6 +104,12 @@ void ColorPal::on_linkMagenta_clicked(void)
 {
     m_linkColor = Qt::magenta;
     emit link_color(m_linkColor);
+}
+
+void ColorPal::on_regWhite_clicked(void)
+{
+    m_regColor = Qt::white;
+    emit reg_color(m_regColor);
 }
 
 void ColorPal::on_regBlack_clicked(void)

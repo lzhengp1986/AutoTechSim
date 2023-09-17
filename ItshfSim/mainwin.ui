@@ -96,6 +96,18 @@
          <string>Information</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
+         <property name="leftMargin">
+          <number>3</number>
+         </property>
+         <property name="topMargin">
+          <number>3</number>
+         </property>
+         <property name="rightMargin">
+          <number>3</number>
+         </property>
+         <property name="bottomMargin">
+          <number>3</number>
+         </property>
          <item row="0" column="0">
           <widget class="QPlainTextEdit" name="infoText">
            <property name="sizePolicy">
@@ -112,7 +124,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>148</width>
+             <width>160</width>
              <height>40</height>
             </size>
            </property>
@@ -139,6 +151,9 @@ color:blue;</string>
            <property name="horizontalScrollBarPolicy">
             <enum>Qt::ScrollBarAlwaysOff</enum>
            </property>
+           <property name="lineWrapMode">
+            <enum>QPlainTextEdit::NoWrap</enum>
+           </property>
            <property name="readOnly">
             <bool>true</bool>
            </property>
@@ -163,7 +178,7 @@ color:blue;</string>
            </property>
            <property name="maximumSize">
             <size>
-             <width>148</width>
+             <width>160</width>
              <height>40</height>
             </size>
            </property>
@@ -189,6 +204,9 @@ color:blue;</string>
            </property>
            <property name="horizontalScrollBarPolicy">
             <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QPlainTextEdit::NoWrap</enum>
            </property>
            <property name="readOnly">
             <bool>true</bool>
@@ -222,6 +240,18 @@ color:blue;</string>
          <string>Statistic</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
+         <property name="leftMargin">
+          <number>3</number>
+         </property>
+         <property name="topMargin">
+          <number>3</number>
+         </property>
+         <property name="rightMargin">
+          <number>3</number>
+         </property>
+         <property name="bottomMargin">
+          <number>3</number>
+         </property>
          <item row="5" column="1">
           <widget class="QLabel" name="totalTestNum">
            <property name="minimumSize">
