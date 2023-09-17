@@ -262,15 +262,15 @@ int LinkSim::sim_idle(int& dsec)
 
     /* 调用策略推荐频率 */
     int algId = m_link->recAlg();
-    int sqlIntv = m_link->sqlIntv();
-    SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
-    if (algId == LinkCfg::RANDOM_SEARCH) {
+    int sqlRule = m_link->sqlRule();
+    SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
+    if (algId == RANDOM_SEARCH) {
         m_rsp = m_rand->bandit(ain, m_req);
-    } else if (algId == LinkCfg::BISECTING_SEARCH) {
+    } else if (algId == BISECTING_SEARCH) {
         m_rsp = m_sect->bandit(ain, m_req);
-    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+    } else if (algId == MONTE_CARLO_TREE) {
         m_rsp = m_mont->bandit(ain, m_req);
-    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+    } else if (algId == ITS_HF_PROPAGATION) {
         m_rsp = m_itshf->bandit(ain, m_req);
     }
 
@@ -291,8 +291,8 @@ int LinkSim::sim_scan(int& dsec)
     }
 
     int algId = m_link->recAlg();
-    int sqlIntv = m_link->sqlIntv();
-    SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
+    int sqlRule = m_link->sqlRule();
+    SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
 
     /* 处理1个频率 */
     FreqRsp* rsp = &m_rsp;
@@ -314,13 +314,13 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 将scan结果发到alg */
         int regret = 0;
-        if (algId == LinkCfg::RANDOM_SEARCH) {
+        if (algId == RANDOM_SEARCH) {
             regret = m_rand->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::BISECTING_SEARCH) {
+        } else if (algId == BISECTING_SEARCH) {
             regret = m_sect->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+        } else if (algId == MONTE_CARLO_TREE) {
             regret = m_mont->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+        } else if (algId == ITS_HF_PROPAGATION) {
             regret = m_itshf->notify(ain, glbChId, out);
         }
 
@@ -355,13 +355,13 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 失败次数过多，复位状态 */
         if (m_scanNok >= MAX_SCAN_FAIL_THR) {
-            if (algId == LinkCfg::RANDOM_SEARCH) {
+            if (algId == RANDOM_SEARCH) {
                 m_rand->restart(ain);
-            } else if (algId == LinkCfg::BISECTING_SEARCH) {
+            } else if (algId == BISECTING_SEARCH) {
                 m_sect->restart(ain);
-            } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+            } else if (algId == MONTE_CARLO_TREE) {
                 m_mont->restart(ain);
-            } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+            } else if (algId == ITS_HF_PROPAGATION) {
                 m_itshf->restart(ain);
             }
             m_scanNok = 0;
@@ -401,15 +401,15 @@ int LinkSim::sim_link(int& dsec)
         /* 将link结果发到alg */
         int regret = 0;
         int algId = m_link->recAlg();
-        int sqlIntv = m_link->sqlIntv();
-        SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
-        if (algId == LinkCfg::RANDOM_SEARCH) {
+        int sqlRule = m_link->sqlRule();
+        SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
+        if (algId == RANDOM_SEARCH) {
             regret = m_rand->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::BISECTING_SEARCH) {
+        } else if (algId == BISECTING_SEARCH) {
             regret = m_sect->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+        } else if (algId == MONTE_CARLO_TREE) {
             regret = m_mont->notify(ain, glbChId, out);
-        } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+        } else if (algId == ITS_HF_PROPAGATION) {
             regret = m_itshf->notify(ain, glbChId, out);
         }
 
@@ -436,13 +436,13 @@ int LinkSim::sim_link(int& dsec)
 void LinkSim::sim_reset(void)
 {
     int algId = m_link->recAlg();
-    if (algId == LinkCfg::RANDOM_SEARCH) {
+    if (algId == RANDOM_SEARCH) {
         m_rand->reset();
-    } else if (algId == LinkCfg::BISECTING_SEARCH) {
+    } else if (algId == BISECTING_SEARCH) {
         m_sect->reset();
-    } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
+    } else if (algId == MONTE_CARLO_TREE) {
         m_mont->reset();
-    } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
+    } else if (algId == ITS_HF_PROPAGATION) {
         m_itshf->reset();
     }
 }

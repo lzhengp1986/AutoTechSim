@@ -1,6 +1,9 @@
 #ifndef MACRO_H
 #define MACRO_H
 
+#define MAX_MONTH_NUM 12 /* 月数 */
+#define MAX_HOUR_NUM 24 /* 小时数 */
+
 #define ONE_CHN_BW  3 /* 信道带宽 */
 #define CHN_SCAN_STEP 5 /* 扫频步进 */
 #define MAX_GLB_CHN 9333 /* 最大信道个数 */

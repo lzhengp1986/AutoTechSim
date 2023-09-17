@@ -2,7 +2,6 @@
 #define WENV_H
 
 #include "type.h"
-#include "macro.h"
 #include "modeldlg.h"
 #include "randmng.h"
 #include <QStringList>
@@ -57,8 +56,6 @@ typedef struct {
 
 /* 频点数固定 */
 #define MAX_FREQ_NUM 12
-#define MAX_MONTH_NUM 12
-#define MAX_HOUR_NUM 24
 
 /* hour信息 */
 typedef struct {

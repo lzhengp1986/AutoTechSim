@@ -179,7 +179,7 @@ bool BisectAlg::bisect(int schband, int& glbChId)
 bool BisectAlg::best(SqlIn& in, int& optChId)
 {
     /* 读取历史记录 */
-    in.mysql->select(SMPL_LINK, in.stamp, in.sqlMin, m_list);
+    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_list);
     int n = m_list.size();
     if (n <= 0) {
         return false;

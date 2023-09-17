@@ -1,7 +1,7 @@
 #ifndef LINKDLG_H
 #define LINKDLG_H
 
-#include "macro.h"
+#include "type.h"
 #include <QDialog>
 
 namespace Ui {
@@ -17,17 +17,9 @@ public:
     int idleIntv(void);
     int scanIntv(void);
     int svcIntv(void);
-    int sqlIntv(void);
+    int sqlRule(void);
     int freqNum(void);
     int recAlg(void);
-
-    /* 算法类型 */
-    enum {
-        RANDOM_SEARCH = 0,
-        BISECTING_SEARCH,
-        MONTE_CARLO_TREE,
-        ITS_HF_PROPAGATION
-    };
 
 public:
     int simDayIndex; /* 仿真天数 */
@@ -128,19 +120,20 @@ inline int LinkCfg::freqNum(void)
     return fcNum;
 }
 
-inline int LinkCfg::sqlIntv(void)
+inline int LinkCfg::sqlRule(void)
 {
-    int intv = 0;
+    int rule = 0;
     switch (sqlIntvIndex) {
-    case 0: intv = 240; break;
-    case 1: intv = 120; break;
-    case 2: intv = 60; break;
-    case 3: intv = 30; break;
-    case 4: intv = 10; break;
-    default: intv = 120; break;
+    case 0: rule = DAY_4_HOUR; break;
+    case 1: rule = DAY_2_HOUR; break;
+    case 2: rule = DAY_1_HOUR; break;
+    case 3: rule = MONTH_4_HOUR; break;
+    case 4: rule = MONTH_2_HOUR; break;
+    case 5: rule = MONTH_1_HOUR; break;
+    default: rule = MONTH_4_HOUR; break;
     }
 
-    return intv;
+    return rule;
 }
 
 inline int LinkCfg::recAlg(void)

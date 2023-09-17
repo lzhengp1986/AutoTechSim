@@ -24,9 +24,15 @@ public:
     /*! @brief 插入信道样本 */
     int insert(int tab, const Time* ts, int valid, int glbChId, int snr, int noise);
     /*! @brief 筛选历史记录，min表示往前多少分钟 */
-    int select(int tab, const Time* ts, int min, QList<FreqInfo>& list);
+    int select(int tab, const Time* ts, int rule, QList<FreqInfo>& list);
     /*! @brief 丢弃所有数据 */
     void drop(int tab);
+
+private:
+    /*! @brief 根据类型生成selec规则 */
+    char* regular(int tab, const Time* ts, int rule);
+    char* today(int tab, const Time* ts, int hr);
+    char* month(int tab, const Time* ts, int hr);
 
 private:
     sqlite3* m_handle;
@@ -35,19 +41,19 @@ private:
 // sql入参
 class SqlIn {
 public:
-    SqlIn(const Time* ts = nullptr, SimSql* sql = nullptr, int min = 60);
+    SqlIn(const Time* ts = nullptr, SimSql* sql = nullptr, int rule = 0);
 
 public:
-    int sqlMin; /* sql时段 */
+    int myRule; /* 时段规则 */
     SimSql* mysql; /* sql句柄 */
     const Time* stamp; /* 时戳 */
 };
 
-inline SqlIn::SqlIn(const Time* ts, SimSql* sql, int min)
+inline SqlIn::SqlIn(const Time* ts, SimSql* sql, int rule)
 {
     stamp = ts;
     mysql = sql;
-    sqlMin = min;
+    myRule = rule;
 }
 
 #endif // SIMSQL_H

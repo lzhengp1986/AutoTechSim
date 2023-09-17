@@ -21,6 +21,24 @@ public:
     int msec; /* 毫秒 */
 };
 
+/* 算法类型 */
+typedef enum {
+    RANDOM_SEARCH = 0,
+    BISECTING_SEARCH,
+    MONTE_CARLO_TREE,
+    ITS_HF_PROPAGATION
+} AlgType;
+
+/* SQL样本规则 */
+typedef enum {
+    DAY_4_HOUR = 0,
+    DAY_2_HOUR,
+    DAY_1_HOUR,
+    MONTH_4_HOUR,
+    MONTH_2_HOUR,
+    MONTH_1_HOUR
+} SqlRule;
+
 // 状态机
 typedef enum {
     WAIT, IDLE, SCAN, LINK

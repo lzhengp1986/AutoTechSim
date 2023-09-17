@@ -334,27 +334,32 @@
        <widget class="QComboBox" name="sqlInterval">
         <item>
          <property name="text">
-          <string>4hour</string>
+          <string>day4h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>2hour</string>
+          <string>day2h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>1hour</string>
+          <string>day1h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>30min</string>
+          <string>month4h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>10min</string>
+          <string>month2h</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>month1h</string>
          </property>
         </item>
        </widget>

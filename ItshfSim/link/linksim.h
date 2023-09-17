@@ -1,7 +1,6 @@
 #ifndef LINKSIM_H
 #define LINKSIM_H
 
-#include "macro.h"
 #include "type.h"
 #include "linkdlg.h"
 #include "env/wenv.h"

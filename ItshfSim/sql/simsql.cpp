@@ -51,8 +51,74 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
     return SQLITE_OK;
 }
 
+char* SimSql::today(int tab, const Time* ts, int hr)
+{
+    int minDay, minHr;
+    int maxDay, maxHr;
+
+    /* 计算定时 */
+    maxDay = minDay = ts->day;
+    maxHr = minHr = ts->hour;
+    if (minHr >= hr) {
+        minHr -= hr;
+    } else {
+        minHr = (minHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
+        minDay--;
+    }
+
+    /* 生成规则 */
+    char* sql;
+    const char* tlist[] = {"SCAN", "LINK"};
+    if (minDay == maxDay) { /* 同一天 */
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and day=%d"
+                              " and (hour>=%d and hour<=%d) order by snr desc",
+                              tlist[tab], ts->year, ts->month, ts->day,
+                              minHr, maxHr);
+    } else { /* 昨天+今天 */
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
+                              " and ((day=%d and hour>=%d) or day=%d) order by snr desc",
+                              tlist[tab], ts->year, ts->month,
+                              minDay, minHr, maxDay);
+    }
+
+    return sql;
+}
+
+char* SimSql::month(int tab, const Time* ts, int hr)
+{
+    /* 计算定时 */
+    int maxHr = ts->hour;
+    int minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
+
+    /* 生成规则 */
+    const char* tlist[] = {"SCAN", "LINK"};
+    char* sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
+                                " and (hour>=%d and hour<=%d) order by snr desc",
+                                tlist[tab], ts->year, ts->month,
+                                minHr, maxHr);
+
+    return sql;
+}
+
+// 根据类型生成selec规则
+char* SimSql::regular(int tab, const Time* ts, int rule)
+{
+    char* sql;
+    switch (rule) {
+    case MONTH_4_HOUR: sql = month(tab, ts, 4); break;
+    case MONTH_2_HOUR: sql = month(tab, ts, 2); break;
+    case MONTH_1_HOUR: sql = month(tab, ts, 1); break;
+    case DAY_4_HOUR: sql = today(tab, ts, 4); break;
+    case DAY_2_HOUR: sql = today(tab, ts, 2); break;
+    case DAY_1_HOUR: sql = today(tab, ts, 1); break;
+    default: sql = month(tab, ts, 2); break;
+    }
+
+    return sql;
+}
+
 // 筛选数据
-int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
+int SimSql::select(int tab, const Time* ts, int rule, QList<FreqInfo>& list)
 {
     list.clear();
     if (m_handle == nullptr) {
@@ -61,49 +127,9 @@ int SimSql::select(int tab, const Time* ts, int min, QList<FreqInfo>& list)
         return SQLITE_ERROR;
     }
 
-    int minDay, minHr, minMin;
-    int maxDay, maxHr, maxMin;
-
-    /* 计算定时 */
-    maxDay = minDay = ts->day;
-    maxHr = minHr = ts->hour;
-    maxMin = minMin = ts->min;
-    while (minMin < min) {
-        minMin += 60;
-        if (minHr > 0) {
-            minHr--;
-        } else {
-            minHr += 23;
-            minDay--;
-        }
-    }
-    minMin -= min;
-
     /* 参数准备 */
-    char* sql;
-    const char* tlist[] = {"SCAN", "LINK"};
-    if (minDay == maxDay) { /* 同一天 */
-        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and day=%d"
-                              " and ((hour=%d and min>=%d) or (hour>%d and hour<%d)" /* 最早+中间 */
-                              " or (hour=%d)) order by snr desc",  /* 最新 */
-                              tlist[tab], ts->year, ts->month, ts->day,
-                              minHr, minMin, minHr, maxHr, maxHr);
-    } else if (minDay + 1 == maxDay) { /* 相临两天 */
-        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
-                              " and ((day=%d and (hour>%d or (hour=%d and min>=%d)))" /* 最早 */
-                              " or (day=%d)) order by snr desc",  /* 最新 */
-                              tlist[tab], ts->year, ts->month,
-                              minDay, minHr, minHr, minMin,
-                              maxDay);
-    } else { /* 相临几天 */
-        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
-                              " and ((day=%d and hour>=%d) or (day>%d))"
-                              " order by snr desc",
-                              tlist[tab], ts->year, ts->month,
-                              minDay, minHr, minDay);
-    }
-
     sqlite3_stmt* stmt;
+    char* sql = regular(tab, ts, rule);
     int rc = sqlite3_prepare_v2(m_handle, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         sqlite3_free(sql);
