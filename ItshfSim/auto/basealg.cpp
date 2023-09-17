@@ -7,6 +7,7 @@ BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
+    m_list.clear();
 }
 
 // 析构
@@ -67,6 +68,7 @@ int BaseAlg::level(int delta)
 // 能效评估
 int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 {
+    Q_UNUSED(in);
     Q_UNUSED(glbChId);
 
     int frqSnr = out.snr;

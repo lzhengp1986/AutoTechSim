@@ -29,7 +29,11 @@ void BisectAlg::reset(void)
 void BisectAlg::restart(SqlIn& in)
 {
     /* 找最好的中心 */
-    m_prvGlbChId = best(in);
+    int optChId;
+    bool flag = best(in, optChId);
+    if (flag == true) {
+        m_prvGlbChId = optChId;
+    }
 
     /* 清状态 */
     memset(m_valid, 0, sizeof(m_valid));
@@ -52,13 +56,13 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 搜索带宽3M/6M/9M */
     int schband;
     if (rnd < 40) { /* 40% */
-        schband = BASIC_SEARCH_WIN * 1;
-    } else if (rnd < 60) { /* 20% */
         schband = BASIC_SEARCH_WIN * 2;
-    } else if (rnd < 80) { /* 20% */
-        schband = BASIC_SEARCH_WIN * 3;
-    } else { /* 20% */
+    } else if (rnd < 60) { /* 20% */
         schband = BASIC_SEARCH_WIN * 4;
+    } else if (rnd < 80) { /* 20% */
+        schband = BASIC_SEARCH_WIN * 6;
+    } else { /* 20% */
+        schband = BASIC_SEARCH_WIN * 8;
     }
     int schWin = schband / ONE_CHN_BW;
 
@@ -75,7 +79,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 将二分频点提前 */
     rnd = qrand() % 100;
-    if (rnd < 25) {
+    if (rnd < 40) {
         int tmp1 = rsp->glb[3];
         rsp->glb[3] = rsp->glb[1];
         rsp->glb[1] = tmp1;
@@ -97,8 +101,12 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     /* 能效评估 */
     BaseAlg::notify(in, glbChId, out);
 
-    /* 统计捕获信息 */
-    m_prvGlbChId = best(in);
+    /* 获取历史最优 */
+    int optChId;
+    bool flag = best(in, optChId);
+    if (flag == true) {
+        m_prvGlbChId = optChId;
+    }
 
     /* 切换状态 */
     m_firstStage = false;
@@ -168,25 +176,55 @@ bool BisectAlg::bisect(int schband, int& glbChId)
 }
 
 // 找最好的中心
-int BisectAlg::best(SqlIn& in)
+bool BisectAlg::best(SqlIn& in, int& optChId)
 {
-    /*
-    QList<FreqInfo> list;
-    in.handle->select(SMPL_LINK, in.stamp, in.sqlMin, list);
-    */
+    /* 读取历史记录 */
+    in.mysql->select(SMPL_LINK, in.stamp, in.sqlMin, m_list);
+    int n = m_list.size();
+    if (n <= 0) {
+        return false;
+    }
+
+    /* 样本清零 */
+    int i, glbChId;
+    for (i = 0; i < n; i++) {
+        glbChId = m_list.at(i).glbChId;
+        m_snrSum[glbChId] = 0;
+        m_snrNum[glbChId] = 0;
+        m_vldNum[glbChId] = 0;
+        m_invNum[glbChId] = 0;
+    }
+
+    /* 样本统计 */
+    bool valid;
+    for (i = 0; i < n; i++) {
+        const FreqInfo& info = m_list.at(i);
+        glbChId = info.glbChId;
+        valid = info.valid;
+
+        /* SNR统计 */
+        m_snrSum[glbChId] += info.snr;
+        m_snrNum[glbChId] ++;
+
+        /* thompson统计 */
+        m_vldNum[glbChId] += (valid == true);
+        m_invNum[glbChId] += (valid == false);
+    }
 
     /* 最大均值 */
     int maxIdx = 0;
-    float maxAvg = avgSnr(0);
-    for (int i = 1; i < MAX_GLB_CHN; i++) {
-        float snr = avgSnr(i);
+    float maxAvg = 0;
+    for (i = 0; i < n; i++) {
+        glbChId = m_list.at(i).glbChId;
+        float snr = avgSnr(glbChId);
         if (snr > maxAvg) {
+            maxIdx = glbChId;
             maxAvg = snr;
-            maxIdx = i;
         }
     }
 
-    return maxIdx;
+    optChId = maxIdx;
+    return true;
 }
 
 // 平均snr

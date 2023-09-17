@@ -24,7 +24,7 @@ public:
 private:
     /*! @brief 根据band二分搜索 */
     bool bisect(int schband, int& glbChId);
-    int best(SqlIn& in);
+    bool best(SqlIn& in, int& optChId);
     float avgSnr(int i);
 
 private:

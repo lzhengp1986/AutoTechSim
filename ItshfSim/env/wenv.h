@@ -97,6 +97,9 @@ public:
     int env(const EnvIn& in, EnvOut& out);
 
     /*! @brief 根据信道号获取底噪 */
+    static int noise(int glbChId);
+
+    /*! @brief 获取所有底噪数据 */
     static const int* noise(void);
 
 private:

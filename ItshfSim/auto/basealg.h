@@ -3,6 +3,7 @@
 
 #include "env/wenv.h"
 #include "sql/simsql.h"
+#include <QList>
 
 class BaseAlg
 {
@@ -44,6 +45,7 @@ protected:
 protected:
     FreqRsp m_rsp;
     unsigned m_regret;
+    QList<FreqInfo> m_list;
 };
 
 // 填写消息头

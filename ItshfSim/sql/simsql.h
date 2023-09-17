@@ -38,14 +38,14 @@ public:
     SqlIn(const Time* ts = nullptr, SimSql* sql = nullptr, int min = 60);
 
 public:
-    Time stamp; /* 时戳 */
     int sqlMin; /* sql时段 */
     SimSql* mysql; /* sql句柄 */
+    const Time* stamp; /* 时戳 */
 };
 
 inline SqlIn::SqlIn(const Time* ts, SimSql* sql, int min)
 {
-    stamp = *ts;
+    stamp = ts;
     mysql = sql;
     sqlMin = min;
 }

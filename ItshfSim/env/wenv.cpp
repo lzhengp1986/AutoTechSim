@@ -57,13 +57,17 @@ int WEnv::setup(int month, int maxband, const QString& fn)
         }
 
         /* 保存数据 */
-        if ((hour <= MAX_HOUR_NUM) && (hour > 0)) {
-            DbFreq* df = &m_dbMonth.hr[hour - 1].fc[fid];
-            df->mufday = mufday;
-            df->freq = freq;
-            df->snr = snr;
-            df->rel = rel;
+        DbFreq* df;
+        if ((hour < MAX_HOUR_NUM) && (hour > 0)) {
+            df = &m_dbMonth.hr[hour].fc[fid];
+        } else { /* 24h填到零晨 */
+            df = &m_dbMonth.hr[0].fc[fid];
         }
+
+        df->mufday = mufday;
+        df->freq = freq;
+        df->snr = snr;
+        df->rel = rel;
     }
 
     /* 关闭db */
@@ -114,11 +118,8 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
 int WEnv::estimate(const EnvIn& in, EnvOut& out)
 {
     /* 获取底噪 */
-    const int* pnoise = noise();
     int glbChId = in.glbChId;
-    int locChId = glbChId / CHN_SCAN_STEP;
-    int subId = locChId / 3; /* 3个信道压缩 */
-    out.n0 = pnoise[subId];
+    out.n0 = noise(glbChId);
 
     /* 获取Hour信息 */
     DbHour* dh = &m_dbMonth.hr[in.hour];
@@ -182,6 +183,15 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
 }
 
 // 根据信道号获取底噪
+int WEnv::noise(int glbChId)
+{
+    const int* pnoise = noise();
+    int locChId = glbChId / CHN_SCAN_STEP;
+    int subId = locChId / 3; /* 3个信道压缩 */
+    return pnoise[subId];
+}
+
+// 获取所有底噪数据
 const int* WEnv::noise(void)
 {
     static int s_noise[NOISE_NUM] = {
