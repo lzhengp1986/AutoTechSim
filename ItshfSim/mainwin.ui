@@ -38,6 +38,11 @@
         <height>460</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>

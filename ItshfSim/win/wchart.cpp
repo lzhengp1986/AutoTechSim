@@ -38,13 +38,13 @@ WChart::WChart(void)
     /* 设置懊悔值 */
     m_regret = new QLineSeries;
     m_regret->setPen(QPen(Qt::cyan, 1));
-    m_regret->setName("regret");
+    m_regret->setName("regrets");
     m_regret->setOpacity(0.5);
     chart->addSeries(m_regret);
 
     /* step3.设置x坐标轴 */
     QValueAxis *x0 = new QValueAxis;
-    x0->setTitleText("frequency/MHz");
+    x0->setTitleText("Frequency/MHz");
     x0->setRange(2, 30); /* MHz */
     x0->setTickCount(15);
     x0->setMinorTickCount(1);
@@ -54,13 +54,13 @@ WChart::WChart(void)
     x0->setGridLineVisible(false);
 
     QValueAxis *x1 = new QValueAxis;
-    x1->setTitleText("regrets");
+    x1->setTitleText("Regrets");
     x1->setRange(0, 100);
     x1->setTickCount(6);
     x1->setMinorTickCount(1);
     x1->setLabelFormat("%d");
     x1->setTitleVisible(true);
-    x1->setMinorGridLineVisible(true);
+    x1->setMinorGridLineVisible(false);
     x1->setGridLineVisible(false);
     x1->setLabelsVisible(true);
     x1->setVisible(true);
