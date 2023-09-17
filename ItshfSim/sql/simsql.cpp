@@ -87,16 +87,26 @@ char* SimSql::today(int tab, const Time* ts, int hr)
 
 char* SimSql::month(int tab, const Time* ts, int hr)
 {
-    /* 计算定时 */
+    char* sql;
     int maxHr = ts->hour;
-    int minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
-
-    /* 生成规则 */
     const char* tlist[] = {"SCAN", "LINK"};
-    char* sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
-                                " and (hour>=%d and hour<=%d) order by snr desc",
-                                tlist[tab], ts->year, ts->month,
-                                minHr, maxHr);
+
+    /* 不跨24小时 */
+    if (maxHr >= hr) {
+        /* 只有1段 */
+        int minHr = maxHr - hr;
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
+                              " and (hour>=%d and hour<=%d) order by snr desc",
+                              tlist[tab], ts->year, ts->month,
+                              minHr, maxHr);
+    } else {
+        /* 2段定时: min~24, 0~max */
+        int minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
+                              " and (hour>=%d or hour<=%d) order by snr desc",
+                              tlist[tab], ts->year, ts->month,
+                              minHr, maxHr);
+    }
 
     return sql;
 }
