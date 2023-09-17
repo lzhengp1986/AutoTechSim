@@ -48,17 +48,22 @@ void LinkSim::stop(void)
 
 void LinkSim::trigger(void)
 {
-    /* step1.时间复位 */
-    m_stamp->reset();
-    expire(m_link->simDays());
-
-    /* step2.统计值复位 */
+    /* step1.统计值复位 */
     emit new_sts(0, 0, 0, 0);
+
+    /* step2.sql复位 */
+    m_sql->drop(BaseAlg::SMPL_SCAN);
+    m_sql->drop(BaseAlg::SMPL_LINK);
 
     /* step3.算法复位 */
     sim_reset();
 
-    /* step4.倒计时 */
+    /* step4.时间复位 */
+    m_to->reset();
+    m_ts->reset();
+    expire(m_link->simDays());
+
+    /* step5.倒计时 */
     m_state = IDLE;
     stamp(10);
 }
@@ -67,8 +72,9 @@ void LinkSim::trigger(void)
 void LinkSim::setup_time(void)
 {
     m_daily = false;
-    m_stamp = new Time;
     m_to = new Time;
+    m_te = new Time;
+    m_ts = new Time;
 
     /* 默认仿真1天 */
     m_expire = new Time;
@@ -90,6 +96,7 @@ void LinkSim::setup_alg(void)
     m_sect = new BisectAlg;
     m_itshf = new ItshfAlg;
     m_mont = new MonteAlg;
+    m_sql = new SimSql;
 }
 
 // 释放算法
@@ -99,18 +106,21 @@ void LinkSim::free_alg(void)
     delete m_sect;
     delete m_itshf;
     delete m_mont;
+    delete m_sql;
     m_rand = nullptr;
     m_sect = nullptr;
     m_itshf = nullptr;
     m_mont = nullptr;
+    m_sql = nullptr;
 }
 
 // 更新Time
 void LinkSim::set_time(int year, int month)
 {
-    m_stamp->year = year;
-    m_stamp->month = month;
-    emit new_time(m_stamp);
+    m_to->year = year;
+    m_to->month = month;
+    *m_ts = *m_to;
+    emit new_time(m_ts);
 }
 
 // 释放time
@@ -120,14 +130,16 @@ void LinkSim::free_time(void)
     m_subthr->quit();
     delete m_timer;
     delete m_subthr;
-    delete m_stamp;
     delete m_expire;
     delete m_to;
+    delete m_te;
+    delete m_ts;
     m_timer = nullptr;
     m_subthr = nullptr;
-    m_stamp = nullptr;
     m_expire = nullptr;
     m_to = nullptr;
+    m_te = nullptr;
+    m_ts = nullptr;
 }
 
 // 定时器超时处理
@@ -141,58 +153,59 @@ void LinkSim::on_timeout(void)
     }
 
     /* 秒数不变则返回 */
-    m_stamp->msec += msec;
-    if (m_stamp->msec < 1000) {
+    m_to->msec += msec;
+    if (m_to->msec < 1000) {
         return;
     }
-    int md = m_stamp->mdays();
+    int md = m_to->mdays();
 
     /* 秒进位 */
-    while (m_stamp->msec >= 1000) {
-        m_stamp->msec -= 1000;
-        m_stamp->sec++;
+    while (m_to->msec >= 1000) {
+        m_to->msec -= 1000;
+        m_to->sec++;
     }
 
     /* 分进位 */
-    if (m_stamp->sec < 60) {
+    if (m_to->sec < 60) {
         goto SIMULATE;
     }
-    while (m_stamp->sec >= 60) {
-        m_stamp->sec -= 60;
-        m_stamp->min++;
+    while (m_to->sec >= 60) {
+        m_to->sec -= 60;
+        m_to->min++;
     }
 
     /* 时进位 */
-    if (m_stamp->min < 60) {
+    if (m_to->min < 60) {
         goto SIMULATE;
     }
-    m_stamp->min -= 60;
-    m_stamp->hour++;
+    m_to->min -= 60;
+    m_to->hour++;
 
     /* 天进位 */
-    if (m_stamp->hour < MAX_HOUR_NUM) {
+    if (m_to->hour < MAX_HOUR_NUM) {
         goto SIMULATE;
     }
-    m_stamp->hour -= MAX_HOUR_NUM;
-    m_stamp->day++;
+    m_to->hour -= MAX_HOUR_NUM;
+    m_to->day++;
     m_daily = true;
 
     /* 月进位 */
-    if (m_stamp->day <= md) {
+    if (m_to->day <= md) {
         goto SIMULATE;
     }
-    m_stamp->day -= md;
-    m_stamp->month++;
+    m_to->day -= md;
+    m_to->month++;
 
     /* 年进位 */
-    if (m_stamp->month <= MAX_MONTH_NUM) {
+    if (m_to->month <= MAX_MONTH_NUM) {
         goto SIMULATE;
     }
-    m_stamp->month -= MAX_MONTH_NUM;
-    m_stamp->year++;
+    m_to->month -= MAX_MONTH_NUM;
+    m_to->year++;
 
 SIMULATE:
-    emit new_time(m_stamp);
+    *m_ts = *m_to;
+    emit new_time(m_ts);
     simulate();
 }
 
@@ -226,7 +239,7 @@ void LinkSim::simulate(void)
 // idle
 int LinkSim::sim_idle(int& dsec)
 {
-    int diff = m_to->second() - m_stamp->second();
+    int diff = m_te->second() - m_ts->second();
     dsec = ABS(diff);
     if (diff > 0) {
         return IDLE;
@@ -250,14 +263,15 @@ int LinkSim::sim_idle(int& dsec)
     /* 调用策略推荐频率 */
     int algId = m_link->recAlg();
     int sqlIntv = m_link->sqlIntv();
+    SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
     if (algId == LinkCfg::RANDOM_SEARCH) {
-        m_rsp = m_rand->bandit(m_stamp, sqlIntv, m_req);
+        m_rsp = m_rand->bandit(ain, m_req);
     } else if (algId == LinkCfg::BISECTING_SEARCH) {
-        m_rsp = m_sect->bandit(m_stamp, sqlIntv, m_req);
+        m_rsp = m_sect->bandit(ain, m_req);
     } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-        m_rsp = m_mont->bandit(m_stamp, sqlIntv, m_req);
+        m_rsp = m_mont->bandit(ain, m_req);
     } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-        m_rsp = m_itshf->bandit(m_stamp, sqlIntv, m_req);
+        m_rsp = m_itshf->bandit(ain, m_req);
     }
 
     /* 切换状态 */
@@ -270,40 +284,44 @@ int LinkSim::sim_idle(int& dsec)
 int LinkSim::sim_scan(int& dsec)
 {
     int scanIntv = m_link->scanIntv();
-    int diff = m_stamp->second() - m_to->second();
+    int diff = m_ts->second() - m_te->second();
     dsec = ABS(scanIntv - diff);
     if (diff < scanIntv) {
         return SCAN;
     }
 
-    /* 处理1个频率 */
-    FreqRsp* rsp = &m_rsp;
     int algId = m_link->recAlg();
     int sqlIntv = m_link->sqlIntv();
+    SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
+
+    /* 处理1个频率 */
+    FreqRsp* rsp = &m_rsp;
     if (rsp->used < rsp->total) {
-        EnvIn in;
-        EnvOut out;
         int glbChId = rsp->glb[rsp->used];
         m_scanFrq++;
+        EnvOut out;
 
         /* 调用环境模型 */
-        in.year = m_stamp->year;
-        in.month = m_stamp->month;
-        in.hour = m_stamp->hour;
-        in.glbChId = glbChId;
-        int flag = m_env->env(in, out);
+        EnvIn ein = EnvIn(m_ts, glbChId);
+        int flag = m_env->env(ein, out);
+
+        /* 将scan结果记录到sql */
+        int type = BaseAlg::SMPL_SCAN;
+        int ret = m_sql->insert(type, m_ts, out.isValid, glbChId, out.snr, out.n0);
+        if (ret != SQLITE_OK) {
+            /* nothing-to-do */
+        }
 
         /* 将scan结果发到alg */
         int regret = 0;
-        int type = BaseAlg::SMPL_SCAN;
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_rand->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_sect->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_mont->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_itshf->notify(ain, glbChId, out);
         }
 
         /* 将scan结果发到MainWin */
@@ -338,13 +356,13 @@ int LinkSim::sim_scan(int& dsec)
         /* 失败次数过多，复位状态 */
         if (m_scanNok >= MAX_SCAN_FAIL_THR) {
             if (algId == LinkCfg::RANDOM_SEARCH) {
-                m_rand->restart(m_stamp, sqlIntv);
+                m_rand->restart(ain);
             } else if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->restart(m_stamp, sqlIntv);
+                m_sect->restart(ain);
             } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-                m_mont->restart(m_stamp, sqlIntv);
+                m_mont->restart(ain);
             } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-                m_itshf->restart(m_stamp, sqlIntv);
+                m_itshf->restart(ain);
             }
             m_scanNok = 0;
         }
@@ -358,38 +376,41 @@ int LinkSim::sim_scan(int& dsec)
 // link
 int LinkSim::sim_link(int& dsec)
 {
-    int diff = m_to->second() - m_stamp->second();
+    int diff = m_te->second() - m_ts->second();
     dsec = ABS(diff);
 
     int idleIntv = m_link->idleIntv();
 
     /* 每分钟上报link信息 */
     if (dsec % 60 == 0) {
-        EnvIn in;
-        EnvOut out;
         FreqRsp* rsp = &m_rsp;
         int glbChId = rsp->glb[rsp->used];
+        EnvOut out;
 
         /* 调用环境模型 */
-        in.year = m_stamp->year;
-        in.month = m_stamp->month;
-        in.hour = m_stamp->hour;
-        in.glbChId = glbChId;
+        EnvIn in = EnvIn(m_ts, glbChId);
         int flag = m_env->env(in, out);
+
+        /* 将link结果记录到sql */
+        int type = BaseAlg::SMPL_LINK;
+        int ret = m_sql->insert(type, m_ts, out.isValid, glbChId, out.snr, out.n0);
+        if (ret != SQLITE_OK) {
+            /* nothing-to-do */
+        }
 
         /* 将link结果发到alg */
         int regret = 0;
-        int type = BaseAlg::SMPL_LINK;
         int algId = m_link->recAlg();
         int sqlIntv = m_link->sqlIntv();
+        SqlIn ain = SqlIn(m_ts, m_sql, sqlIntv);
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_rand->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_sect->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_mont->notify(ain, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(m_stamp, sqlIntv, type, glbChId, out);
+            regret = m_itshf->notify(ain, glbChId, out);
         }
 
         /* 将link结果发到MainWin */
@@ -430,11 +451,11 @@ void LinkSim::sim_reset(void)
 bool LinkSim::isExpired(void)
 {
     bool flag = false;
-    if (m_stamp->year > m_expire->year) {
+    if (m_ts->year > m_expire->year) {
         flag = true;
-    } else if (m_stamp->month > m_expire->month) {
+    } else if (m_ts->month > m_expire->month) {
         flag = true;
-    } else if (m_stamp->day >= m_expire->day) {
+    } else if (m_ts->day >= m_expire->day) {
         flag = true;
     }
     return flag;
@@ -443,11 +464,11 @@ bool LinkSim::isExpired(void)
 // 在当前定时上加days
 void LinkSim::expire(int days)
 {
-    *m_expire = *m_stamp;
+    *m_expire = *m_ts;
     m_expire->day += days;
 
     /* 进位判断 */
-    int md = m_stamp->mdays();
+    int md = m_ts->mdays();
     if (m_expire->day > md) {
         m_expire->day -= md;
         m_expire->month++;
@@ -461,7 +482,7 @@ void LinkSim::expire(int days)
 // 超时时戳
 void LinkSim::stamp(int plus)
 {
-    *m_to = *m_stamp;
-    m_to->sec += plus;
+    *m_te = *m_ts;
+    m_te->sec += plus;
 }
 

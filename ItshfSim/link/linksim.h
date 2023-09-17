@@ -60,22 +60,24 @@ public:
 private:
     /* 定时器线程 */
     bool m_daily;
-    Time *m_stamp;
-    Time *m_expire;
-    QTimer *m_timer;
     QThread *m_subthr;
+    QTimer *m_timer; /* 定时器 */
+    Time *m_expire; /* 过期时间 */
+    Time *m_to; /* 定时器时间 */
 
     /* 算法实例化 */
     BaseAlg *m_rand;
     BisectAlg *m_sect;
     ItshfAlg *m_itshf;
     MonteAlg *m_mont;
+    SimSql *m_sql;
 
     /* 状态机 */
     FreqReq m_req;
     FreqRsp m_rsp;
     int m_state;
-    Time *m_to;
+    Time *m_ts; /* 仿真时间 */
+    Time *m_te; /* 结束时间 */
 
     /* 统计值 */
     unsigned m_linkNum; /* 建链总次数 */

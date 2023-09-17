@@ -17,14 +17,14 @@ public:
 
     /* api */
     virtual void reset(void);
-    virtual void restart(const Time* ts, int min);
-    virtual const FreqRsp& bandit(const Time* ts, int min, const FreqReq& req);
-    virtual int notify(const Time* ts, int min, int type, int glbChId, const EnvOut& out);
+    virtual void restart(SqlIn& in);
+    virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
+    virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
 private:
     /*! @brief 根据band二分搜索 */
     bool bisect(int schband, int& glbChId);
-    int best(const Time* ts, int min);
+    int best(SqlIn& in);
     float avgSnr(int i);
 
 private:

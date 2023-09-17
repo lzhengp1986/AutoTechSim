@@ -2,16 +2,11 @@
 #include <QtGlobal>
 #include <QTime>
 
-// 实例化
-SimSql BaseAlg::m_sql;
-
 // 构造
 BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
-    m_sql.drop(SMPL_SCAN);
-    m_sql.drop(SMPL_LINK);
 }
 
 // 析构
@@ -26,19 +21,17 @@ void BaseAlg::reset(void)
 }
 
 // 算法状态重置
-void BaseAlg::restart(const Time* ts, int min)
+void BaseAlg::restart(SqlIn& in)
 {
-    Q_UNUSED(ts);
-    Q_UNUSED(min);
+    Q_UNUSED(in);
     int msec = QTime::currentTime().msecsSinceStartOfDay();
     qsrand((uint)msec);
 }
 
 // 随机搜索
-const FreqRsp& BaseAlg::bandit(const Time* ts, int min, const FreqReq& req)
+const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
 {
-    Q_UNUSED(ts);
-    Q_UNUSED(min);
+    Q_UNUSED(in);
     FreqRsp* rsp = &m_rsp;
     int n = req.fcNum;
     set_head(n);
@@ -56,7 +49,9 @@ const FreqRsp& BaseAlg::bandit(const Time* ts, int min, const FreqReq& req)
 int BaseAlg::level(int delta)
 {
     int lev;
-    if (delta < -10) {
+    if (delta < -15) {
+        lev = -7;
+    } else if (delta < -10) {
         lev = -5;
     } else if (delta < -5) {
         lev = -3;
@@ -70,22 +65,14 @@ int BaseAlg::level(int delta)
 }
 
 // 能效评估
-int BaseAlg::notify(const Time* ts, int min, int type, int glbChId, const EnvOut& out)
+int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 {
-    Q_UNUSED(ts);
-    Q_UNUSED(min);
     Q_UNUSED(glbChId);
 
     int frqSnr = out.snr;
     bool frqVld = out.isValid;
     bool mufVld = out.mufVld;
     int mufSnr = out.mufSnr;
-
-    /* 记录到sql */
-    int ret = m_sql.insert(type, ts, frqVld, glbChId, frqSnr, out.n0);
-    if (ret != SQLITE_OK) {
-        /* nothing-to-do */
-    }
 
     /* 性能差异比较 */
     int delta;

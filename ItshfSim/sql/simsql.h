@@ -32,4 +32,22 @@ private:
     sqlite3* m_handle;
 };
 
+// sql入参
+class SqlIn {
+public:
+    SqlIn(const Time* ts = nullptr, SimSql* sql = nullptr, int min = 60);
+
+public:
+    Time stamp; /* 时戳 */
+    int sqlMin; /* sql时段 */
+    SimSql* mysql; /* sql句柄 */
+};
+
+inline SqlIn::SqlIn(const Time* ts, SimSql* sql, int min)
+{
+    stamp = *ts;
+    mysql = sql;
+    sqlMin = min;
+}
+
 #endif // SIMSQL_H

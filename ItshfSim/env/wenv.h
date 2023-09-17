@@ -1,18 +1,40 @@
 #ifndef WENV_H
 #define WENV_H
 
+#include "type.h"
 #include "macro.h"
 #include "modeldlg.h"
 #include "randmng.h"
 #include <QStringList>
 
 /* 入参 */
-typedef struct {
+class EnvIn {
+public:
+    EnvIn(const Time* ts, int glb);
+    EnvIn(int y = 0, int m = 0, int h = 0, int glb = 0);
+
+public:
     int year;
     int month; /* 1~12 */
     int hour; /* 1~24 */
     int glbChId; /* 0~9333 */
-} EnvIn;
+};
+
+inline EnvIn::EnvIn(const Time* ts, int glb)
+{
+    year = ts->year;
+    month = ts->month;
+    hour = ts->hour;
+    glbChId = glb;
+}
+
+inline EnvIn::EnvIn(int y, int m, int h, int glb)
+{
+    year = y;
+    month = m;
+    hour = h;
+    glbChId = glb;
+}
 
 /* 出参 */
 typedef struct {

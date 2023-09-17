@@ -3,13 +3,14 @@
 // 构造
 Time::Time(void)
 {
+    year = 2023;
+    month = 1;
     reset();
 }
 
 void Time::reset(void)
 {
-    year = 2023;
-    month = 1;
+    /* 除开年月 */
     day = 15;
     hour = 0;
     min = 0;
