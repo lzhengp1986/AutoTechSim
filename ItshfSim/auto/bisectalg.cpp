@@ -96,7 +96,17 @@ int BisectAlg::notify(const Time* ts, int type, int glbChId, const EnvOut& out)
     /* 能效评估 */
     BaseAlg::notify(ts, type, glbChId, out);
 
+    /* 捕获失败不返回 */
+    bool flag = out.isValid;
+    if (flag == false) {
+        m_invNum[glbChId]++;
+    }
+
     /* 统计捕获信息 */
+    int snr = out.snr;
+    m_snrSum[glbChId] += snr;
+    m_snrNum[glbChId] ++;
+    m_vldNum[glbChId] ++;
     m_prvGlbChId = best(ts);
 
     /* 切换状态 */
