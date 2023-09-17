@@ -11,7 +11,7 @@ Time::Time(void)
 void Time::reset(void)
 {
     /* 除开年月 */
-    day = 15;
+    day = 5;
     hour = 0;
     min = 0;
     sec = 0;

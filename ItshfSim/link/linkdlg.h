@@ -39,8 +39,8 @@ inline int LinkCfg::simDays(void) const
     case 0: days = 1; break;
     case 1: days = 2; break;
     case 2: days = 4; break;
-    case 3: days = 15; break;
-    case 4: days = 30; break;
+    case 3: days = 14; break;
+    case 4: days = 21; break;
     default: days = 1; break;
     }
     return days;
