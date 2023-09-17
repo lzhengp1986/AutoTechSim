@@ -26,15 +26,17 @@ void BaseAlg::reset(void)
 }
 
 // 算法状态重置
-void BaseAlg::restart(void)
+void BaseAlg::restart(const Time* ts)
 {
+    Q_UNUSED(ts);
     int msec = QTime::currentTime().msecsSinceStartOfDay();
     qsrand((uint)msec);
 }
 
 // 随机搜索
-const FreqRsp& BaseAlg::bandit(const FreqReq& req)
+const FreqRsp& BaseAlg::bandit(const Time* ts, const FreqReq& req)
 {
+    Q_UNUSED(ts);
     FreqRsp* rsp = &m_rsp;
     int n = req.fcNum;
     set_head(n);
@@ -66,7 +68,7 @@ int BaseAlg::level(int delta)
 }
 
 // 能效评估
-int BaseAlg::notify(int type, const Time* ts, int glbChId, const EnvOut& out)
+int BaseAlg::notify(const Time* ts, int type, int glbChId, const EnvOut& out)
 {
     Q_UNUSED(ts);
     Q_UNUSED(glbChId);

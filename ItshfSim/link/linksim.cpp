@@ -253,13 +253,13 @@ int LinkSim::sim_idle(int& dsec)
     /* 调用策略推荐频率 */
     int algId = m_link->algIndex;
     if (algId == LinkCfg::RANDOM_SEARCH) {
-        m_rsp = m_rand->bandit(m_req);
+        m_rsp = m_rand->bandit(m_stamp, m_req);
     } else if (algId == LinkCfg::BISECTING_SEARCH) {
-        m_rsp = m_sect->bandit(m_req);
+        m_rsp = m_sect->bandit(m_stamp, m_req);
     } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-        // todo
+        m_rsp = m_mont->bandit(m_stamp, m_req);
     } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-        // todo
+        m_rsp = m_itshf->bandit(m_stamp, m_req);
     }
 
     /* 切换状态 */
@@ -299,13 +299,13 @@ int LinkSim::sim_scan(int& dsec)
         int regret = 0;
         int type = BaseAlg::SMPL_SCAN;
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(type, m_stamp, glbChId, out);
+            regret = m_rand->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(type, m_stamp, glbChId, out);
+            regret = m_sect->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(type, m_stamp, glbChId, out);
+            regret = m_mont->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(type, m_stamp, glbChId, out);
+            regret = m_itshf->notify(m_stamp, type, glbChId, out);
         }
 
         /* 将scan结果发到MainWin */
@@ -342,7 +342,7 @@ int LinkSim::sim_scan(int& dsec)
         /* 失败次数过多，复位状态 */
         if (m_scanNok >= MAX_SCAN_FAIL_THR) {
             if (algId == LinkCfg::BISECTING_SEARCH) {
-                m_sect->restart();
+                m_sect->restart(m_stamp);
             }
             m_scanNok = 0;
         }
@@ -383,13 +383,13 @@ int LinkSim::sim_link(int& dsec)
         int regret = 0;
         int type = BaseAlg::SMPL_LINK;
         if (algId == LinkCfg::RANDOM_SEARCH) {
-            regret = m_rand->notify(type, m_stamp, glbChId, out);
+            regret = m_rand->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::BISECTING_SEARCH) {
-            regret = m_sect->notify(type, m_stamp, glbChId, out);
+            regret = m_sect->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::MONTE_CARLO_TREE) {
-            regret = m_mont->notify(type, m_stamp, glbChId, out);
+            regret = m_mont->notify(m_stamp, type, glbChId, out);
         } else if (algId == LinkCfg::ITS_HF_PROPAGATION) {
-            regret = m_itshf->notify(type, m_stamp, glbChId, out);
+            regret = m_itshf->notify(m_stamp, type, glbChId, out);
         }
 
         /* 将link结果发到MainWin */

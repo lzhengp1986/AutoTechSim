@@ -15,13 +15,13 @@ public:
     virtual void reset(void);
 
     /*! @brief 算法状态重置 */
-    virtual void restart(void);
+    virtual void restart(const Time* ts);
 
     /*! @brief 推荐算法调度 */
-    virtual const FreqRsp& bandit(const FreqReq& req);
+    virtual const FreqRsp& bandit(const Time* ts, const FreqReq& req);
 
     /*! @brief 状态调整+性能评估 */
-    virtual int notify(int type, const Time* ts, int glbChId, const EnvOut& out);
+    virtual int notify(const Time* ts, int type, int glbChId, const EnvOut& out);
 
     /*! @brief 样本类型  */
     enum {SMPL_SCAN = 0, SMPL_LINK};

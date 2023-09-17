@@ -59,8 +59,8 @@ WChart::WChart(void)
     x1->setTickCount(6);
     x1->setMinorTickCount(1);
     x1->setLabelFormat("%d");
-    x1->setTitleVisible(false);
-    x1->setMinorGridLineVisible(false);
+    x1->setTitleVisible(true);
+    x1->setMinorGridLineVisible(true);
     x1->setGridLineVisible(false);
     x1->setLabelsVisible(true);
     x1->setVisible(true);
