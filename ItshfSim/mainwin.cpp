@@ -144,15 +144,15 @@ void MainWin::display(const QString& algName, const QString& sqlRule)
 
     /* 仿真参数 */
     LinkCfg* cfg = m_sim->m_link;
-    QString tmr = QString("days%1 speed x%2").arg(cfg->simDays()).arg(cfg->timerSpeed());
-    QString intv1 = QString("idle:%1 scan:%2").arg(cfg->idleIntv()).arg(cfg->scanIntv());
-    QString intv2 = QString("link:%1 freq:%2").arg(cfg->svcIntv()).arg(cfg->freqNum());
+    QString tmr = QString("days:%1 speed:x%2").arg(cfg->simDays()).arg(cfg->timerSpeed());
+    QString intv1 = QString("idle:%1(%2) scan:%3").arg(cfg->idleIntv()).arg(cfg->idleIntvIndex).arg(cfg->scanIntv());
+    QString intv2 = QString("link:%1(%2) freq:%3").arg(cfg->svcIntv()).arg(cfg->svcIntvIndex).arg(cfg->freqNum());
     QString serve = QString("idle:%1 scan:%2").arg(cfg->idleIntv()).arg(cfg->scanIntv());
     ui->infoText->appendPlainText(tmr);
     ui->infoText->appendPlainText(intv1);
     ui->infoText->appendPlainText(intv2);
     ui->infoText->appendPlainText(serve);
-    ui->infoText->appendPlainText(algName);
+    ui->infoText->appendPlainText("alg:" + algName);
     ui->infoText->appendPlainText("rule:" + sqlRule);
 }
 

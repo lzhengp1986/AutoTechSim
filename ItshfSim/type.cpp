@@ -1,17 +1,22 @@
 #include "type.h"
 
+// 初始日期
+#define INIT_YEAR  2023
+#define INIT_MONTH 1
+#define INIT_DAY   5
+
 // 构造
 Time::Time(void)
 {
-    year = 2023;
-    month = 1;
+    year = INIT_YEAR;
+    month = INIT_MONTH;
     reset();
 }
 
 void Time::reset(void)
 {
     /* 除开年月 */
-    day = 5;
+    day = INIT_DAY;
     hour = 0;
     min = 0;
     sec = 0;

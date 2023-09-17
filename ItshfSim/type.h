@@ -7,9 +7,9 @@
 class Time {
 public:
     Time(void);
-    void reset(void);
     int mdays(void);
     int second(void);
+    void reset(void);
 
 public:
     int year; /* 年(2023~) */
