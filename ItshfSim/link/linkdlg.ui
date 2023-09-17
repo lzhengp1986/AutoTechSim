@@ -6,36 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>185</height>
+    <width>260</width>
+    <height>205</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>253</width>
-    <height>185</height>
+    <width>260</width>
+    <height>205</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>253</width>
-    <height>185</height>
+    <width>264</width>
+    <height>205</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Simulator</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="2" colspan="3">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="2" colspan="3">
     <widget class="QGroupBox" name="simGrpBox">
      <property name="title">
@@ -45,7 +35,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="daysLabel">
         <property name="text">
-         <string>Days</string>
+         <string>SimDays</string>
         </property>
        </widget>
       </item>
@@ -81,7 +71,7 @@
       <item row="0" column="2">
        <widget class="QLabel" name="speedLabel">
         <property name="text">
-         <string>Timer</string>
+         <string>TimerEx</string>
         </property>
        </widget>
       </item>
@@ -122,7 +112,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="reqFcLabel">
         <property name="text">
-         <string>FcNum</string>
+         <string>FreqNum</string>
         </property>
        </widget>
       </item>
@@ -143,7 +133,7 @@
       <item row="1" column="2">
        <widget class="QLabel" name="idleLabel">
         <property name="text">
-         <string>Idle</string>
+         <string>IdleIntv</string>
         </property>
        </widget>
       </item>
@@ -209,7 +199,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="scanLabel">
         <property name="text">
-         <string>Scan</string>
+         <string>ScanIntv</string>
         </property>
        </widget>
       </item>
@@ -230,7 +220,7 @@
       <item row="2" column="2">
        <widget class="QLabel" name="linkLabel">
         <property name="text">
-         <string>Link</string>
+         <string>LinkIntv</string>
         </property>
        </widget>
       </item>
@@ -286,6 +276,16 @@
      </layout>
     </widget>
    </item>
+   <item row="3" column="2" colspan="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="2" colspan="3">
     <widget class="QGroupBox" name="algGrpBox">
      <property name="title">
@@ -295,11 +295,18 @@
       <item row="0" column="0">
        <widget class="QLabel" name="algLabel">
         <property name="text">
-         <string>Alg</string>
+         <string>Recommendation Alg</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
+       <widget class="QLabel" name="sqlLabel">
+        <property name="text">
+         <string>SQL Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QComboBox" name="alg">
         <item>
          <property name="text">
@@ -323,28 +330,31 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="algLabel_2">
-        <property name="text">
-         <string>TS</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QComboBox" name="simDay_2">
+      <item row="1" column="2">
+       <widget class="QComboBox" name="sqlInterval">
         <item>
          <property name="text">
-          <string>2</string>
+          <string>4hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>3</string>
+          <string>2hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>4</string>
+          <string>1hour</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30min</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10min</string>
          </property>
         </item>
        </widget>

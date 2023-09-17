@@ -14,14 +14,32 @@ public:
     /*! @brief 复位函数 */
     virtual void reset(void);
 
-    /*! @brief 算法状态重置 */
-    virtual void restart(const Time* ts);
+    /*!
+     * @brief 算法状态重置
+     * @param [IN] ts 当前时间
+     * @param [IN] min 历史记录时间范围
+     */
+    virtual void restart(const Time* ts, int min);
 
-    /*! @brief 推荐算法调度 */
-    virtual const FreqRsp& bandit(const Time* ts, const FreqReq& req);
+    /*!
+     * @brief 推荐算法调度
+     * @param [IN] ts 当前时间
+     * @param [IN] min 历史记录时间范围
+     * @param [IN] req 频率请求
+     * @return FreqRsp& 频率推荐表
+     */
+    virtual const FreqRsp& bandit(const Time* ts, int min, const FreqReq& req);
 
-    /*! @brief 状态调整+性能评估 */
-    virtual int notify(const Time* ts, int type, int glbChId, const EnvOut& out);
+    /*!
+     * @brief 状态调整+性能评估
+     * @param [IN] ts 当前时间
+     * @param [IN] min 历史记录时间范围
+     * @param [IN] type 样本类型
+     * @param [IN] glbChId 信道号
+     * @param [IN] out 环境评估结果
+     * @return int 懊悔值
+     */
+    virtual int notify(const Time* ts, int min, int type, int glbChId, const EnvOut& out);
 
     /*! @brief 样本类型  */
     enum {SMPL_SCAN = 0, SMPL_LINK};

@@ -26,19 +26,21 @@ void BisectAlg::reset(void)
 }
 
 // 重新找中心点
-void BisectAlg::restart(const Time* ts)
+void BisectAlg::restart(const Time* ts, int min)
 {
     /* 找最好的中心 */
-    m_prvGlbChId = best(ts);
+    m_prvGlbChId = best(ts, min);
 
     /* 清状态 */
     memset(m_valid, 0, sizeof(m_valid));
     m_valid[m_prvGlbChId] = true;
 }
 
-const FreqRsp& BisectAlg::bandit(const Time* ts, const FreqReq& req)
+const FreqRsp& BisectAlg::bandit(const Time* ts, int min, const FreqReq& req)
 {
     Q_UNUSED(ts);
+    Q_UNUSED(min);
+
     FreqRsp* rsp = &m_rsp;
     int n = req.fcNum;
 
@@ -87,27 +89,17 @@ const FreqRsp& BisectAlg::bandit(const Time* ts, const FreqReq& req)
     return m_rsp;
 }
 
-int BisectAlg::notify(const Time* ts, int type, int glbChId, const EnvOut& out)
+int BisectAlg::notify(const Time* ts, int min, int type, int glbChId, const EnvOut& out)
 {
     if (glbChId >= MAX_GLB_CHN) {
         return m_regret;
     }
 
     /* 能效评估 */
-    BaseAlg::notify(ts, type, glbChId, out);
-
-    /* 捕获失败不返回 */
-    bool flag = out.isValid;
-    if (flag == false) {
-        m_invNum[glbChId]++;
-    }
+    BaseAlg::notify(ts, min, type, glbChId, out);
 
     /* 统计捕获信息 */
-    int snr = out.snr;
-    m_snrSum[glbChId] += snr;
-    m_snrNum[glbChId] ++;
-    m_vldNum[glbChId] ++;
-    m_prvGlbChId = best(ts);
+    m_prvGlbChId = best(ts, min);
 
     /* 切换状态 */
     m_firstStage = false;
@@ -177,8 +169,11 @@ bool BisectAlg::bisect(int schband, int& glbChId)
 }
 
 // 找最好的中心
-int BisectAlg::best(const Time* ts, int hours)
+int BisectAlg::best(const Time* ts, int min)
 {
+    QList<FreqInfo> list;
+    m_sql.select(SMPL_LINK, ts, min, list);
+
     /* 最大均值 */
     int maxIdx = 0;
     float maxAvg = avgSnr(0);
