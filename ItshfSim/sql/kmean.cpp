@@ -1,6 +1,7 @@
 #include "kmean.h"
 
-KMean::KMean()
+KMean::KMean(int bw)
+    : MAX_KM_BW(bw)
 {
     clear();
 }
@@ -23,21 +24,23 @@ void KMean::push(bool valid, int glbChId, int snr)
 }
 
 // 300KHz聚类
-int KMean::kmean(int n, int bw)
+int KMean::kmean(QList<int>& list)
 {
     /* 聚类分组 */
-    int grp1 = group(bw);
-    if (grp1 <= 0) {
+    int ret = group(MAX_KM_BW);
+    if (ret <= 0) {
         return 0;
     }
 
     /* 信息统计 */
-    int grp2 = grpState();
-    int m = MIN(grp2, n);
+    grpState();
 
     /* 组排序 */
-    int grp3 = grpSort(m);
-    return grp3;
+    grpSort();
+
+    /* 频率推荐 */
+    int m = recommend(list);
+    return m;
 }
 
 // 分组
@@ -65,10 +68,8 @@ int KMean::group(int bw)
     m_grpNum = 1;
     m_vldNum = j;
 
-    /* step4.计算门限 */
-    int thr = bw / CHN_SCAN_STEP / ONE_CHN_BW;
-
-    /* step5.二分迭代分组 */
+    /* step4.二分迭代分组 */
+    int thr =bw / ONE_CHN_BW / CHN_SCAN_STEP;
     while (true) {
         /* 找最大组 */
         int mgid = 0;
@@ -110,9 +111,17 @@ int KMean::group(int bw)
 }
 
 // 频率推荐
-bool KMean::recommend(QList<int>& list)
+int KMean::recommend(QList<int>& list)
 {
+    int i, j, k;
+    list.clear();
+    for(i = 0; i < m_grpNum; i++) {
+        j = grpMid(i);
+        k = m_vldIdx[j];
+        list.append(k * CHN_SCAN_STEP);
+    }
 
+    return list.size();
 }
 
 // 组长度
@@ -181,6 +190,7 @@ int KMean::grpState(void)
         }
 
         /* 信息计算 */
+        inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;
         inf->coefB = smpCnt - vldNum;
         inf->coefA = vldNum;
@@ -190,22 +200,21 @@ int KMean::grpState(void)
 }
 
 // 排序
-int KMean::grpSort(int n)
+int KMean::grpSort(void)
 {
     int i, j, k, l;
 
     /* 初始化索引 */
-    int grpNum = m_grpNum;
     for (i = 0; i < m_grpNum; i++) {
         m_grpIdx[i] = i;
     }
 
     /* 组排序 */
     int sj, sk;
-    for (i = 0; i < n - 1; i++) {
-        for (j = i + 1, k = i; j < grpNum; j++) {
-            sj = m_grpInf[m_grpIdx[j]].avgSnr;
-            sk = m_grpInf[m_grpIdx[k]].avgSnr;
+    for (i = 0; i < m_grpNum - 1; i++) {
+        for (j = i + 1, k = i; j < m_grpNum; j++) {
+            sj = m_grpInf[m_grpIdx[j]].sumSnr;
+            sk = m_grpInf[m_grpIdx[k]].sumSnr;
             if (sj > sk) {
                 k = j;
             }
@@ -217,5 +226,5 @@ int KMean::grpSort(int n)
         }
     }
 
-    return n;
+    return m_grpNum;
 }

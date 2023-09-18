@@ -15,6 +15,7 @@ typedef struct {
 
 // 组信息
 typedef struct {
+    int sumSnr; /* 样本和 */
     int avgSnr; /* 均值 */
     int coefA; /* Beta(a,b) */
     int coefB; /* Beta(a,b) */
@@ -23,25 +24,21 @@ typedef struct {
 class KMean
 {
 public:
-    KMean(void);
+    /*!
+     * @brief 默认构造函数
+     * @param [IN] bw 最大分裂带宽KHz
+     */
+    KMean(int bw = 300);
     void clear(void);
 
     /*! @brief 输入样本 */
     void push(bool valid, int glbChId, int snr);
 
-    /*!
-     * @brief 300KHz聚类
-     * @param [IN] n 最多n类
-     * @return int 实际类数
-     */
-    int kmean(int n, int bw = 300);
+    /*! * @brief 300KHz聚类 */
+    int kmean(QList<int>& list);
 
-    /*!
-     * @brief 频率推荐
-     * @param [IN] list 频率列表
-     * @return bool 成功与否
-     */
-    bool recommend(QList<int>& list);
+    /*! * @brief 频率推荐 */
+    int recommend(QList<int>& list);
 
 private:
     int group(int bw);
@@ -49,13 +46,14 @@ private:
     int grpMid(int gid);
     int grpMid(int from, int to);
     int grpState(void);
-    int grpSort(int n);
+    int grpSort(void);
 
     int weight(int from, int to);
     int weight(int from, int mid, int to);
 
 private:
     /* 原始样本 */
+    const int MAX_KM_BW;
     int m_snrSum[MAX_KM_NUM];
     int m_smpCnt[MAX_KM_NUM];
     int m_vldCnt[MAX_KM_NUM];
