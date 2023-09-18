@@ -13,7 +13,7 @@ void BisectAlg::reset(void)
 
     /* 初始中心 */
     int half = MAX_GLB_CHN / 2;
-    int win = BASIC_SEARCH_WIN / ONE_CHN_BW;
+    int win = BASIC_SCH_WIN / ONE_CHN_BW;
     int rand = qrand() % win - (win >> 1);
     m_prvGlbChId = align(half + rand);
     m_firstStage = true;
@@ -56,13 +56,13 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 搜索带宽3M/6M/9M */
     int schband;
     if (rnd < 40) { /* 40% */
-        schband = BASIC_SEARCH_WIN * 2;
+        schband = BASIC_SCH_WIN * 2;
     } else if (rnd < 60) { /* 20% */
-        schband = BASIC_SEARCH_WIN * 4;
+        schband = BASIC_SCH_WIN * 4;
     } else if (rnd < 80) { /* 20% */
-        schband = BASIC_SEARCH_WIN * 6;
+        schband = BASIC_SCH_WIN * 6;
     } else { /* 20% */
-        schband = BASIC_SEARCH_WIN * 8;
+        schband = BASIC_SCH_WIN * 8;
     }
     int schWin = schband / ONE_CHN_BW;
 

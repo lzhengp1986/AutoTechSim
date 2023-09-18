@@ -11,6 +11,8 @@
 
 /* 定时器最小精度 */
 #define TIMER_INTERVAL_MS 5
+/* 扫频最大失败次数 */
+#define MAX_SCAN_FAIL_THR 5
 
 class LinkSim : public QThread
 {

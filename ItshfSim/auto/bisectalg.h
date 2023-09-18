@@ -5,11 +5,6 @@
 #include "basealg.h"
 #include <string.h>
 
-/* 扫频最大失败次数 */
-#define MAX_SCAN_FAIL_THR 5
-/* 基本探索窗KHz */
-#define BASIC_SEARCH_WIN 3000
-
 class BisectAlg : public BaseAlg
 {
 public:
