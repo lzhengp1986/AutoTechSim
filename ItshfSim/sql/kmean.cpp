@@ -1,4 +1,6 @@
 #include "kmean.h"
+#include "beta.h"
+#include <QtGlobal>
 
 KMean::KMean(int bw)
     : MAX_KM_BW(bw)
@@ -15,11 +17,11 @@ void KMean::clear(void)
 }
 
 // 输入样本
-void KMean::push(bool valid, int glbChId, int snr)
+void KMean::push(const FreqInfo& info)
 {
-    int locChId = glbChId / CHN_SCAN_STEP;
-    m_vldCnt[locChId] += (valid == true);
-    m_snrSum[locChId] += snr;
+    int locChId = info.glbChId / CHN_SCAN_STEP;
+    m_vldCnt[locChId] += (info.valid == true);
+    m_snrSum[locChId] += info.snr;
     m_smpCnt[locChId]++;
 }
 
@@ -27,6 +29,7 @@ void KMean::push(bool valid, int glbChId, int snr)
 int KMean::kmean(QList<int>& list)
 {
     /* 聚类分组 */
+    list.clear();
     int ret = group(MAX_KM_BW);
     if (ret <= 0) {
         return 0;
@@ -63,8 +66,8 @@ int KMean::group(int bw)
     }
 
     /* step3.第1组 */
-    m_grpInd[0].from = m_vldIdx[0];
-    m_grpInd[0].to = m_vldIdx[j - 1];
+    m_grpInd[0].from = 0;
+    m_grpInd[0].to = j - 1;
     m_grpNum = 1;
     m_vldNum = j;
 
@@ -114,7 +117,6 @@ int KMean::group(int bw)
 int KMean::recommend(QList<int>& list)
 {
     int i, j, k;
-    list.clear();
     for(i = 0; i < m_grpNum; i++) {
         j = grpMid(i);
         k = m_vldIdx[j];
@@ -177,11 +179,14 @@ int KMean::grpState(void)
     int smpCnt = 0;
     int vldNum = 0;
 
+    int rnd = qrand();
+    double px = (double)rnd / RAND_MAX;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
 
         /* 样本统计 */
+        snrSum = smpCnt = vldNum = 0;
         for (j = ind->from; j <= ind->to; j++) {
             k = m_vldIdx[j];
             snrSum += m_snrSum[k];
@@ -190,10 +195,10 @@ int KMean::grpState(void)
         }
 
         /* 信息计算 */
+        k = smpCnt - vldNum;
         inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;
-        inf->coefB = smpCnt - vldNum;
-        inf->coefA = vldNum;
+        inf->beta = beta(vldNum, k, px);
     }
 
     return m_grpNum;

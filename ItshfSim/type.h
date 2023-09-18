@@ -69,4 +69,12 @@ typedef struct {
     int glb[RSP_FREQ_NUM];
 } FreqRsp;
 
+// 频点信息
+typedef struct {
+    int glbChId;
+    int valid;
+    int snr;
+    int n0;
+} FreqInfo;
+
 #endif // TYPE_H

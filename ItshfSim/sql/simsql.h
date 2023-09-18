@@ -5,14 +5,6 @@
 #include "sqlite3.h"
 #include <QList>
 
-// 频点信息
-typedef struct {
-    int glbChId;
-    int valid;
-    int snr;
-    int n0;
-} FreqInfo;
-
 // 仿真SQL
 class SimSql
 {

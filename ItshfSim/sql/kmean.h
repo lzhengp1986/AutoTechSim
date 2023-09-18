@@ -1,7 +1,7 @@
 #ifndef KMEAN_H
 #define KMEAN_H
 
-#include "macro.h"
+#include "type.h"
 #include <QList>
 
 /* 压缩信道个数：5个一组 */
@@ -17,8 +17,7 @@ typedef struct {
 typedef struct {
     int sumSnr; /* 样本和 */
     int avgSnr; /* 均值 */
-    int coefA; /* Beta(a,b) */
-    int coefB; /* Beta(a,b) */
+    int beta; /* Beta(a,b) */
 } KGInf;
 
 class KMean
@@ -32,7 +31,7 @@ public:
     void clear(void);
 
     /*! @brief 输入样本 */
-    void push(bool valid, int glbChId, int snr);
+    void push(const FreqInfo& info);
 
     /*! * @brief 300KHz聚类 */
     int kmean(QList<int>& list);

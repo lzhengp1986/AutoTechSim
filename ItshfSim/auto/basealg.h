@@ -44,8 +44,9 @@ protected:
 
 protected:
     FreqRsp m_rsp;
-    unsigned m_regret;
-    QList<FreqInfo> m_list;
+    unsigned m_regret; /* 懊悔值 */
+    QList<int> m_kmList; /* KMean列表 */
+    QList<FreqInfo> m_sqlList; /* SQL列表 */
 };
 
 // 填写消息头

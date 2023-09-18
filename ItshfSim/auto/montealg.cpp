@@ -2,7 +2,14 @@
 
 MonteAlg::MonteAlg(void)
 {
+    m_kmean = new KMean;
     reset();
+}
+
+MonteAlg::~MonteAlg(void)
+{
+    delete m_kmean;
+    m_kmean = nullptr;
 }
 
 void MonteAlg::reset(void)
@@ -16,12 +23,6 @@ void MonteAlg::reset(void)
     int rand = qrand() % win - (win >> 1);
     m_prvGlbChId = align(half + rand);
     m_firstStage = true;
-
-    /* 统计清零 */
-    memset(m_snrNum, 0, sizeof(m_snrNum));
-    memset(m_snrSum, 0, sizeof(m_snrSum));
-    memset(m_vldNum, 0, sizeof(m_vldNum));
-    memset(m_invNum, 0, sizeof(m_invNum));
 }
 
 // 重新找中心点
@@ -178,62 +179,19 @@ bool MonteAlg::bisect(int schband, int& glbChId)
 bool MonteAlg::best(SqlIn& in, int& optChId)
 {
     /* 读取历史记录 */
-    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_list);
-    int n = m_list.size();
+    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
+    int n = m_sqlList.size();
     if (n <= 0) {
         return false;
     }
 
-    /* 样本清零 */
-    int i, glbChId;
-    for (i = 0; i < n; i++) {
-        glbChId = m_list.at(i).glbChId;
-        m_snrSum[glbChId] = 0;
-        m_snrNum[glbChId] = 0;
-        m_vldNum[glbChId] = 0;
-        m_invNum[glbChId] = 0;
-    }
-
     /* 样本统计 */
-    bool valid;
-    for (i = 0; i < n; i++) {
-        const FreqInfo& info = m_list.at(i);
-        glbChId = info.glbChId;
-        valid = info.valid;
-
-        /* SNR统计 */
-        m_snrSum[glbChId] += info.snr;
-        m_snrNum[glbChId] ++;
-
-        /* thompson统计 */
-        m_vldNum[glbChId] += (valid == true);
-        m_invNum[glbChId] += (valid == false);
+    for (int i = 0; i < n; i++) {
+        m_kmean->push(m_sqlList.at(i));
     }
 
-    /* 最大均值 */
-    int maxIdx = 0;
-    float maxAvg = 0;
-    for (i = 0; i < n; i++) {
-        glbChId = m_list.at(i).glbChId;
-        float snr = avgSnr(glbChId);
-        if (snr > maxAvg) {
-            maxIdx = glbChId;
-            maxAvg = snr;
-        }
-    }
-
-    optChId = maxIdx;
+    /* 聚类取最优组 */
+    m_kmean->kmean(m_kmList);
+    optChId = m_kmList.at(0);
     return true;
-}
-
-// 平均snr
-float MonteAlg::avgSnr(int i)
-{
-    float avg = 0;
-    if (m_snrNum[i] <= 0) {
-        return avg;
-    }
-
-    avg = (float)m_snrSum[i] / m_snrNum[i];
-    return avg;
 }

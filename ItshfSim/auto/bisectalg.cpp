@@ -179,8 +179,8 @@ bool BisectAlg::bisect(int schband, int& glbChId)
 bool BisectAlg::best(SqlIn& in, int& optChId)
 {
     /* 读取历史记录 */
-    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_list);
-    int n = m_list.size();
+    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
+    int n = m_sqlList.size();
     if (n <= 0) {
         return false;
     }
@@ -188,7 +188,7 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
     /* 样本清零 */
     int i, glbChId;
     for (i = 0; i < n; i++) {
-        glbChId = m_list.at(i).glbChId;
+        glbChId = m_sqlList.at(i).glbChId;
         m_snrSum[glbChId] = 0;
         m_snrNum[glbChId] = 0;
         m_vldNum[glbChId] = 0;
@@ -198,7 +198,7 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
     /* 样本统计 */
     bool valid;
     for (i = 0; i < n; i++) {
-        const FreqInfo& info = m_list.at(i);
+        const FreqInfo& info = m_sqlList.at(i);
         glbChId = info.glbChId;
         valid = info.valid;
 
@@ -215,7 +215,7 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
     int maxIdx = 0;
     float maxAvg = 0;
     for (i = 0; i < n; i++) {
-        glbChId = m_list.at(i).glbChId;
+        glbChId = m_sqlList.at(i).glbChId;
         float snr = avgSnr(glbChId);
         if (snr > maxAvg) {
             maxIdx = glbChId;

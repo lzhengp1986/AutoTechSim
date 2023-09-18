@@ -7,7 +7,8 @@ BaseAlg::BaseAlg(void)
 {
     set_head(0);
     m_regret = 0;
-    m_list.clear();
+    m_kmList.clear();
+    m_sqlList.clear();
 }
 
 // 析构
