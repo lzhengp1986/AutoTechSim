@@ -17,6 +17,7 @@ public:
     void set_scan_color(QColor color);
     void set_link_color(QColor color);
     void set_regret_color(QColor color);
+    void set_fcNum_color(QColor color);
 
     /* plot */
     void plot_scan(float hour, float fc, int snr);

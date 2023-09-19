@@ -6,39 +6,6 @@ ColorPal::ColorPal(QWidget *parent) :
     ui(new Ui::ColorPal)
 {
     ui->setupUi(this);
-
-    /* 扫频点颜色 */
-    if (ui->scanBlack->isChecked()) {
-        m_scanColor = Qt::black;
-    } else if (ui->scanBlue->isChecked()) {
-        m_scanColor = Qt::blue;
-    } else if (ui->scanCyan->isChecked()) {
-        m_scanColor = Qt::cyan;
-    } else {
-        m_scanColor = Qt::magenta;
-    }
-
-    /* 建链业务颜色 */
-    if (ui->linkBlack->isChecked()) {
-        m_linkColor = Qt::black;
-    } else if (ui->linkBlue->isChecked()) {
-        m_linkColor = Qt::blue;
-    } else if (ui->linkCyan->isChecked()) {
-        m_linkColor = Qt::cyan;
-    } else {
-        m_linkColor = Qt::magenta;
-    }
-
-    /* 懊悔值颜色 */
-    if (ui->regBlack->isChecked()) {
-        m_regColor = Qt::black;
-    } else if (ui->regBlue->isChecked()) {
-        m_regColor = Qt::blue;
-    } else if (ui->regCyan->isChecked()) {
-        m_regColor = Qt::cyan;
-    } else {
-        m_regColor = Qt::magenta;
-    }
 }
 
 ColorPal::~ColorPal()
@@ -48,90 +15,120 @@ ColorPal::~ColorPal()
 
 void ColorPal::on_scanWhite_clicked(void)
 {
-    m_scanColor = Qt::white;
-    emit scan_color(m_scanColor);
+    emit scan_color(Qt::white);
 }
 
 void ColorPal::on_scanBlack_clicked(void)
 {
-    m_scanColor = Qt::black;
-    emit scan_color(m_scanColor);
+    emit scan_color(Qt::black);
 }
 
 void ColorPal::on_scanBlue_clicked(void)
 {
-    m_scanColor = Qt::blue;
-    emit scan_color(m_scanColor);
+    emit scan_color(Qt::blue);
 }
 
 void ColorPal::on_scanCyan_clicked(void)
 {
-    m_scanColor = Qt::cyan;
-    emit scan_color(m_scanColor);
+    emit scan_color(Qt::cyan);
 }
 
 void ColorPal::on_scanMagenta_clicked(void)
 {
-    m_scanColor = Qt::magenta;
-    emit scan_color(m_scanColor);
+    emit scan_color(Qt::magenta);
+}
+
+void ColorPal::on_scanRed_clicked(void)
+{
+    emit scan_color(Qt::red);
 }
 
 void ColorPal::on_linkWhite_clicked(void)
 {
-    m_linkColor = Qt::white;
-    emit link_color(m_linkColor);
+    emit link_color(Qt::white);
 }
 
 void ColorPal::on_linkBlack_clicked(void)
 {
-    m_linkColor = Qt::black;
-    emit link_color(m_linkColor);
+    emit link_color(Qt::black);
 }
 
 void ColorPal::on_linkBlue_clicked(void)
 {
-    m_linkColor = Qt::blue;
-    emit link_color(m_linkColor);
+    emit link_color(Qt::blue);
 }
 
 void ColorPal::on_linkCyan_clicked(void)
 {
-    m_linkColor = Qt::cyan;
-    emit link_color(m_linkColor);
+    emit link_color(Qt::cyan);
 }
 
 void ColorPal::on_linkMagenta_clicked(void)
 {
-    m_linkColor = Qt::magenta;
-    emit link_color(m_linkColor);
+    emit link_color(Qt::magenta);
+}
+
+void ColorPal::on_linkRed_clicked(void)
+{
+    emit link_color(Qt::red);
 }
 
 void ColorPal::on_regWhite_clicked(void)
 {
-    m_regColor = Qt::white;
-    emit reg_color(m_regColor);
+    emit reg_color(Qt::white);
 }
 
 void ColorPal::on_regBlack_clicked(void)
 {
-    m_regColor = Qt::black;
-    emit reg_color(m_regColor);
+    emit reg_color(Qt::black);
 }
 
 void ColorPal::on_regBlue_clicked(void)
 {
-    m_regColor = Qt::blue;
-    emit reg_color(m_regColor);
+    emit reg_color(Qt::blue);
 }
 
 void ColorPal::on_regCyan_clicked(void)
 {
-    m_regColor = Qt::cyan;
-    emit reg_color(m_regColor);
+    emit reg_color(Qt::cyan);
 }
 
 void ColorPal::on_regMagenta_clicked(void)
 {
-    m_regColor = Qt::magenta;
-    emit reg_color(m_regColor);
+    emit reg_color(Qt::magenta);
+}
+
+void ColorPal::on_regRed_clicked(void)
+{
+    emit reg_color(Qt::red);
+}
+
+void ColorPal::on_avgWhite_clicked(void)
+{
+    emit fnum_color(Qt::white);
+}
+
+void ColorPal::on_avgBlack_clicked(void)
+{
+    emit fnum_color(Qt::black);
+}
+
+void ColorPal::on_avgBlue_clicked(void)
+{
+    emit fnum_color(Qt::blue);
+}
+
+void ColorPal::on_avgCyan_clicked(void)
+{
+    emit fnum_color(Qt::cyan);
+}
+
+void ColorPal::on_avgMagenta_clicked(void)
+{
+    emit fnum_color(Qt::magenta);
+}
+
+void ColorPal::on_avgRed_clicked(void)
+{
+    emit fnum_color(Qt::red);
 }

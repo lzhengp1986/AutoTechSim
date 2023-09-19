@@ -30,6 +30,7 @@ private slots:
     void on_scan_color(Qt::GlobalColor color);
     void on_link_color(Qt::GlobalColor color);
     void on_reg_color(Qt::GlobalColor color);
+    void on_fnum_color(Qt::GlobalColor color);
 
     void on_actModel_triggered(void);
     void on_actStrategy_triggered(void);

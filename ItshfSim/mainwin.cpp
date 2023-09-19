@@ -167,6 +167,7 @@ void MainWin::setup_pal(void)
     connect(m_pal, SIGNAL(scan_color(Qt::GlobalColor)), this, SLOT(on_scan_color(Qt::GlobalColor)));
     connect(m_pal, SIGNAL(link_color(Qt::GlobalColor)), this, SLOT(on_link_color(Qt::GlobalColor)));
     connect(m_pal, SIGNAL(reg_color(Qt::GlobalColor)), this, SLOT(on_reg_color(Qt::GlobalColor)));
+    connect(m_pal, SIGNAL(fnum_color(Qt::GlobalColor)), this, SLOT(on_fnum_color(Qt::GlobalColor)));
 }
 
 void MainWin::free_pal(void)
@@ -241,6 +242,11 @@ void MainWin::on_link_color(Qt::GlobalColor color)
 void MainWin::on_reg_color(Qt::GlobalColor color)
 {
     m_chart->set_regret_color(color);
+}
+
+void MainWin::on_fnum_color(Qt::GlobalColor color)
+{
+    m_chart->set_fcNum_color(color);
 }
 
 void MainWin::on_actModel_triggered(void)
