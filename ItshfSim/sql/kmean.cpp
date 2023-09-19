@@ -22,24 +22,22 @@ void KMean::push(const FreqInfo& info)
     int locChId = info.glbChId / CHN_SCAN_STEP;
     m_vldCnt[locChId] += (info.valid == true);
     m_snrSum[locChId] += info.snr;
-    m_smpCnt[locChId]++;
+    m_smpCnt[locChId] ++;
 }
 
 // 300KHz聚类
-int KMean::kmean(QList<int>& list)
+int KMean::sche(QList<int>& list)
 {
     /* 聚类分组 */
     list.clear();
-    int ret = group(MAX_KM_BW);
-    if (ret <= 0) {
+    int gn = group(MAX_KM_BW);
+    if (gn <= 0) {
         return 0;
     }
 
-    /* 信息统计 */
-    grpState();
-
-    /* 组排序 */
-    grpSort();
+    /* 排序 */
+    state();
+    sort();
 
     /* 频率推荐 */
     int m = recommend(list);
@@ -76,9 +74,9 @@ int KMean::group(int bw)
     while (true) {
         /* 找最大组 */
         int mgid = 0;
-        int maxLen = grpLen(mgid);
+        int maxLen = length(mgid);
         for (i = 1; i < m_grpNum; i++) {
-            j = grpLen(i);
+            j = length(i);
             if (j > maxLen) {
                 maxLen = j;
                 mgid = i;
@@ -89,8 +87,8 @@ int KMean::group(int bw)
         }
 
         /* 找分裂点 */
+        int maxWt = weight(mgid);
         KGInd *grp = m_grpInd + mgid;
-        int maxWt = weight(grp->from, grp->to);
         for (i = k = grp->from + 1; i <= grp->to; i++) {
             j = weight(grp->from, i) + weight(i + 1, grp->to);
             if (j < maxWt) {
@@ -118,7 +116,7 @@ int KMean::recommend(QList<int>& list)
 {
     int i, j, k;
     for(i = 0; i < m_grpNum; i++) {
-        j = grpMid(i);
+        j = middle(i);
         k = m_vldIdx[j];
         list.append(k * CHN_SCAN_STEP);
     }
@@ -127,7 +125,7 @@ int KMean::recommend(QList<int>& list)
 }
 
 // 组长度
-inline int KMean::grpLen(int gid)
+inline int KMean::length(int gid)
 {
     int from = m_grpInd[gid].from;
     int to = m_grpInd[gid].to;
@@ -135,41 +133,70 @@ inline int KMean::grpLen(int gid)
 }
 
 // 组中心
-inline int KMean::grpMid(int gid)
+inline int KMean::middle(int gid)
 {
     int from = m_grpInd[gid].from;
     int to = m_grpInd[gid].to;
-    return grpMid(from, to);
+    return middle(from, to);
 }
 
 // 组中心
-inline int KMean::grpMid(int from, int to)
+inline int KMean::middle(int from, int to)
 {
-    return ((from + to) >> 1);
+    /* 样本统计 */
+    int i, j, k;
+    for (i = from, k = 0; i <= to; i++) {
+        k += m_smpCnt[m_vldIdx[i]];
+    }
+
+    /* 找中值 */
+    j = (k >> 1);
+    for (i = from, k = 0; i <= to; i++) {
+        k += m_smpCnt[m_vldIdx[i]];
+        if (k >= j) {
+            break;
+        }
+    }
+
+    return i;
+}
+
+// 权重计算
+inline int KMean::weight(int gid)
+{
+    int mid = middle(gid);
+    int from = m_grpInd[gid].from;
+    int to = m_grpInd[gid].to;
+
+    int i, j, k, w;
+    int l = m_vldIdx[mid];
+    for (i = from, w = 0; i <= to; i++) {
+        j = m_vldIdx[i];
+        k = m_smpCnt[j];
+        w += k * ABS(j - l);
+    }
+
+    return w;
 }
 
 // 权重计算
 inline int KMean::weight(int from, int to)
 {
-    int mid = grpMid(from, to);
-    return weight(from, mid, to);
-}
+    int i, j, k, w;
+    int mid = middle(from, to);
+    int l = m_vldIdx[mid];
 
-// 权重计算
-inline int KMean::weight(int from, int mid, int to)
-{
-    int i, j, k, w = 0;
-    int x = m_vldIdx[mid];
-    for (i = from; i <= to; i++) {
+    for (i = from, w = 0; i <= to; i++) {
         j = m_vldIdx[i];
         k = m_smpCnt[j];
-        w += k * ABS(j - x);
+        w += k * ABS(j - l);
     }
+
     return w;
 }
 
 // 统计
-int KMean::grpState(void)
+int KMean::state(void)
 {
     int i, j, k;
     KGInd* ind;
@@ -205,7 +232,7 @@ int KMean::grpState(void)
 }
 
 // 排序
-int KMean::grpSort(void)
+int KMean::sort(void)
 {
     int i, j, k, l;
 

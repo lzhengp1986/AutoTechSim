@@ -42,7 +42,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     Q_UNUSED(in);
 
     FreqRsp* rsp = &m_rsp;
-    int n = req.fcNum;
+    int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
     /* 300KHz附近选点 */
     int rnd = qrand() % 100;

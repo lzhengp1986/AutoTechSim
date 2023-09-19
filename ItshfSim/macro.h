@@ -16,6 +16,7 @@
 #define MIN_PN0 -130 /* 最小N0 */
 #define MAX_PN0 +60 /* 最大N0 */
 
+#define MAX_SCH_WINX 8 /* 最大搜索窗系数 */
 #define BASIC_SCH_WIN 3000 /* 基本探索窗KHz */
 #define REQ_FREQ_NUM 10 /* 最大请求频点数 */
 #define RSP_FREQ_NUM REQ_FREQ_NUM /* 最大响应频点数 */

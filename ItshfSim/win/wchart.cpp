@@ -39,14 +39,14 @@ WChart::WChart(void)
 
     /* 设置懊悔值 */
     m_regret = new QLineSeries;
-    m_regret->setPen(QPen(Qt::cyan, 1));
+    m_regret->setPen(QPen(Qt::darkCyan, 1));
     m_regret->setName("regret");
     m_regret->setOpacity(0.5);
     chart->addSeries(m_regret);
 
     /* 设置平均试探频点数 */
     m_fcNum = new QLineSeries;
-    m_fcNum->setPen(QPen(Qt::red, 1));
+    m_fcNum->setPen(QPen(Qt::darkRed, 1));
     m_fcNum->setName("avgFreq");
     m_fcNum->setOpacity(0.5);
     chart->addSeries(m_fcNum);

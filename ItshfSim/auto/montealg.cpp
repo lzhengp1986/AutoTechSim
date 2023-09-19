@@ -2,8 +2,8 @@
 
 MonteAlg::MonteAlg(void)
 {
-    m_kmean = new KMean;
     reset();
+    m_kmean = new KMean;
 }
 
 MonteAlg::~MonteAlg(void)
@@ -15,75 +15,78 @@ MonteAlg::~MonteAlg(void)
 void MonteAlg::reset(void)
 {
     BaseAlg::reset();
+    m_lost = MAX_SCH_WINX;
     memset(m_valid, 0, sizeof(m_valid));
-    m_lost = true;
 }
 
-// 重新开始
+// 重头开始
 void MonteAlg::restart(SqlIn& in)
 {
+    Q_UNUSED(in);
     memset(m_valid, 0, sizeof(m_valid));
-    m_lost = true;
+    m_lost = MIN(m_lost + 1, MAX_SCH_WINX);
 }
 
 const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 {
-    Q_UNUSED(in);
-    int i, j, k;
-
     /* 读取记录 */
     in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
     int n = m_sqlList.size();
 
-    /* 聚类 */
+    int i, j, k;
     if (n > 0) {
+        /* 样本输入 */
         for (i = 0; i < n; i++) {
-            m_kmean->push(m_sqlList.at(i));
+            const FreqInfo& info = m_sqlList.at(i);
+            m_valid[info.glbChId] = true;
+            m_kmean->push(info);
         }
-        m_kmean->kmean(m_kmList);
+
+        /* 样本聚类 */
+        m_kmean->sche(m_kmList);
     } else {
+        i = middle();
         m_kmList.clear();
-        int mid = middle();
-        m_kmList.append(mid);
+        m_kmList.append(i);
+        m_valid[i] = true;
     }
 
-    /* 搜索带宽 */
-    int schband;
-    if (m_lost == true) {
-        int rnd = qrand() % 100;
-        if (rnd < 40) { /* 40% */
-            schband = BASIC_SCH_WIN * 2;
-        } else if (rnd < 60) { /* 20% */
-            schband = BASIC_SCH_WIN * 4;
-        } else if (rnd < 80) { /* 20% */
-            schband = BASIC_SCH_WIN * 6;
-        } else { /* 20% */
-            schband = BASIC_SCH_WIN * 8;
-        }
-    } else {
-        schband = BASIC_SCH_WIN;
-    }
+    int schband = m_lost * BASIC_SCH_WIN;
     int schWin = schband / ONE_CHN_BW;
+    int halfWin = (schWin >> 1);
+
+    /* 以k0为中心限带宽 */
+    int k0 = m_kmList.at(0);
+    int minGlbId = MAX(k0 - halfWin, 0);
+    int maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN);
+
+    /* 添加随机频率 */
+    FreqRsp* rsp = &m_rsp;
+    rsp->glb[0] = k0 + qrand() % halfWin;
+    rsp->glb[1] = k0;
 
     /* 添加WIN内结果 */
-    /* 信道不足则二分 */
+    n = m_kmList.size();
+    int m = MIN(req.fcNum, RSP_FREQ_NUM);
+    for (i = 1, j = 2; i < n; i++) {
+        k = m_kmList.at(i);
+        if ((k >= minGlbId) && (k <= maxGlbId)) {
+            rsp->glb[j++] = k;
+            if (j >= m) {
+                break;
+            }
+        }
+    }
+
+    /* 补充二分推荐 */
+    for (; j < m; j++) {
+        if (bisect(minGlbId, maxGlbId, k)) {
+            rsp->glb[j++] = align(k);
+        }
+    }
 
     set_head(j);
     return m_rsp;
-}
-
-int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
-{
-    if (glbChId >= MAX_GLB_CHN) {
-        return m_regret;
-    }
-
-    /* 状态切换 */
-    m_lost = false;
-
-    /* 能效评估 */
-    BaseAlg::notify(in, glbChId, out);
-    return m_regret;
 }
 
 bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
@@ -126,3 +129,20 @@ bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
     m_valid[glbChId] = true;
     return true;
 }
+
+int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
+{
+    if (glbChId >= MAX_GLB_CHN) {
+        return m_regret;
+    }
+
+    /* 状态切换 */
+    if (out.isValid == true) {
+        m_lost = 1;
+    }
+
+    /* 能效评估 */
+    BaseAlg::notify(in, glbChId, out);
+    return m_regret;
+}
+

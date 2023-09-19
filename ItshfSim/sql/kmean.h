@@ -34,21 +34,20 @@ public:
     void push(const FreqInfo& info);
 
     /*! * @brief 300KHz聚类 */
-    int kmean(QList<int>& list);
+    int sche(QList<int>& list);
 
     /*! * @brief 频率推荐 */
     int recommend(QList<int>& list);
 
 private:
     int group(int bw);
-    int grpLen(int gid);
-    int grpMid(int gid);
-    int grpMid(int from, int to);
-    int grpState(void);
-    int grpSort(void);
-
+    int length(int gid);
+    int middle(int gid);
+    int middle(int from, int to);
     int weight(int from, int to);
-    int weight(int from, int mid, int to);
+    int weight(int gid);
+    int state(void);
+    int sort(void);
 
 private:
     /* 原始样本 */
