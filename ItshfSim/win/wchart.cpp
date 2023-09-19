@@ -14,19 +14,20 @@ WChart::WChart(void)
 
     /* step2.设置散点 */
     m_scan = new QScatterSeries;
-    m_link = new QScatterSeries;
-    chart->addSeries(m_scan);
-    chart->addSeries(m_link);
     m_scan->setName("scan");
-    m_link->setName("link");
     m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scan->setBorderColor(Qt::black);
-    m_link->setBorderColor(Qt::blue);
     m_scan->setBrush(QBrush(Qt::black));
-    m_link->setBrush(QBrush(Qt::blue));
     m_scan->setMarkerSize(1);
+    chart->addSeries(m_scan);
+
+    m_link->setBrush(QBrush(Qt::blue));
+    m_link->setBorderColor(Qt::blue);
+    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    m_link->setName("link");
     m_link->setMarkerSize(1);
+    m_link = new QScatterSeries;
+    chart->addSeries(m_link);
 
     /* 设置底噪 */
     m_noise = new QLineSeries;
@@ -38,7 +39,7 @@ WChart::WChart(void)
     /* 设置懊悔值 */
     m_regret = new QLineSeries;
     m_regret->setPen(QPen(Qt::cyan, 1));
-    m_regret->setName("regrets");
+    m_regret->setName("regret");
     m_regret->setOpacity(0.5);
     chart->addSeries(m_regret);
 
@@ -52,6 +53,8 @@ WChart::WChart(void)
     x0->setTitleVisible(false);
     x0->setMinorGridLineVisible(false);
     x0->setGridLineVisible(false);
+    x0->setLabelsVisible(false);
+    x0->setVisible(false);
 
     QValueAxis *x1 = new QValueAxis;
     x1->setTitleText("Regrets");
@@ -76,6 +79,8 @@ WChart::WChart(void)
     y0->setTitleVisible(false);
     y0->setMinorGridLineVisible(false);
     y0->setGridLineVisible(false);
+    y0->setLabelsVisible(false);
+    y0->setVisible(false);
 
     /* 设置y1坐标轴 */
     QValueAxis *y1 = new QValueAxis;
@@ -87,6 +92,8 @@ WChart::WChart(void)
     y1->setTitleVisible(false);
     y1->setMinorGridLineVisible(false);
     y1->setGridLineVisible(false);
+    y1->setLabelsVisible(true);
+    y1->setVisible(true);
 
     /* step4.添加坐标轴 */
     chart->addAxis(x0, Qt::AlignLeft);
@@ -103,13 +110,6 @@ WChart::WChart(void)
     m_regret->attachAxis(y0);
 
     /* 设置图形区域 */
-    bool flag = false;
-    x0->setVisible(flag);
-    y0->setVisible(flag);
-    y1->setVisible(flag);
-    x0->setLabelsVisible(flag);
-    y0->setLabelsVisible(flag);
-    y1->setLabelsVisible(flag);
     QRect rect(47, 92, 544, 409);
     chart->setPlotArea(rect);
 
