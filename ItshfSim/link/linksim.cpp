@@ -188,6 +188,7 @@ void LinkSim::on_timeout(void)
     m_to->hour -= MAX_HOUR_NUM;
     m_to->day++;
     m_daily = true;
+    emit new_day();
 
     /* 月进位 */
     if (m_to->day <= md) {

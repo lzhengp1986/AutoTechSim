@@ -51,6 +51,7 @@ private slots:
     void on_timeout(void);
 
 signals:
+    void new_day(void);
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
     void new_chan(int type, int glbChId, int snr, int n0, int regret);

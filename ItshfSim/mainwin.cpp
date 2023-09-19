@@ -112,6 +112,7 @@ void MainWin::setup_sim(void)
     m_time = new Time;
 
     /* 信号连接 */
+    connect(m_sim, SIGNAL(new_day()), this, SLOT(on_new_day()));
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
     connect(m_sim, SIGNAL(new_chan(int, int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int, int)));
@@ -174,13 +175,13 @@ void MainWin::free_pal(void)
     m_pal = nullptr;
 }
 
+void MainWin::on_new_day(void)
+{
+    m_chart->restart();
+}
+
 void MainWin::on_new_time(const Time* ts)
 {
-    /* 24h切换 */
-    if (ts->hour < m_time->hour) {
-        m_chart->restart();
-    }
-
     *m_time = *ts;
     m_label->set_time(ts);
 }

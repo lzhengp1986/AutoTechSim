@@ -15,7 +15,8 @@ WChart::WChart(void)
     /* step2.设置散点 */
     m_scan = new QScatterSeries;
     m_scan->setName("scan");
-    m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_scan->setOpacity(0.7);
+    m_scan->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scan->setBrush(QBrush(Qt::black));
     m_scan->setBorderColor(Qt::black);
     m_scan->setMarkerSize(1);
@@ -23,7 +24,7 @@ WChart::WChart(void)
 
     m_link = new QScatterSeries;
     m_link->setName("link");
-    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    m_link->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
     m_link->setBrush(QBrush(Qt::blue));
     m_link->setBorderColor(Qt::blue);
     m_link->setMarkerSize(1);
@@ -69,7 +70,7 @@ WChart::WChart(void)
     x1->setTickCount(6);
     x1->setMinorTickCount(1);
     x1->setLabelFormat("%d");
-    x1->setTitleVisible(true);
+    x1->setTitleVisible(false);
     x1->setMinorGridLineVisible(false);
     x1->setGridLineVisible(false);
     x1->setLabelsVisible(true);
@@ -82,7 +83,7 @@ WChart::WChart(void)
     x2->setTickCount(6);
     x2->setMinorTickCount(1);
     x2->setLabelFormat("%d");
-    x2->setTitleVisible(true);
+    x2->setTitleVisible(false);
     x2->setMinorGridLineVisible(false);
     x2->setGridLineVisible(false);
     x2->setLabelsVisible(true);
