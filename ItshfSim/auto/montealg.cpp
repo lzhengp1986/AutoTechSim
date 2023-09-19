@@ -62,7 +62,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 添加随机频率 */
     FreqRsp* rsp = &m_rsp;
-    rsp->glb[0] = k0 + qrand() % halfWin;
+    i = qrand() % FST_RND_RNG;
+    j = i - FST_RND_RNG / 2;
+    rsp->glb[0] = k0 + j;
     rsp->glb[1] = k0;
 
     /* 添加WIN内结果 */

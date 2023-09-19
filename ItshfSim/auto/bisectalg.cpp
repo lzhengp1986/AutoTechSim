@@ -45,8 +45,8 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
     /* 300KHz附近选点 */
-    int rnd = qrand() % 100;
-    int glbChId = m_prvGlbChId + rnd - 50;
+    int rnd = qrand() % FST_RND_RNG;
+    int glbChId = m_prvGlbChId + rnd - FST_RND_RNG / 2;
     rsp->glb[0] = align(MIN(MAX(glbChId, 0), MAX_GLB_CHN - 1));
     rsp->glb[1] = align(m_prvGlbChId);
 
