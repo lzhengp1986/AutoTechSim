@@ -138,7 +138,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     /* 状态切换 */
     if (out.isValid == true) {
-        m_lost = 1;
+        m_lost = MAX(m_lost / 2, 1);
     }
 
     /* 能效评估 */
