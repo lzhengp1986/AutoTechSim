@@ -114,7 +114,7 @@ void MainWin::setup_sim(void)
     /* 信号连接 */
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_chan(int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(int, int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int, int)));
     connect(m_sim, SIGNAL(new_sts(int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int)));
 
     /* 启动线程 */
@@ -176,6 +176,11 @@ void MainWin::free_pal(void)
 
 void MainWin::on_new_time(const Time* ts)
 {
+    /* 24h切换 */
+    if (ts->hour < m_time->hour) {
+        m_chart->restart();
+    }
+
     *m_time = *ts;
     m_label->set_time(ts);
 }
@@ -185,18 +190,21 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_chan(int glbChId, int snr, int n0, int regret)
+void MainWin::on_new_chan(int type, int glbChId, int snr, int n0, int regret)
 {
     /* 绘图 */
-    float fm = m_time->min / 60.0f;
-    float fs = m_time->sec / 3600.0f;
-    float hour = m_time->hour + fm + fs;
+    float hr = m_time->Hour();
     float fc = GLB2FREQ(glbChId) / 1000.0f;
-    m_chart->plot(hour, fc, snr, regret);
+    m_chart->plot_regret(hr, regret);
+    if (type == LINK) {
+        m_chart->plot_link(hr, fc, snr);
+    } else {
+        m_chart->plot_scan(hr, fc, snr);
+    }
 
     /* 日志 */
     QString text = QString("%1 %2 %3 %4 %5")
-            .arg(hour, 4, 'f', 2)
+            .arg(hr, 4, 'f', 2)
             .arg(glbChId, 4, 10, QLatin1Char(' '))
             .arg(snr, 3, 10, QLatin1Char(' '))
             .arg(n0, 4, 10, QLatin1Char(' '))
@@ -209,9 +217,11 @@ void MainWin::on_new_chan(int glbChId, int snr, int n0, int regret)
     m_label->set_noise(n0);
 }
 
-void MainWin::on_new_sts(int scanTry, int scanFrq, int linkNum, int testNum)
+void MainWin::on_new_sts(int avgScan, int scanFrq, int linkNum, int testNum)
 {
-    ui->avgScanTry->setText(QString::number(scanTry));
+    float hr = m_time->Hour();
+    m_chart->plot_avgScan(hr, avgScan);
+    ui->avgScanTry->setText(QString::number(avgScan));
     ui->totalScanNum->setText(QString::number(scanFrq));
     ui->totalLinkNum->setText(QString::number(linkNum));
     ui->totalTestNum->setText(QString::number(testNum));
@@ -241,8 +251,8 @@ void MainWin::on_actModel_triggered(void)
     int ret = dlg->exec();
     if (ret == QDialog::Accepted) {
         /* 停止仿真 */
+        m_chart->restart();
         m_sim->stop();
-        m_chart->clear();
 
         /* 获取模型参数 */
         ModelCfg cfg = *m_model;
@@ -275,8 +285,8 @@ void MainWin::on_actStrategy_triggered(void)
 
     if (ret == QDialog::Accepted) {
         /* 停止仿真 */
+        m_chart->restart();
         m_sim->stop();
-        m_chart->clear();
 
         /* 配置参数 */
         QString algName, sqlRule;

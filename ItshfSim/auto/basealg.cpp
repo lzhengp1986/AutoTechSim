@@ -47,6 +47,14 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
     return m_rsp;
 }
 
+int BaseAlg::middle(void)
+{
+    int half = MAX_GLB_CHN / 2;
+    int win = BASIC_SCH_WIN / ONE_CHN_BW;
+    int rand = qrand() % win - (win >> 1);
+    return align(half + rand);
+}
+
 // snr差值分段
 int BaseAlg::level(int delta)
 {

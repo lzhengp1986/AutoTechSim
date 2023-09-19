@@ -12,10 +12,7 @@ void BisectAlg::reset(void)
     BaseAlg::reset();
 
     /* 初始中心 */
-    int half = MAX_GLB_CHN / 2;
-    int win = BASIC_SCH_WIN / ONE_CHN_BW;
-    int rand = qrand() % win - (win >> 1);
-    m_prvGlbChId = align(half + rand);
+    m_prvGlbChId = middle();
     m_firstStage = true;
 
     /* 统计清零 */

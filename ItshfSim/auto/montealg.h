@@ -18,12 +18,10 @@ public:
 
 private:
     /*! @brief 根据band二分搜索 */
-    bool bisect(int schband, int& glbChId);
-    bool best(SqlIn& in, int& optChId);
+    bool bisect(int minGlbId, int maxGlbId, int& glbChId);
 
 private:
-    int m_prvGlbChId;
-    bool m_firstStage;
+    int m_lost; /* 失锁标志 */
     bool m_valid[MAX_GLB_CHN];
     KMean *m_kmean;
 };

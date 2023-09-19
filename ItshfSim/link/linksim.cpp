@@ -246,13 +246,8 @@ int LinkSim::sim_idle(int& dsec)
     }
 
     /* 更新统计 */
-    int tryFcNum = 0;
-    if (m_scanNum > 0) {
-        /* 向上取整 */
-        int pad = m_scanNum - 1;
-        tryFcNum = (m_scanFrq + pad) / m_scanNum;
-    }
-    emit new_sts(tryFcNum, m_scanFrq, m_linkNum, m_testNum);
+    int avgScanFreq = avgScan();
+    emit new_sts(avgScanFreq, m_scanFrq, m_linkNum, m_testNum);
 
     /* 构造频率请求消息 */
     FreqReq* req = &m_req;
@@ -325,7 +320,7 @@ int LinkSim::sim_scan(int& dsec)
         }
 
         /* 将scan结果发到MainWin */
-        emit new_chan(glbChId, out.snr, out.n0, regret);
+        emit new_chan(SCAN, glbChId, out.snr, out.n0, regret);
 
         /* 状态切换: LINK or SCAN */
         if (flag != ENV_OK) {
@@ -414,7 +409,7 @@ int LinkSim::sim_link(int& dsec)
         }
 
         /* 将link结果发到MainWin */
-        emit new_chan(glbChId, out.snr, out.n0, regret);
+        emit new_chan(LINK, glbChId, out.snr, out.n0, regret);
 
         /* 状态切换：信道恶化断链 */
         if ((flag != ENV_OK) || (out.isValid != true)) {
@@ -459,6 +454,18 @@ bool LinkSim::isExpired(void)
         flag = true;
     }
     return flag;
+}
+
+int LinkSim::avgScan(void)
+{
+    int avg = 0;
+
+    /* 向上取整 */
+    if (m_scanNum > 0) {
+        avg = (m_scanFrq + m_scanNum - 1) / m_scanNum;
+    }
+
+    return avg;
 }
 
 // 在当前定时上加days

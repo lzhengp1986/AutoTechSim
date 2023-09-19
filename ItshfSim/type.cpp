@@ -23,6 +23,14 @@ void Time::reset(void)
     msec = 0;
 }
 
+float Time::Hour(void)
+{
+    float fm = min / 60.0f;
+    float fs = sec / 3600.0f;
+    float hr = hour + fm + fs;
+    return hr;
+}
+
 // 月份中天数
 int Time::mdays(void)
 {

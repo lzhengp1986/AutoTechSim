@@ -16,17 +16,17 @@ WChart::WChart(void)
     m_scan = new QScatterSeries;
     m_scan->setName("scan");
     m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-    m_scan->setBorderColor(Qt::black);
     m_scan->setBrush(QBrush(Qt::black));
+    m_scan->setBorderColor(Qt::black);
     m_scan->setMarkerSize(1);
     chart->addSeries(m_scan);
 
+    m_link = new QScatterSeries;
+    m_link->setName("link");
+    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_link->setBrush(QBrush(Qt::blue));
     m_link->setBorderColor(Qt::blue);
-    m_link->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_link->setName("link");
     m_link->setMarkerSize(1);
-    m_link = new QScatterSeries;
     chart->addSeries(m_link);
 
     /* 设置底噪 */
@@ -42,6 +42,13 @@ WChart::WChart(void)
     m_regret->setName("regret");
     m_regret->setOpacity(0.5);
     chart->addSeries(m_regret);
+
+    /* 设置平均试探频点数 */
+    m_fcNum = new QLineSeries;
+    m_fcNum->setPen(QPen(Qt::red, 1));
+    m_fcNum->setName("avgFreq");
+    m_fcNum->setOpacity(0.5);
+    chart->addSeries(m_fcNum);
 
     /* step3.设置x坐标轴 */
     QValueAxis *x0 = new QValueAxis;
@@ -68,6 +75,18 @@ WChart::WChart(void)
     x1->setLabelsVisible(true);
     x1->setVisible(true);
     m_axisX1 = x1;
+
+    QValueAxis *x2 = new QValueAxis;
+    x2->setTitleText("avgScanFc");
+    x2->setRange(0, 10);
+    x2->setTickCount(6);
+    x2->setMinorTickCount(1);
+    x2->setLabelFormat("%d");
+    x2->setTitleVisible(true);
+    x2->setMinorGridLineVisible(false);
+    x2->setGridLineVisible(false);
+    x2->setLabelsVisible(true);
+    x2->setVisible(true);
 
     /* 设置y0坐标轴 */
     QValueAxis *y0 = new QValueAxis;
@@ -98,12 +117,15 @@ WChart::WChart(void)
     /* step4.添加坐标轴 */
     chart->addAxis(x0, Qt::AlignLeft);
     chart->addAxis(x1, Qt::AlignRight);
+    chart->addAxis(x2, Qt::AlignRight);
     chart->addAxis(y0, Qt::AlignBottom);
     chart->addAxis(y1, Qt::AlignTop);
     m_scan->attachAxis(x0);
     m_scan->attachAxis(y0);
     m_link->attachAxis(x0);
     m_link->attachAxis(y0);
+    m_fcNum->attachAxis(x2);
+    m_fcNum->attachAxis(y0);
     m_noise->attachAxis(x0);
     m_noise->attachAxis(y1);
     m_regret->attachAxis(x1);
@@ -117,10 +139,6 @@ WChart::WChart(void)
     chart->setBackgroundVisible(false);
     chart->legend()->setVisible(false);
     chart->show();
-
-    /* 24小时切换 */
-    m_init = false;
-    m_prvHour = 0;
 }
 
 WChart::~WChart(void)
@@ -151,36 +169,34 @@ QChart* WChart::get_chart(void) const
     return m_chart;
 }
 
-void WChart::plot(float hour, float fc, int snr, int regret)
+void WChart::plot_scan(float hour, float fc, int snr)
 {
-    /* 初始化小时值 */
-    if (m_init == false) {
-        m_prvHour = hour;
-        m_init = true;
-    }
-
-    /* 判断24小时切换 */
-    if (m_prvHour > hour) {
-        m_axisX1->setRange(0, 100);
-        clear();
-    } else {
-        /* 懊悔值：调整坐标范围 */
-        qreal max = m_axisX1->max();
-        if (regret > max) {
-            qreal min = m_axisX1->min();
-            m_axisX1->setRange(min, max * 1.2f);
-        }
-    }
-
-    /* 添加数据点 */
+    Q_UNUSED(snr);
     m_scan->append(hour, fc);
-    m_regret->append(hour, regret);
-    if (snr > MIN_SNR) {
-        m_link->append(hour, fc);
+}
+
+void WChart::plot_link(float hour, float fc, int snr)
+{
+    Q_UNUSED(snr);
+    m_link->append(hour, fc);
+}
+
+void WChart::plot_regret(float hour, int regret)
+{
+    /* 调整坐标范围 */
+    qreal max = m_axisX1->max();
+    if (regret > max) {
+        qreal min = m_axisX1->min();
+        m_axisX1->setRange(min, max * 1.2f);
     }
 
-    m_prvHour = hour;
-    m_chart->update();
+    /* 更新数据 */
+    m_regret->append(hour, regret);
+}
+
+void WChart::plot_avgScan(float hour, int fcNum)
+{
+    m_fcNum->append(hour, fcNum);
 }
 
 void WChart::plot(const int* noise, int n)
@@ -191,7 +207,6 @@ void WChart::plot(const int* noise, int n)
         qreal k = GLB2FREQ(i) / 1000.0;
         m_noise->append(noise[j], k);
     }
-    m_chart->update();
 }
 
 void WChart::clear_noise(void)
@@ -200,11 +215,15 @@ void WChart::clear_noise(void)
     m_chart->update();
 }
 
-void WChart::clear(void)
+void WChart::restart(void)
 {
     /* 不要清除噪声 */
     m_regret->clear();
+    m_fcNum->clear();
     m_scan->clear();
     m_link->clear();
+
+    /* 重置懊悔范围 */
+    m_axisX1->setRange(0, 100);
     m_chart->update();
 }

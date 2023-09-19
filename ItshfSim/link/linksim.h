@@ -40,6 +40,9 @@ private:
     int sim_scan(int& dsec);
     int sim_link(int& dsec);
     void sim_reset(void);
+
+    /* 工具函数 */
+    int avgScan(void);
     bool isExpired(void);
     void expire(int days);
     void stamp(int plus);
@@ -50,8 +53,8 @@ private slots:
 signals:
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
-    void new_chan(int glbChId, int snr, int n0, int regret);
-    void new_sts(int scanTry, int scanNum, int linkNum, int testNum);
+    void new_chan(int type, int glbChId, int snr, int n0, int regret);
+    void new_sts(int avgScan, int scanNum, int linkNum, int testNum);
 
 public:
     /* 仿真配置 */
