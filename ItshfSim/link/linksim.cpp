@@ -441,6 +441,13 @@ void LinkSim::sim_reset(void)
     } else if (algId == ITS_HF_PROPAGATION) {
         m_itshf->reset();
     }
+
+    /* 统计值 */
+    m_linkNum = 0;
+    m_scanNum = 0;
+    m_scanNok = 0;
+    m_scanFrq = 0;
+    m_testNum = 0;
 }
 
 // 过期
