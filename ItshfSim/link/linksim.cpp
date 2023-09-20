@@ -44,7 +44,10 @@ void LinkSim::stop(void)
     m_scanNok = 0;
     m_scanFrq = 0;
     m_testNum = 0;
+
+    /* 状态清理 */
     m_state = WAIT;
+    m_rd = m_wr = 0;
 }
 
 void LinkSim::trigger(void)
