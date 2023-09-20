@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     int sumSnr; /* 样本和 */
     int avgSnr; /* 均值 */
-    int beta; /* Beta(a,b) */
+    float beta; /* Beta(a,b) */
 } KGInf;
 
 class KMean

@@ -188,7 +188,6 @@ void LinkSim::on_timeout(void)
     m_to->hour -= MAX_HOUR_NUM;
     m_to->day++;
     m_daily = true;
-    emit new_day();
 
     /* 月进位 */
     if (m_to->day <= md) {
@@ -213,24 +212,25 @@ SIMULATE:
 // 主调度函数
 void LinkSim::simulate(void)
 {
-    /* 每日操作 */
-    if (m_daily == true) {
-        m_daily = false;
-        sim_reset();
-    }
-
-    /* 算法仿真 */
-    int dsec = 0;
-    switch (m_state) {
-    case IDLE: m_state = sim_idle(dsec); break;
-    case SCAN: m_state = sim_scan(dsec); break;
-    case LINK: m_state = sim_link(dsec); break;
-    default: break;
-    }
-
     /* 判断过期 */
+    int dsec = 0;
     if (isExpired()) {
         stop();
+    } else {
+        /* 每日操作 */
+        if (m_daily == true) {
+            sim_reset();
+            emit new_day();
+            m_daily = false;
+        }
+
+        /* 算法仿真 */
+        switch (m_state) {
+        case IDLE: m_state = sim_idle(dsec); break;
+        case SCAN: m_state = sim_scan(dsec); break;
+        case LINK: m_state = sim_link(dsec); break;
+        default: break;
+        }
     }
 
     /* 更新界面状态 */
@@ -247,7 +247,7 @@ int LinkSim::sim_idle(int& dsec)
     }
 
     /* 更新统计 */
-    int avgScanFreq = avgScan();
+    float avgScanFreq = avgScan();
     emit new_sts(avgScanFreq, m_scanFrq, m_linkNum, m_testNum);
 
     /* 构造频率请求消息 */
@@ -457,13 +457,13 @@ bool LinkSim::isExpired(void)
     return flag;
 }
 
-int LinkSim::avgScan(void)
+float LinkSim::avgScan(void)
 {
-    int avg = 0;
+    float avg = 0;
 
     /* 向上取整 */
     if (m_scanNum > 0) {
-        avg = (m_scanFrq + m_scanNum - 1) / m_scanNum;
+        avg = (float)m_scanFrq / m_scanNum;
     }
 
     return avg;

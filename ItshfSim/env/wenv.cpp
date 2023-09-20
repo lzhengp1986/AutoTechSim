@@ -99,8 +99,8 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
     /* 初始化 */
     out.isValid = false;
     out.mufVld = false;
-    out.snr = MIN_SNR - 1;
-    out.mufSnr = MIN_SNR - 1;
+    out.snr = INV_SNR;
+    out.mufSnr = INV_SNR;
     out.n0 = MIN_PN0;
 
     /* 时间检查 */

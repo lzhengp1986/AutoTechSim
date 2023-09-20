@@ -23,7 +23,7 @@ public:
     void plot_scan(float hour, float fc, int snr);
     void plot_link(float hour, float fc, int snr);
     void plot_regret(float hour, int regret);
-    void plot_avgScan(float hour, int fcNum);
+    void plot_avgScan(float hour, float fcNum);
     void plot(const int* noise, int n);
 
     /* clear */

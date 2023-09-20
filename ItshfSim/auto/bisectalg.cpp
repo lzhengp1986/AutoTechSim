@@ -12,14 +12,12 @@ void BisectAlg::reset(void)
     BaseAlg::reset();
 
     /* 初始中心 */
-    m_prvGlbChId = middle();
+    m_prvGlbChId = initChId();
     m_firstStage = true;
 
-    /* 统计清零 */
-    memset(m_snrNum, 0, sizeof(m_snrNum));
-    memset(m_snrSum, 0, sizeof(m_snrSum));
-    memset(m_vldNum, 0, sizeof(m_vldNum));
-    memset(m_invNum, 0, sizeof(m_invNum));
+    /* 清状态 */
+    memset(m_valid, 0, sizeof(m_valid));
+    m_valid[m_prvGlbChId] = true;
 }
 
 // 重新找中心点
@@ -103,10 +101,15 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     bool flag = best(in, optChId);
     if (flag == true) {
         m_prvGlbChId = optChId;
+        m_valid[m_prvGlbChId] = true;
     }
 
-    /* 切换状态 */
-    m_firstStage = false;
+    /* 捕获成功切状态 */
+    if (out.isValid == true) {
+        memset(m_valid, 0, sizeof(m_valid));
+        m_valid[m_prvGlbChId] = true;
+        m_firstStage = false;
+    }
     return m_regret;
 }
 

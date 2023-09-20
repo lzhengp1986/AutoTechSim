@@ -92,7 +92,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:cyan;</string>
+         <string notr="true">background-color:cyan;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -120,7 +123,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:white</string>
+         <string notr="true">background-color:white;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -148,7 +154,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: red;</string>
+         <string notr="true">background-color: red;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -176,7 +185,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:blue;</string>
+         <string notr="true">background-color:blue;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -204,7 +216,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:black;</string>
+         <string notr="true">background-color:black;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -232,7 +247,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color:magenta;</string>
+         <string notr="true">background-color:magenta;
+border-style:solid;
+border-width:1px;
+border-color:black;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>

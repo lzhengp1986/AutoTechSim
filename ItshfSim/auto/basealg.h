@@ -38,7 +38,7 @@ public:
     enum {SMPL_SCAN = 0, SMPL_LINK};
 
 protected:
-    int middle(void);
+    int initChId(void);
     static int level(int snrDelta);
     static int align(int glbChId);
     void set_head(int n);

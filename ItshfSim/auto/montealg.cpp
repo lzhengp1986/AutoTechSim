@@ -45,7 +45,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         /* 样本聚类 */
         m_kmean->sche(m_kmList);
     } else {
-        i = middle();
+        i = initChId();
         m_kmList.clear();
         m_kmList.append(i);
         m_valid[i] = true;
@@ -81,7 +81,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     }
 
     /* 补充二分推荐 */
-    for (; j < m; j++) {
+    while (j < m) {
         if (bisect(minGlbId, maxGlbId, k)) {
             rsp->glb[j++] = align(k);
         }
@@ -141,6 +141,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     /* 状态切换 */
     if (out.isValid == true) {
         m_lost = MAX(m_lost / 2, 1);
+        memset(m_valid, 0, sizeof(m_valid));
     }
 
     /* 能效评估 */

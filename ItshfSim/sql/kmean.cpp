@@ -89,7 +89,7 @@ int KMean::group(int bw)
         /* 找分裂点 */
         int maxWt = weight(mgid);
         KGInd *grp = m_grpInd + mgid;
-        for (i = k = grp->from + 1; i <= grp->to; i++) {
+        for (i = k = grp->from; i <= grp->to; i++) {
             j = weight(grp->from, i) + weight(i + 1, grp->to);
             if (j < maxWt) {
                 maxWt = j;
@@ -127,8 +127,8 @@ int KMean::recommend(QList<int>& list)
 // 组长度
 inline int KMean::length(int gid)
 {
-    int from = m_grpInd[gid].from;
-    int to = m_grpInd[gid].to;
+    int from = m_vldIdx[m_grpInd[gid].from];
+    int to = m_vldIdx[m_grpInd[gid].to];
     return to - from + 1;
 }
 
@@ -206,11 +206,15 @@ int KMean::state(void)
     int smpCnt = 0;
     int vldNum = 0;
 
+    double py;
     int rnd = qrand();
     double px = (double)rnd / RAND_MAX;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
+        inf->avgSnr = INV_SNR;
+        inf->sumSnr = 0;
+        inf->beta = 0;
 
         /* 样本统计 */
         snrSum = smpCnt = vldNum = 0;
@@ -221,11 +225,17 @@ int KMean::state(void)
             vldNum += m_vldCnt[k];
         }
 
+        /* 异常保护 */
+        if (smpCnt <= 0) {
+            continue;
+        }
+
         /* 信息计算 */
         k = smpCnt - vldNum;
+        py = beta(vldNum, k, px);
         inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;
-        inf->beta = beta(vldNum, k, px);
+        inf->beta = (float)py;
     }
 
     return m_grpNum;
@@ -245,8 +255,8 @@ int KMean::sort(void)
     int sj, sk;
     for (i = 0; i < m_grpNum - 1; i++) {
         for (j = i + 1, k = i; j < m_grpNum; j++) {
-            sj = m_grpInf[m_grpIdx[j]].sumSnr;
-            sk = m_grpInf[m_grpIdx[k]].sumSnr;
+            sj = m_grpInf[m_grpIdx[j]].avgSnr;
+            sk = m_grpInf[m_grpIdx[k]].avgSnr;
             if (sj > sk) {
                 k = j;
             }
@@ -256,7 +266,14 @@ int KMean::sort(void)
             m_grpIdx[k] = m_grpIdx[i];
             m_grpIdx[i] = l;
         }
+
+        /* SNR太小时不使用 */
+        sk = m_grpInf[m_grpIdx[i]].avgSnr;
+        if (sk < MIN_SNR) {
+            break;
+        }
     }
 
-    return m_grpNum;
+    m_grpNum = i;
+    return i;
 }

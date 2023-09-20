@@ -11,7 +11,8 @@
 #define MIN_CHN_FREQ 2000 /* 最小频率 */
 #define MAX_CHN_FREQ 30000 /* 最大频率 */
 
-#define MIN_SNR -10 /* 最小SNR */
+#define INV_SNR -10 /* 异常SNR */
+#define MIN_SNR -7 /* 最小SNR */
 #define MAX_SNR +30 /* 最大SNR */
 #define MIN_PN0 -130 /* 最小N0 */
 #define MAX_PN0 +60 /* 最大N0 */

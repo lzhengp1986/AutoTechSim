@@ -85,22 +85,22 @@ void ColorPal::on_regBlack_clicked(void)
 
 void ColorPal::on_regBlue_clicked(void)
 {
-    emit reg_color(Qt::blue);
+    emit reg_color(Qt::darkBlue);
 }
 
 void ColorPal::on_regCyan_clicked(void)
 {
-    emit reg_color(Qt::cyan);
+    emit reg_color(Qt::darkCyan);
 }
 
 void ColorPal::on_regMagenta_clicked(void)
 {
-    emit reg_color(Qt::magenta);
+    emit reg_color(Qt::darkMagenta);
 }
 
 void ColorPal::on_regRed_clicked(void)
 {
-    emit reg_color(Qt::red);
+    emit reg_color(Qt::darkRed);
 }
 
 void ColorPal::on_avgWhite_clicked(void)
@@ -115,20 +115,20 @@ void ColorPal::on_avgBlack_clicked(void)
 
 void ColorPal::on_avgBlue_clicked(void)
 {
-    emit fnum_color(Qt::blue);
+    emit fnum_color(Qt::darkBlue);
 }
 
 void ColorPal::on_avgCyan_clicked(void)
 {
-    emit fnum_color(Qt::cyan);
+    emit fnum_color(Qt::darkCyan);
 }
 
 void ColorPal::on_avgMagenta_clicked(void)
 {
-    emit fnum_color(Qt::magenta);
+    emit fnum_color(Qt::darkMagenta);
 }
 
 void ColorPal::on_avgRed_clicked(void)
 {
-    emit fnum_color(Qt::red);
+    emit fnum_color(Qt::darkRed);
 }

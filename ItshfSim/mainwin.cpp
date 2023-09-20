@@ -116,7 +116,7 @@ void MainWin::setup_sim(void)
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
     connect(m_sim, SIGNAL(new_chan(int, int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int, int)));
-    connect(m_sim, SIGNAL(new_sts(int, int, int, int)), this, SLOT(on_new_sts(int, int, int, int)));
+    connect(m_sim, SIGNAL(new_sts(float, int, int, int)), this, SLOT(on_new_sts(float, int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
@@ -219,11 +219,11 @@ void MainWin::on_new_chan(int type, int glbChId, int snr, int n0, int regret)
     m_label->set_noise(n0);
 }
 
-void MainWin::on_new_sts(int avgScan, int scanFrq, int linkNum, int testNum)
+void MainWin::on_new_sts(float avgScan, int scanFrq, int linkNum, int testNum)
 {
     float hr = m_time->Hour();
     m_chart->plot_avgScan(hr, avgScan);
-    ui->avgScanTry->setText(QString::number(avgScan));
+    ui->avgScanTry->setText(QString::number(avgScan, 'f', 1));
     ui->totalScanNum->setText(QString::number(scanFrq));
     ui->totalLinkNum->setText(QString::number(linkNum));
     ui->totalTestNum->setText(QString::number(testNum));

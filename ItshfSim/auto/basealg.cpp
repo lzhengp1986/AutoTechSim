@@ -47,7 +47,7 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
     return m_rsp;
 }
 
-int BaseAlg::middle(void)
+int BaseAlg::initChId(void)
 {
     int half = MAX_GLB_CHN / 2;
     int win = BASIC_SCH_WIN / ONE_CHN_BW;

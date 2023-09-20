@@ -200,7 +200,7 @@ void WChart::plot_regret(float hour, int regret)
     m_regret->append(hour, regret);
 }
 
-void WChart::plot_avgScan(float hour, int fcNum)
+void WChart::plot_avgScan(float hour, float fcNum)
 {
     m_fcNum->append(hour, fcNum);
 }

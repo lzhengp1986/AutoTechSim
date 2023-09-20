@@ -42,7 +42,7 @@ private:
     void sim_reset(void);
 
     /* 工具函数 */
-    int avgScan(void);
+    float avgScan(void);
     bool isExpired(void);
     void expire(int days);
     void stamp(int plus);
@@ -55,7 +55,7 @@ signals:
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
     void new_chan(int type, int glbChId, int snr, int n0, int regret);
-    void new_sts(int avgScan, int scanNum, int linkNum, int testNum);
+    void new_sts(float avgScan, int scanNum, int linkNum, int testNum);
 
 public:
     /* 仿真配置 */

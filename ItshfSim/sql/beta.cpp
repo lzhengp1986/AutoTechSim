@@ -75,18 +75,15 @@ double beta(double a, double b, double x)
     double y;
 
     if (a <= 0.0) {
-        printf("err**a<=0!");
-        return -1.0;
+        return 0.0;
     }
 
     if (b <= 0.0) {
-        printf("err**b<=0!");
-        return(-1.0);
+        return 1.0;
     }
 
     if ((x < 0.0) || (x > 1.0)) {
-        printf("err**x<0 or x>1 !");
-        return(1.0e+70);
+        return 1.0e+70;
     }
 
     if ((x == 0.0)||(x == 1.0)) {
