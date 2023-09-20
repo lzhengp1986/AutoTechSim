@@ -61,11 +61,19 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     }
     int schWin = schband / ONE_CHN_BW;
 
+    /* 限制搜索范围2M */
+    int minGlbId = 0;
+    int maxGlbId = MAX_GLB_CHN - 1;
+    if (m_firstStage == false) {
+        minGlbId = MAX(m_prvGlbChId - schWin / 2, 0);
+        maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
+    }
+
     /* 二分搜索 */
     int i, j;
     bool flag;
     for (i = j = 2; i < n; i++) {
-        flag = bisect(schWin, glbChId);
+        flag = bisect(minGlbId, maxGlbId, glbChId);
         if (flag == false) {
             break;
         }
@@ -113,26 +121,18 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     return m_regret;
 }
 
-bool BisectAlg::bisect(int schband, int& glbChId)
+bool BisectAlg::bisect(int min, int max, int& glbChId)
 {
-    /* 限制搜索范围2M */
-    int minGlbId = 0;
-    int maxGlbId = MAX_GLB_CHN - 1;
-    if (m_firstStage == false) {
-        minGlbId = MAX(m_prvGlbChId - schband / 2, 0);
-        maxGlbId = MIN(minGlbId + schband, MAX_GLB_CHN - 1);
-    }
-
     /* 二分搜索 */
     int maxLen = 0;
     int start = m_prvGlbChId;
     int stop = m_prvGlbChId;
-    m_valid[minGlbId] = true;
-    m_valid[maxGlbId] = true;
+    m_valid[min] = true;
+    m_valid[max] = true;
 
     /* 正向 */
     int i, j, k;
-    for (i = start, j = start + 1; j <= maxGlbId; j++) {
+    for (i = start, j = start + 1; j <= max; j++) {
         if (m_valid[j] == true) {
             k = j - i - 1;
             if (k > maxLen) {
@@ -145,7 +145,7 @@ bool BisectAlg::bisect(int schband, int& glbChId)
     }
 
     /* 反向 */
-    for (i = m_prvGlbChId, j = m_prvGlbChId - 1; j >= minGlbId; j--) {
+    for (i = m_prvGlbChId, j = m_prvGlbChId - 1; j >= min; j--) {
         if (m_valid[j] == true) {
             k = i - j - 1;
             if (k > maxLen) {
