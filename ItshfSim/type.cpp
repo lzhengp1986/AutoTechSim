@@ -23,7 +23,7 @@ void Time::reset(void)
     msec = 0;
 }
 
-float Time::Hour(void)
+float Time::Hour(void) const
 {
     float fm = min / 60.0f;
     float fs = sec / 3600.0f;
@@ -32,7 +32,7 @@ float Time::Hour(void)
 }
 
 // 月份中天数
-int Time::mdays(void)
+int Time::mdays(void) const
 {
     int days = 30;
     if ((month == 1) || (month == 3)
@@ -46,7 +46,7 @@ int Time::mdays(void)
 }
 
 // 秒计数
-int Time::second(void)
+int Time::second(void) const
 {
     /* 润年 */
     int leap = (((year % 100 != 0) && (year % 4 == 0)) || (year % 400 == 0));

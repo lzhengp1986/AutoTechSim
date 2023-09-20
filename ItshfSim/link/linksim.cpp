@@ -7,6 +7,7 @@ LinkSim::LinkSim(QObject *parent)
     /* ITS仿真环境 */
     m_env = new WEnv;
     m_state = WAIT;
+    m_rd = m_wr = 0;
 
     /* link */
     m_link = new LinkCfg;
@@ -60,12 +61,12 @@ void LinkSim::trigger(void)
 
     /* step4.时间复位 */
     m_to->reset();
-    m_ts->reset();
     expire(m_link->simDays());
+    m_rd = m_wr = 0;
 
     /* step5.倒计时 */
     m_state = IDLE;
-    stamp(10);
+    stamp(m_to, 10);
 }
 
 // 设置time
@@ -74,7 +75,6 @@ void LinkSim::setup_time(void)
     m_daily = false;
     m_to = new Time;
     m_te = new Time;
-    m_ts = new Time;
 
     /* 默认仿真1天 */
     m_expire = new Time;
@@ -119,8 +119,7 @@ void LinkSim::set_time(int year, int month)
 {
     m_to->year = year;
     m_to->month = month;
-    *m_ts = *m_to;
-    emit new_time(m_ts);
+    emit new_time(m_to);
 }
 
 // 释放time
@@ -133,13 +132,11 @@ void LinkSim::free_time(void)
     delete m_expire;
     delete m_to;
     delete m_te;
-    delete m_ts;
     m_timer = nullptr;
     m_subthr = nullptr;
     m_expire = nullptr;
     m_to = nullptr;
     m_te = nullptr;
-    m_ts = nullptr;
 }
 
 // 定时器超时处理
@@ -204,43 +201,52 @@ void LinkSim::on_timeout(void)
     m_to->year++;
 
 SIMULATE:
-    *m_ts = *m_to;
-    emit new_time(m_ts);
-    simulate();
+    emit new_time(m_to);
+    push(m_to);
 }
 
 // 主调度函数
-void LinkSim::simulate(void)
+void LinkSim::run(void)
 {
-    /* 判断过期 */
-    int dsec = 0;
-    if (isExpired()) {
-        stop();
-    } else {
-        /* 每日操作 */
-        if (m_daily == true) {
-            sim_reset();
-            emit new_day();
-            m_daily = false;
+    while (true) {
+        if (isempty()) {
+            continue;
         }
 
-        /* 算法仿真 */
-        switch (m_state) {
-        case IDLE: m_state = sim_idle(dsec); break;
-        case SCAN: m_state = sim_scan(dsec); break;
-        case LINK: m_state = sim_link(dsec); break;
-        default: break;
+        /* 定时任务 */
+        Time ts = pop();
+        Time* pts = &ts;
+
+        /* 判断过期 */
+        int dsec = 0;
+        if (isExpired(pts)) {
+            stop();
+        } else {
+            /* 每日操作 */
+            if (m_daily == true) {
+                sim_reset();
+                emit new_day();
+                m_daily = false;
+            }
+
+            /* 算法仿真 */
+            switch (m_state) {
+            case IDLE: m_state = sim_idle(pts, dsec); break;
+            case SCAN: m_state = sim_scan(pts, dsec); break;
+            case LINK: m_state = sim_link(pts, dsec); break;
+            default: break;
+            }
         }
+
+        /* 更新界面状态 */
+        emit new_state(m_state, dsec);
     }
-
-    /* 更新界面状态 */
-    emit new_state(m_state, dsec);
 }
 
 // idle
-int LinkSim::sim_idle(int& dsec)
+int LinkSim::sim_idle(const Time* ts, int& dsec)
 {
-    int diff = m_te->second() - m_ts->second();
+    int diff = m_te->second() - ts->second();
     dsec = ABS(diff);
     if (diff > 0) {
         return IDLE;
@@ -259,7 +265,7 @@ int LinkSim::sim_idle(int& dsec)
     /* 调用策略推荐频率 */
     int algId = m_link->recAlg();
     int sqlRule = m_link->sqlRule();
-    SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
+    SqlIn ain = SqlIn(ts, m_sql, sqlRule);
     if (algId == RANDOM_SEARCH) {
         m_rsp = m_rand->bandit(ain, m_req);
     } else if (algId == BISECTING_SEARCH) {
@@ -271,16 +277,16 @@ int LinkSim::sim_idle(int& dsec)
     }
 
     /* 切换状态 */
-    stamp(1);
+    stamp(ts, 1);
     m_testNum++;
     return SCAN;
 }
 
 // scan
-int LinkSim::sim_scan(int& dsec)
+int LinkSim::sim_scan(const Time* ts, int& dsec)
 {
     int scanIntv = m_link->scanIntv();
-    int diff = m_ts->second() - m_te->second();
+    int diff = ts->second() - m_te->second();
     dsec = ABS(scanIntv - diff);
     if (diff < scanIntv) {
         return SCAN;
@@ -288,7 +294,7 @@ int LinkSim::sim_scan(int& dsec)
 
     int algId = m_link->recAlg();
     int sqlRule = m_link->sqlRule();
-    SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
+    SqlIn ain = SqlIn(ts, m_sql, sqlRule);
 
     /* 处理1个频率 */
     FreqRsp* rsp = &m_rsp;
@@ -298,12 +304,12 @@ int LinkSim::sim_scan(int& dsec)
         EnvOut out;
 
         /* 调用环境模型 */
-        EnvIn ein = EnvIn(m_ts, glbChId);
+        EnvIn ein = EnvIn(ts, glbChId);
         int flag = m_env->env(ein, out);
 
         /* 将scan结果记录到sql */
         int type = BaseAlg::SMPL_SCAN;
-        int ret = m_sql->insert(type, m_ts, out.isValid, glbChId, out.snr, out.n0);
+        int ret = m_sql->insert(type, ts, out.isValid, glbChId, out.snr, out.n0);
         if (ret != SQLITE_OK) {
             /* nothing-to-do */
         }
@@ -325,7 +331,7 @@ int LinkSim::sim_scan(int& dsec)
 
         /* 状态切换: LINK or SCAN */
         if (flag != ENV_OK) {
-            stamp(scanIntv);
+            stamp(ts, scanIntv);
             rsp->used++;
             return SCAN;
         } else {
@@ -335,11 +341,11 @@ int LinkSim::sim_scan(int& dsec)
                 m_linkNum++;
 
                 /* 切换到link */
-                stamp(m_link->svcIntv());
+                stamp(ts, m_link->svcIntv());
                 return LINK;
             } else {
                 /* 继续scan */
-                stamp(scanIntv);
+                stamp(ts, scanIntv);
                 rsp->used++;
                 return SCAN;
             }
@@ -364,15 +370,15 @@ int LinkSim::sim_scan(int& dsec)
         }
 
         /* 超时打点 */
-        stamp(m_link->idleIntv());
+        stamp(ts, m_link->idleIntv());
         return IDLE;
     }
 }
 
 // link
-int LinkSim::sim_link(int& dsec)
+int LinkSim::sim_link(const Time* ts, int& dsec)
 {
-    int diff = m_te->second() - m_ts->second();
+    int diff = m_te->second() - ts->second();
     dsec = ABS(diff);
 
     int idleIntv = m_link->idleIntv();
@@ -384,12 +390,12 @@ int LinkSim::sim_link(int& dsec)
         EnvOut out;
 
         /* 调用环境模型 */
-        EnvIn in = EnvIn(m_ts, glbChId);
+        EnvIn in = EnvIn(ts, glbChId);
         int flag = m_env->env(in, out);
 
         /* 将link结果记录到sql */
         int type = BaseAlg::SMPL_LINK;
-        int ret = m_sql->insert(type, m_ts, out.isValid, glbChId, out.snr, out.n0);
+        int ret = m_sql->insert(type, ts, out.isValid, glbChId, out.snr, out.n0);
         if (ret != SQLITE_OK) {
             /* nothing-to-do */
         }
@@ -398,7 +404,7 @@ int LinkSim::sim_link(int& dsec)
         int regret = 0;
         int algId = m_link->recAlg();
         int sqlRule = m_link->sqlRule();
-        SqlIn ain = SqlIn(m_ts, m_sql, sqlRule);
+        SqlIn ain = SqlIn(ts, m_sql, sqlRule);
         if (algId == RANDOM_SEARCH) {
             regret = m_rand->notify(ain, glbChId, out);
         } else if (algId == BISECTING_SEARCH) {
@@ -414,7 +420,7 @@ int LinkSim::sim_link(int& dsec)
 
         /* 状态切换：信道恶化断链 */
         if ((flag != ENV_OK) || (out.isValid != true)) {
-            stamp(idleIntv);
+            stamp(ts, idleIntv);
             return IDLE;
         }
     }
@@ -423,7 +429,7 @@ int LinkSim::sim_link(int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
-        stamp(idleIntv);
+        stamp(ts, idleIntv);
         return IDLE;
     }
 }
@@ -451,14 +457,14 @@ void LinkSim::sim_reset(void)
 }
 
 // 过期
-bool LinkSim::isExpired(void)
+bool LinkSim::isExpired(const Time* ts)
 {
     bool flag = false;
-    if (m_ts->year > m_expire->year) {
+    if (ts->year > m_expire->year) {
         flag = true;
-    } else if (m_ts->month > m_expire->month) {
+    } else if (ts->month > m_expire->month) {
         flag = true;
-    } else if (m_ts->day >= m_expire->day) {
+    } else if (ts->day >= m_expire->day) {
         flag = true;
     }
     return flag;
@@ -479,11 +485,11 @@ float LinkSim::avgScan(void)
 // 在当前定时上加days
 void LinkSim::expire(int days)
 {
-    *m_expire = *m_ts;
+    *m_expire = *m_to;
     m_expire->day += days;
 
     /* 进位判断 */
-    int md = m_ts->mdays();
+    int md = m_to->mdays();
     if (m_expire->day > md) {
         m_expire->day -= md;
         m_expire->month++;
@@ -495,9 +501,29 @@ void LinkSim::expire(int days)
 }
 
 // 超时时戳
-void LinkSim::stamp(int plus)
+void LinkSim::stamp(const Time* ts, int plus)
 {
-    *m_te = *m_ts;
+    *m_te = *ts;
     m_te->sec += plus;
 }
 
+bool LinkSim::isempty(void)
+{
+    return (m_rd == m_wr);
+}
+
+void LinkSim::push(const Time* ts)
+{
+    if ((m_rd + MAX_TIME_QNUM - 1 - m_wr) % MAX_TIME_QNUM > 1) {
+        m_ts[m_wr] = *ts;
+        m_wr = (m_wr + 1) % MAX_TIME_QNUM;
+    } else {
+        printf("TimeQ: queue is full\n");
+    }
+}
+
+Time LinkSim::pop(void)
+{
+    m_rd = (m_rd + 1) % MAX_TIME_QNUM;
+    return m_ts[m_rd];
+}

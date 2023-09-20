@@ -7,9 +7,9 @@
 class Time {
 public:
     Time(void);
-    float Hour(void);
-    int mdays(void);
-    int second(void);
+    float Hour(void) const;
+    int mdays(void) const;
+    int second(void) const;
     void reset(void);
 
 public:

@@ -13,6 +13,8 @@
 #define TIMER_INTERVAL_MS 5
 /* 扫频最大失败次数 */
 #define MAX_SCAN_FAIL_THR 5
+/* 最大时间任务队列 */
+#define MAX_TIME_QNUM 256
 
 class LinkSim : public QThread
 {
@@ -35,17 +37,21 @@ private:
     void free_alg(void);
 
     /*! @brief 算法仿真 */
-    void simulate(void);
-    int sim_idle(int& dsec);
-    int sim_scan(int& dsec);
-    int sim_link(int& dsec);
+    int sim_idle(const Time* ts, int& dsec);
+    int sim_scan(const Time* ts, int& dsec);
+    int sim_link(const Time* ts, int& dsec);
     void sim_reset(void);
 
     /* 工具函数 */
     float avgScan(void);
-    bool isExpired(void);
     void expire(int days);
-    void stamp(int plus);
+    bool isExpired(const Time* ts);
+    void stamp(const Time* ts, int plus);
+
+    /* 任务队列 */
+    bool isempty(void);
+    void push(const Time* ts);
+    Time pop(void);
 
 private slots:
     void on_timeout(void);
@@ -61,6 +67,9 @@ public:
     /* 仿真配置 */
     WEnv *m_env;
     LinkCfg *m_link;
+
+protected:
+    virtual void run(void);
 
 private:
     /* 定时器线程 */
@@ -81,8 +90,11 @@ private:
     FreqReq m_req;
     FreqRsp m_rsp;
     int m_state;
-    Time *m_ts; /* 仿真时间 */
     Time *m_te; /* 结束时间 */
+
+    /* 仿真队列 */
+    int m_rd, m_wr;
+    Time m_ts[MAX_TIME_QNUM];
 
     /* 统计值 */
     unsigned m_linkNum; /* 建链总次数 */
