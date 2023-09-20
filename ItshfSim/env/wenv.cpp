@@ -137,15 +137,13 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
     }
 
     /* === step2.估计当前频点的性能 === */
-    /* 计算最小可用频率 */
-    int muf = dh->fc[0].freq;
-    int halfband = m_maxband / 2;
-    int min = MAX(muf - halfband, MIN_CHN_FREQ);
-
     /* 计算最大可通频率 */
     int maxMuf = (int)(muf * 1.25f);
-    int maxFreq = MIN(maxMuf, MAX_CHN_FREQ);
-    int max = MIN(min + m_maxband, maxFreq);
+    int max = MIN(maxMuf, MAX_CHN_FREQ);
+
+    /* 计算最小可用频率 */
+    int muf = dh->fc[0].freq;
+    int min = MAX(max - m_maxband, MIN_CHN_FREQ);
 
     /* 是否在可通频带 */
     int fc = GLB2FREQ(glbChId);
