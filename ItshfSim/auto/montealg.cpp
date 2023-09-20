@@ -33,61 +33,86 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
     int n = m_sqlList.size();
 
+    int glbChId;
+    int sqlMaxId = 0;
+    int sqlMinId = MAX_GLB_CHN;
+
     int i, j, k;
     if (n > 0) {
         /* 样本输入 */
+        m_kmean->clear();
         for (i = 0; i < n; i++) {
             const FreqInfo& info = m_sqlList.at(i);
-            m_valid[info.glbChId] = true;
+            glbChId = info.glbChId;
+            m_valid[glbChId] = true;
             m_kmean->push(info);
+            if (info.valid == false) {
+                continue;
+            }
+
+            /* 样本范围 */
+            if (glbChId > sqlMaxId) {
+                sqlMaxId = glbChId;
+            }
+            if (glbChId < sqlMinId) {
+                sqlMinId = glbChId;
+            }
         }
 
         /* 样本聚类 */
         m_kmean->sche(m_kmList);
-    } else {
+    }
+
+    /* 无<有效样本> */
+    if ((n <= 0) || (sqlMaxId <= 0)) {
         i = initChId();
         m_kmList.clear();
         m_kmList.append(i);
         m_valid[i] = true;
+        sqlMaxId = sqlMinId = i;
     }
 
-    int schband = m_lost * BASIC_SCH_WIN;
-    int schWin = schband / ONE_CHN_BW;
-    int halfWin = (schWin >> 1);
-
-    /* 以k0为中心限带宽 */
-    int k0 = m_kmList.at(0);
-    int minGlbId = MAX(k0 - halfWin, 0);
-    int maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN);
-
-    /* 添加随机频率 */
-    FreqRsp* rsp = &m_rsp;
-    i = qrand() % FST_RND_RNG;
-    j = i - FST_RND_RNG / 2;
-    rsp->glb[0] = k0 + j;
-    rsp->glb[1] = k0;
-
-    /* 添加WIN内结果 */
+    int fid = 0;
     n = m_kmList.size();
+    FreqRsp* rsp = &m_rsp;
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
-    for (i = 1, j = 2; i < n; i++) {
-        k = m_kmList.at(i);
-        if ((k >= minGlbId) && (k <= maxGlbId)) {
-            rsp->glb[j++] = k;
-            if (j >= m) {
+    if (m_lost <= 1) {
+        /* 添加随机频率 */
+        if (n > 0) {
+            int k0 = m_kmList.at(0);
+            i = qrand() % FST_RND_RNG;
+            j = i - FST_RND_RNG / 2;
+            k = k0 + j;
+            rsp->glb[0] = k;
+            rsp->glb[1] = k0;
+            m_valid[k] = true;
+            fid = 2;
+        }
+
+        /* 添加聚类结果 */
+        for (i = 1, j = 2; i < n; i++) {
+            rsp->glb[fid++] = m_kmList.at(i);;
+            if (fid >= m) {
                 break;
             }
         }
     }
 
+    /* 限制带宽 */
+    int schband = m_lost * BASIC_SCH_WIN;
+    int schWin = schband / ONE_CHN_BW;
+    int halfWin = (schWin >> 1);
+    int minGlbId = MAX(sqlMinId - halfWin, 0);
+    int maxGlbId = MIN(MAX(sqlMaxId + halfWin, minGlbId + schWin), MAX_GLB_CHN);
+
     /* 补充二分推荐 */
-    while (j < m) {
+    while (fid < m) {
         if (bisect(minGlbId, maxGlbId, k)) {
-            rsp->glb[j++] = align(k);
+            rsp->glb[fid++] = align(k);
         }
     }
 
-    set_head(j);
+    set_head(fid);
     return m_rsp;
 }
 

@@ -50,14 +50,15 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 搜索带宽3M/6M/9M */
     int schband;
+    int maxWin = BASIC_SCH_WIN * MAX_SCH_WINX;
     if (rnd < 40) { /* 40% */
-        schband = BASIC_SCH_WIN * 2;
+        schband = (maxWin >> 3);
     } else if (rnd < 60) { /* 20% */
-        schband = BASIC_SCH_WIN * 4;
+        schband = (maxWin >> 2);
     } else if (rnd < 80) { /* 20% */
-        schband = BASIC_SCH_WIN * 6;
+        schband = (maxWin >> 1);
     } else { /* 20% */
-        schband = BASIC_SCH_WIN * 8;
+        schband = maxWin;
     }
     int schWin = schband / ONE_CHN_BW;
 
