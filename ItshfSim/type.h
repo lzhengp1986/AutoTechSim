@@ -72,6 +72,8 @@ typedef struct {
 
 // 频点信息
 typedef struct {
+    int hour;
+    int min;
     int glbChId;
     int valid;
     int snr;

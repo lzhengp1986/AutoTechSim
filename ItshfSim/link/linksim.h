@@ -37,6 +37,7 @@ private:
     void free_alg(void);
 
     /*! @brief 算法仿真 */
+	void simulate(const Time* ts);
     int sim_idle(const Time* ts, int& dsec);
     int sim_scan(const Time* ts, int& dsec);
     int sim_link(const Time* ts, int& dsec);
@@ -68,9 +69,6 @@ public:
     WEnv *m_env;
     LinkCfg *m_link;
 
-protected:
-    virtual void run(void);
-
 private:
     /* 定时器线程 */
     bool m_daily;
@@ -90,11 +88,8 @@ private:
     FreqReq m_req;
     FreqRsp m_rsp;
     int m_state;
+	Time *m_ts; /* 仿真时间 */
     Time *m_te; /* 结束时间 */
-
-    /* 仿真队列 */
-    int m_rd, m_wr;
-    Time m_ts[MAX_TIME_QNUM];
 
     /* 统计值 */
     unsigned m_linkNum; /* 建链总次数 */

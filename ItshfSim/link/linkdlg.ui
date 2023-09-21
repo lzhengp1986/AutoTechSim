@@ -79,7 +79,12 @@
        <widget class="QComboBox" name="tmrSpeed">
         <item>
          <property name="text">
-          <string>x256</string>
+          <string>x32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x64</string>
          </property>
         </item>
         <item>
@@ -89,7 +94,7 @@
         </item>
         <item>
          <property name="text">
-          <string>x64</string>
+          <string>x16</string>
          </property>
         </item>
         <item>
@@ -125,7 +130,12 @@
         </item>
         <item>
          <property name="text">
-          <string>5</string>
+          <string>20</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>50</string>
          </property>
         </item>
        </widget>
@@ -141,57 +151,57 @@
        <widget class="QComboBox" name="idleInterval">
         <item>
          <property name="text">
-          <string>rand5</string>
+          <string>r5m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>rand10</string>
+          <string>r10m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>1min</string>
+          <string>1m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>2min</string>
+          <string>2m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>5min</string>
+          <string>5m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>10min</string>
+          <string>10m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>20min</string>
+          <string>20m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>30min</string>
+          <string>30m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>1hour</string>
+          <string>1h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>2hour</string>
+          <string>2h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>4hour</string>
+          <string>4h</string>
          </property>
         </item>
        </widget>
@@ -228,47 +238,47 @@
        <widget class="QComboBox" name="linkInterval">
         <item>
          <property name="text">
-          <string>rand5</string>
+          <string>r5m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>rand10</string>
+          <string>r10m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>2min</string>
+          <string>2m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>5min</string>
+          <string>5m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>10min</string>
+          <string>10m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>20min</string>
+          <string>20m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>30min</string>
+          <string>30m</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>1hour</string>
+          <string>1h</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>2hour</string>
+          <string>2h</string>
          </property>
         </item>
        </widget>

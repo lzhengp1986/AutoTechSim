@@ -7,7 +7,6 @@ LinkSim::LinkSim(QObject *parent)
     /* ITS仿真环境 */
     m_env = new WEnv;
     m_state = WAIT;
-    m_rd = m_wr = 0;
 
     /* link */
     m_link = new LinkCfg;
@@ -47,7 +46,6 @@ void LinkSim::stop(void)
 
     /* 状态清理 */
     m_state = WAIT;
-    m_rd = m_wr = 0;
 }
 
 void LinkSim::trigger(void)
@@ -64,12 +62,12 @@ void LinkSim::trigger(void)
 
     /* step4.时间复位 */
     m_to->reset();
+    m_ts->reset();
     expire(m_link->simDays());
-    m_rd = m_wr = 0;
 
     /* step5.倒计时 */
     m_state = IDLE;
-    stamp(m_to, 10);
+    stamp(m_ts, 10);
 }
 
 // 设置time
@@ -77,6 +75,7 @@ void LinkSim::setup_time(void)
 {
     m_daily = false;
     m_to = new Time;
+    m_ts = new Time;
     m_te = new Time;
 
     /* 默认仿真1天 */
@@ -122,7 +121,8 @@ void LinkSim::set_time(int year, int month)
 {
     m_to->year = year;
     m_to->month = month;
-    emit new_time(m_to);
+	*m_ts = *m_to;
+    emit new_time(m_ts);
 }
 
 // 释放time
@@ -134,11 +134,13 @@ void LinkSim::free_time(void)
     delete m_subthr;
     delete m_expire;
     delete m_to;
+    delete m_ts;
     delete m_te;
     m_timer = nullptr;
     m_subthr = nullptr;
     m_expire = nullptr;
     m_to = nullptr;
+    m_ts = nullptr;
     m_te = nullptr;
 }
 
@@ -204,46 +206,37 @@ void LinkSim::on_timeout(void)
     m_to->year++;
 
 SIMULATE:
-    emit new_time(m_to);
-    push(m_to);
+	*m_ts = *m_to;
+    simulate(m_ts);
+    emit new_time(m_ts);
 }
 
 // 主调度函数
-void LinkSim::run(void)
+void LinkSim::simulate(const Time* ts)
 {
-    while (true) {
-        if (isempty()) {
-            continue;
-        }
-
-        /* 定时任务 */
-        Time ts = pop();
-        Time* pts = &ts;
-
-        /* 判断过期 */
-        int dsec = 0;
-        if (isExpired(pts)) {
-            stop();
-        } else {
-            /* 每日操作 */
-            if (m_daily == true) {
-                sim_reset();
-                emit new_day();
-                m_daily = false;
-            }
-
-            /* 算法仿真 */
-            switch (m_state) {
-            case IDLE: m_state = sim_idle(pts, dsec); break;
-            case SCAN: m_state = sim_scan(pts, dsec); break;
-            case LINK: m_state = sim_link(pts, dsec); break;
-            default: break;
-            }
-        }
-
-        /* 更新界面状态 */
-        emit new_state(m_state, dsec);
-    }
+	/* 判断过期 */
+	int dsec = 0;
+	if (isExpired(ts)) {
+		stop();
+	} else {
+		/* 每日操作 */
+		if (m_daily == true) {
+			sim_reset();
+			emit new_day();
+			m_daily = false;
+		}
+	
+		/* 算法仿真 */
+		switch (m_state) {
+		case IDLE: m_state = sim_idle(ts, dsec); break;
+		case SCAN: m_state = sim_scan(ts, dsec); break;
+		case LINK: m_state = sim_link(ts, dsec); break;
+		default: break;
+		}
+	}
+	
+	/* 更新界面状态 */
+	emit new_state(m_state, dsec);
 }
 
 // idle
@@ -488,11 +481,11 @@ float LinkSim::avgScan(void)
 // 在当前定时上加days
 void LinkSim::expire(int days)
 {
-    *m_expire = *m_to;
+    *m_expire = *m_ts;
     m_expire->day += days;
 
     /* 进位判断 */
-    int md = m_to->mdays();
+    int md = m_ts->mdays();
     if (m_expire->day > md) {
         m_expire->day -= md;
         m_expire->month++;
@@ -510,23 +503,3 @@ void LinkSim::stamp(const Time* ts, int plus)
     m_te->sec += plus;
 }
 
-bool LinkSim::isempty(void)
-{
-    return (m_rd == m_wr);
-}
-
-void LinkSim::push(const Time* ts)
-{
-    if ((m_rd + MAX_TIME_QNUM - 1 - m_wr) % MAX_TIME_QNUM > 1) {
-        m_ts[m_wr] = *ts;
-        m_wr = (m_wr + 1) % MAX_TIME_QNUM;
-    } else {
-        printf("TimeQ: queue is full\n");
-    }
-}
-
-Time LinkSim::pop(void)
-{
-    m_rd = (m_rd + 1) % MAX_TIME_QNUM;
-    return m_ts[m_rd];
-}

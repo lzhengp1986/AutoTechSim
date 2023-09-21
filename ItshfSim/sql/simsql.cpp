@@ -153,6 +153,8 @@ int SimSql::select(int tab, const Time* ts, int rule, QList<FreqInfo>& list)
     FreqInfo info;
     int result = SQLITE_OK;
     while ((result = sqlite3_step(stmt)) == SQLITE_ROW) {
+        info.hour = sqlite3_column_int(stmt, 3);
+        info.min = sqlite3_column_int(stmt, 4);
         info.valid = sqlite3_column_int(stmt, 6);
         info.glbChId = sqlite3_column_int(stmt, 7);
         info.snr = sqlite3_column_int(stmt, 8);

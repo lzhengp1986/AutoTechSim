@@ -51,7 +51,7 @@ int KMean::group(int bw)
 
     /* step1.有效样本映射 */
     for (i = 0, j = 0; i < MAX_KM_NUM; i++) {
-        if (m_smpCnt[i] > 0) {
+        if ((m_smpCnt[i] > 0) && (m_vldCnt[i] > 0)) {
             m_vldIdx[j++] = i;
         }
     }
@@ -253,7 +253,7 @@ int KMean::sort(void)
 
     /* 组排序 */
     int sj, sk;
-    for (i = 0; i < m_grpNum - 1; i++) {
+    for (i = 0; i < m_grpNum; i++) {
         for (j = i + 1, k = i; j < m_grpNum; j++) {
             sj = m_grpInf[m_grpIdx[j]].avgSnr;
             sk = m_grpInf[m_grpIdx[k]].avgSnr;

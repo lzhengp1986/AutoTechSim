@@ -50,11 +50,12 @@ inline int LinkCfg::timerSpeed(void) const
 {
     int speed = 0;
     switch (tmrSpeedIndex) {
-    case 0: speed = 256; break;
-    case 1: speed = 128; break;
-    case 2: speed = 64; break;
-    case 3: speed = 8; break;
-    case 4: speed = 4; break;
+    case 0: speed = 32; break;
+    case 1: speed = 64; break;
+    case 2: speed = 128; break;
+    case 3: speed = 16; break;
+    case 4: speed = 8; break;
+    case 5: speed = 4; break;
     default: speed = 1; break;
     }
     return speed;
@@ -114,7 +115,8 @@ inline int LinkCfg::freqNum(void) const
     int fcNum = 0;
     switch (freqNumIndex) {
     case 0: fcNum = 10; break;
-    case 1: fcNum = 5; break;
+    case 1: fcNum = 20; break;
+    case 2: fcNum = 50; break;
     default: fcNum = 10; break;
     }
     return fcNum;

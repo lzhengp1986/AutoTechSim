@@ -20,8 +20,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    sql/beta.cpp \
     type.cpp \
+    sql/beta.cpp \
     sql/kmean.cpp \
     sql/simsql.cpp \
     sql/sqlite3.c \
@@ -43,8 +43,8 @@ SOURCES += \
 
 HEADERS += \
     macro.h \
-    sql/beta.h \
     type.h \
+    sql/beta.h \
     sql/kmean.h \
     sql/simsql.h \
     sql/sqlite3.h \
