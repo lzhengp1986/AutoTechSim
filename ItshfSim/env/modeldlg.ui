@@ -107,17 +107,7 @@
      </item>
      <item>
       <property name="text">
-       <string>1MHz</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2MHz</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>4MHz</string>
+       <string>16MHz</string>
       </property>
      </item>
      <item>

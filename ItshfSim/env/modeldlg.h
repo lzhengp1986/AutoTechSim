@@ -27,10 +27,10 @@ inline int ModelCfg::get_maxband(void) const
 {
     int maxband = 0;
     switch (bandIndex) {
-    case 1: maxband = 1000; break;
-    case 2: maxband = 2000; break;
+    case 0: maxband = 30000; break;
+    case 1: maxband = 16000; break;
+    case 2: maxband = 8000; break;
     case 3: maxband = 4000; break;
-    case 4: maxband = 8000; break;
     default: maxband = 30000; break;
     }
 
