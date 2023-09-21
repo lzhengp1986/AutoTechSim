@@ -4,6 +4,10 @@
 #include "basealg.h"
 #include "sql/kmean.h"
 
+/* 搜索树大小 */
+#define MAX_TREE_LEN 128
+#define MAX_TREE_MSK 127
+
 class MonteAlg : public BaseAlg
 {
 public:
@@ -19,11 +23,22 @@ public:
 private:
     /*! @brief 根据band二分搜索 */
     bool bisect(int minGlbId, int maxGlbId, int& glbChId);
+    /*! @brief 选择历史样本点分层聚类 */
+    bool kmean(SqlIn& in);
+    /*! @brief 带宽限制 */
+    void limit(int& minGlbId, int& maxGlbId);
+    /*! @brief 搜索树 */
+    void tree(int minGlbId, int maxGlbId);
 
 private:
     int m_lost; /* 失锁标志 */
     bool m_valid[MAX_GLB_CHN];
     KMean *m_kmean;
+
+    /* 搜索树 */
+    int m_treeId;
+    bool m_flag[MAX_GLB_CHN];
+    int m_tree[MAX_TREE_LEN];
 };
 
 #endif // MONTEALG_H

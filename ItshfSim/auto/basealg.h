@@ -34,9 +34,6 @@ public:
      */
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
-    /*! @brief 样本类型  */
-    enum {SMPL_SCAN = 0, SMPL_LINK};
-
 protected:
     int initChId(void);
     static int level(int snrDelta);

@@ -54,8 +54,8 @@ void LinkSim::trigger(void)
     emit new_sts(0, 0, 0, 0);
 
     /* step2.sql复位 */
-    m_sql->drop(BaseAlg::SMPL_SCAN);
-    m_sql->drop(BaseAlg::SMPL_LINK);
+    m_sql->drop(SMPL_SCAN);
+    m_sql->drop(SMPL_LINK);
 
     /* step3.算法复位 */
     sim_reset();
@@ -304,8 +304,7 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
         int flag = m_env->env(ein, out);
 
         /* 将scan结果记录到sql */
-        int type = BaseAlg::SMPL_SCAN;
-        int ret = m_sql->insert(type, ts, out.isValid, glbChId, out.snr, out.n0);
+        int ret = m_sql->insert(SMPL_SCAN, ts, out.isValid, glbChId, out.snr, out.n0);
         if (ret != SQLITE_OK) {
             /* nothing-to-do */
         }
@@ -390,8 +389,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
         int flag = m_env->env(in, out);
 
         /* 将link结果记录到sql */
-        int type = BaseAlg::SMPL_LINK;
-        int ret = m_sql->insert(type, ts, out.isValid, glbChId, out.snr, out.n0);
+        int ret = m_sql->insert(SMPL_LINK, ts, out.isValid, glbChId, out.snr, out.n0);
         if (ret != SQLITE_OK) {
             /* nothing-to-do */
         }

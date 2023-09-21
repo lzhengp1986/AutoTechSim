@@ -45,6 +45,12 @@ typedef enum {
     WAIT, IDLE, SCAN, LINK
 } SimState;
 
+/*! @brief 样本类型  */
+typedef enum {
+    SMPL_SCAN = 0,
+    SMPL_LINK
+} SmplType;
+
 // 消息类型
 typedef enum {
     MSG_FREQ_REQ = 0x1,
@@ -72,6 +78,7 @@ typedef struct {
 
 // 频点信息
 typedef struct {
+    bool isNew;
     int hour;
     int min;
     int glbChId;

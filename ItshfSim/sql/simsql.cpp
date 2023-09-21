@@ -159,6 +159,7 @@ int SimSql::select(int tab, const Time* ts, int rule, QList<FreqInfo>& list)
         info.glbChId = sqlite3_column_int(stmt, 7);
         info.snr = sqlite3_column_int(stmt, 8);
         info.n0 = sqlite3_column_int(stmt, 9);
+        info.isNew = true;
 
         /* 保存数据 */
         list.append(info);
