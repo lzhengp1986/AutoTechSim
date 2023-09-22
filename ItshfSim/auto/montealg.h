@@ -27,6 +27,8 @@ private:
     bool kmean(SqlIn& in);
     /*! @brief 搜索树 */
     void tree(int minGlbId, int maxGlbId);
+    /*! @brief thompson统计 */
+    void thomp(int glbChId, bool flag);
 
 private:
     int m_lost; /* 失锁标志 */
@@ -35,8 +37,8 @@ private:
 
     /* 搜索树 */
     int m_trId;
-    int m_vld[MAX_TREE_LEN];
-    int m_inv[MAX_TREE_LEN];
+    int m_vldNum[MAX_TREE_LEN];
+    int m_invNum[MAX_TREE_LEN];
     int m_tree[MAX_TREE_LEN];
 };
 

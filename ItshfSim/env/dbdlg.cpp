@@ -156,7 +156,12 @@ bool DbDlg::is_valid_hour(int i)
 }
 
 /* 转换从i行开始的hour结构 */
-int DbDlg::trans_one_hour(int i, QList<int>& freq, QList<int>& mufDay, QList<int>& dbu, QList<int>& snr, QList<int>& rel, QList<int>& sprb)
+int DbDlg::trans_one_hour(int i, QList<int>& freq,
+                          QList<int>& mufDay,
+                          QList<int>& dbu,
+                          QList<int>& snr,
+                          QList<int>& rel,
+                          QList<int>& sprb)
 {
     int hour = 0;
     trans_freq(i, hour, freq);

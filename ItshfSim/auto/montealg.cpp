@@ -60,13 +60,15 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             m_valid[glbChId] = true;
 
             /* f2:第2类 */
-            int n = m_kmList.size();
-            if (n > 1) {
-                rsp->glb[fid++] = m_kmList.at(1);
+            if (m_kmList.size() > 1) {
+                glbChId = m_kmList.at(1);
+                rsp->glb[fid++] = glbChId;
+                m_valid[glbChId] = true;
             }
 
             /* f3:第1类k0 */
             rsp->glb[fid++] = k0;
+            m_valid[k0] = true;
         }
 
         /* 限制带宽 */
@@ -228,10 +230,14 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     }
 
     /* 状态切换 */
-    if (out.isValid == true) {
+    bool flag = out.isValid;
+    if (flag == true) {
         m_lost = MAX(m_lost >> 1, 1);
         memset(m_valid, 0, sizeof(m_valid));
     }
+
+    /* thompson统计 */
+    thomp(glbChId, flag);
 
     /* 能效评估 */
     BaseAlg::notify(in, glbChId, out);
@@ -281,8 +287,8 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         }
 
         /* 统计初始化 */
-        m_vld[fid] = 0;
-        m_inv[fid] = 0;
+        m_vldNum[fid] = 0;
+        m_invNum[fid] = 0;
         fid++;
     }
 
@@ -290,3 +296,21 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
     m_trId = 0;
 }
 
+// thompson统计
+void MonteAlg::thomp(int glbChId, bool flag)
+{
+    /* 找最近信道号 */
+    int i, j, k = 0;
+    int md = ABS(glbChId - m_tree[k]);
+    for (i = 1; i < MAX_TREE_LEN; i++) {
+        j = ABS(glbChId - m_tree[i]);
+        if (j < md) {
+            md = j;
+            k = i;
+        }
+    }
+
+    /* 结果统计 */
+    m_vldNum[k] += (flag == true);
+    m_invNum[k] += (flag == false);
+}
