@@ -233,7 +233,7 @@ int KMean::state(void)
 
         /* 信息计算 */
         k = smpCnt - vldNum;
-        py = beta(vldNum, k, px);
+        py = beta(vldNum + 1, k + 1, px);
         inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;
         inf->beta = (float)py;
