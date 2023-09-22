@@ -130,7 +130,6 @@ char* SimSql::regular(int tab, const Time* ts, int rule)
 // 筛选数据
 int SimSql::select(int tab, const Time* ts, int rule, QList<FreqInfo>& list)
 {
-    list.clear();
     if (m_handle == nullptr) {
         printf("err: null DB handle\n");
         fflush(stdout);

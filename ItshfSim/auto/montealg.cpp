@@ -100,6 +100,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 bool MonteAlg::kmean(SqlIn& in)
 {
     /* 读取记录 */
+    m_sqlList.clear();
     const Time* ts = in.stamp;
     in.mysql->select(SMPL_LINK, ts, in.myRule, m_sqlList);
     if (m_sqlList.isEmpty()) {
@@ -286,8 +287,8 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         }
 
         /* 统计初始化 */
-        m_vldNum[fid] = 0;
-        m_invNum[fid] = 0;
+        m_vldNum[fid] = 10;
+        m_invNum[fid] = 1;
         fid++;
     }
 }
