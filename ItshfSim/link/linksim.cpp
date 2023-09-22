@@ -30,6 +30,8 @@ LinkSim::~LinkSim(void)
 {
     free_time();
     free_alg();
+    quit();
+
     delete m_env;
     delete m_link;
     m_env = nullptr;
@@ -149,7 +151,7 @@ void LinkSim::on_timeout(void)
 {
     /* 控制速度 */
     int msec = TIMER_INTERVAL_MS;
-    if ((m_state == IDLE) || (m_state == LINK)) {
+    if ((m_state == IDLE) || (m_state == LINK)) {
         int speed = m_link->timerSpeed();
         msec = speed * TIMER_INTERVAL_MS;
     }

@@ -318,10 +318,13 @@ int MonteAlg::thomp(void)
     double pi;
 
     /* 取最大概率对应信道 */
-    double px = (double)qrand() / RAND_MAX;
+    int rnd = qrand();
+    double recp = 1.0 / RAND_MAX;
+    double px = (double)(rnd + (!rnd)) * recp;
     double pm = beta(m_vldNum[k] + 1, m_invNum[k] + 1, px);
     for (int i = 1; i < MAX_TREE_LEN; i++) {
-        px = (double)qrand() / RAND_MAX;
+        rnd = qrand();
+        px = (double)(rnd + (!rnd)) * recp;
         pi = beta(m_vldNum[i] + 1, m_invNum[i] + 1, px);
         if (pi > pm) {
             pm = pi;
