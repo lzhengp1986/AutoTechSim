@@ -124,7 +124,7 @@ void MainWin::setup_sim(void)
 
 void MainWin::free_sim(void)
 {
-    m_sim->stop();
+    m_sim->deactive();
     m_sim->quit();
     delete m_time;
     delete m_sim;
@@ -148,11 +148,9 @@ void MainWin::display(const QString& algName, const QString& sqlRule)
     QString tmr = QString("days:%1 speed:x%2").arg(cfg->simDays()).arg(cfg->timerSpeed());
     QString intv1 = QString("idle:%1(%2) scan:%3").arg(cfg->idleIntv()).arg(cfg->idleIntvIndex).arg(cfg->scanIntv());
     QString intv2 = QString("link:%1(%2) freq:%3").arg(cfg->svcIntv()).arg(cfg->svcIntvIndex).arg(cfg->freqNum());
-    QString serve = QString("idle:%1 scan:%2").arg(cfg->idleIntv()).arg(cfg->scanIntv());
     ui->infoText->appendPlainText(tmr);
     ui->infoText->appendPlainText(intv1);
     ui->infoText->appendPlainText(intv2);
-    ui->infoText->appendPlainText(serve);
     ui->infoText->appendPlainText("alg:" + algName);
     ui->infoText->appendPlainText("rule:" + sqlRule);
 }
@@ -259,7 +257,7 @@ void MainWin::on_actModel_triggered(void)
     if (ret == QDialog::Accepted) {
         /* 停止仿真 */
         m_chart->restart();
-        m_sim->stop();
+        m_sim->deactive();
 
         /* 获取模型参数 */
         ModelCfg cfg = *m_model;
@@ -293,7 +291,7 @@ void MainWin::on_actStrategy_triggered(void)
     if (ret == QDialog::Accepted) {
         /* 停止仿真 */
         m_chart->restart();
-        m_sim->stop();
+        m_sim->deactive();
 
         /* 配置参数 */
         QString algName, sqlRule;

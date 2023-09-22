@@ -13,8 +13,6 @@
 #define TIMER_INTERVAL_MS 5
 /* 扫频最大失败次数 */
 #define MAX_SCAN_FAIL_THR 5
-/* 最大时间任务队列 */
-#define MAX_TIME_QNUM 256
 
 class LinkSim : public QThread
 {
@@ -25,7 +23,7 @@ public:
     ~LinkSim(void);
 
     /* api */
-    void stop(void);
+    void deactive(void);
     void trigger(void);
     void set_time(int year, int month);
 
@@ -37,8 +35,8 @@ private:
     void free_alg(void);
 
     /*! @brief 算法仿真 */
-	void simulate(const Time* ts);
     int sim_idle(const Time* ts, int& dsec);
+    int sim_req(const Time* ts, int& dsec);
     int sim_scan(const Time* ts, int& dsec);
     int sim_link(const Time* ts, int& dsec);
     void sim_reset(void);
@@ -69,6 +67,9 @@ public:
     WEnv *m_env;
     LinkCfg *m_link;
 
+protected:
+    virtual void run(void);
+
 private:
     /* 定时器线程 */
     bool m_daily;
@@ -87,9 +88,10 @@ private:
     /* 状态机 */
     FreqReq m_req;
     FreqRsp m_rsp;
-    int m_state;
-	Time *m_ts; /* 仿真时间 */
+    int m_state; /* 仿真状态 */
+    Time *m_ts; /* 仿真时间 */
     Time *m_te; /* 结束时间 */
+    bool m_active; /* 主线程状态 */
 
     /* 统计值 */
     unsigned m_linkNum; /* 建链总次数 */

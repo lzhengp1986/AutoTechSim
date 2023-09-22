@@ -84,6 +84,7 @@ void WLabel::set_state(int state, int dsec)
     QString text;
     switch (state) {
     case IDLE: text = "IDLE"; break;
+    case FREQ: text = "FREQ"; break;
     case SCAN: text = "SCAN"; break;
     case LINK: text = "LINK"; break;
     default: text = "WAIT"; break;
@@ -91,7 +92,9 @@ void WLabel::set_state(int state, int dsec)
     m_label.at(STATE)->setText(text);
 
     /* 倒计时 */
-    if (state != WAIT) {
+    if ((state == IDLE) 
+        || (state == SCAN)
+        || (state == LINK)) {
         QString ts;
         int asec = ABS(dsec);
         if (asec > 24 * 3600) {

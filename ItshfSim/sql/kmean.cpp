@@ -40,7 +40,7 @@ int KMean::sche(QList<int>& list)
     sort();
 
     /* 频率推荐 */
-    int m = recommend(list);
+    int m = opti(list);
     return m;
 }
 
@@ -112,13 +112,14 @@ int KMean::group(int bw)
 }
 
 // 频率推荐
-int KMean::recommend(QList<int>& list)
+int KMean::opti(QList<int>& list)
 {
-    int i, j, k;
+    int i, j, k, l;
     for(i = 0; i < m_grpNum; i++) {
         j = middle(i);
         k = m_vldIdx[j];
-        list.append(k * CHN_SCAN_STEP);
+        l = k * CHN_SCAN_STEP;
+        list.append(l);
     }
 
     return list.size();

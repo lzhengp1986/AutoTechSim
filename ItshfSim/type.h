@@ -42,7 +42,7 @@ typedef enum {
 
 // 状态机
 typedef enum {
-    WAIT, IDLE, SCAN, LINK
+    WAIT, IDLE, FREQ, SCAN, LINK
 } SimState;
 
 /*! @brief 样本类型  */

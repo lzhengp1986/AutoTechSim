@@ -22,6 +22,7 @@ LinkSim::LinkSim(QObject *parent)
     setup_alg();
 
     /* 定时器 */
+    m_active = false;
     setup_time();
 }
 
@@ -35,7 +36,7 @@ LinkSim::~LinkSim(void)
     m_link = nullptr;
 }
 
-void LinkSim::stop(void)
+void LinkSim::deactive(void)
 {
     /* 统计值 */
     m_linkNum = 0;
@@ -80,7 +81,7 @@ void LinkSim::setup_time(void)
 
     /* 默认仿真1天 */
     m_expire = new Time;
-    expire(1);
+    expire(0);
 
     /* 定时器子线程 */
     m_timer = new QTimer;
@@ -121,8 +122,7 @@ void LinkSim::set_time(int year, int month)
 {
     m_to->year = year;
     m_to->month = month;
-	*m_ts = *m_to;
-    emit new_time(m_ts);
+    emit new_time(m_to);
 }
 
 // 释放time
@@ -149,7 +149,7 @@ void LinkSim::on_timeout(void)
 {
     /* 控制速度 */
     int msec = TIMER_INTERVAL_MS;
-    if (m_state != WAIT) {
+    if ((m_state == IDLE) || (m_state == LINK)) {
         int speed = m_link->timerSpeed();
         msec = speed * TIMER_INTERVAL_MS;
     }
@@ -206,37 +206,53 @@ void LinkSim::on_timeout(void)
     m_to->year++;
 
 SIMULATE:
-	*m_ts = *m_to;
-    simulate(m_ts);
     emit new_time(m_ts);
+    if (m_active == false) {
+        *m_ts = *m_to;
+        m_active = true;
+    }
 }
 
 // 主调度函数
-void LinkSim::simulate(const Time* ts)
+void LinkSim::run(void)
 {
-	/* 判断过期 */
-	int dsec = 0;
-	if (isExpired(ts)) {
-		stop();
-	} else {
-		/* 每日操作 */
-		if (m_daily == true) {
-			sim_reset();
-			emit new_day();
-			m_daily = false;
-		}
-	
-		/* 算法仿真 */
-		switch (m_state) {
-		case IDLE: m_state = sim_idle(ts, dsec); break;
-		case SCAN: m_state = sim_scan(ts, dsec); break;
-		case LINK: m_state = sim_link(ts, dsec); break;
-		default: break;
-		}
-	}
-	
-	/* 更新界面状态 */
-	emit new_state(m_state, dsec);
+    while (true) {
+        if (m_active == false) {
+            continue;
+        }
+
+        int dsec = 0;
+        const Time* ts = m_ts;
+
+        /* 判断过期 */
+        if (isExpired(ts)) {
+            deactive();
+        } else {
+            /* 每日操作 */
+            if (m_daily == true) {
+                sim_reset();
+                emit new_day();
+                m_daily = false;
+            }
+
+            /* 算法仿真 */
+            int next;
+            switch (m_state) {
+            case IDLE: next = sim_idle(ts, dsec); break;
+            case FREQ: next = sim_req(ts, dsec); break;
+            case SCAN: next = sim_scan(ts, dsec); break;
+            case LINK: next = sim_link(ts, dsec); break;
+            default: next = m_state; break;
+            }
+            m_state = next;
+        }
+
+        /* 更新界面状态 */
+        emit new_state(m_state, dsec);
+
+        /* 修改时戳标志 */
+        m_active = false;
+    }
 }
 
 // idle
@@ -244,10 +260,12 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
 {
     int diff = m_te->second() - ts->second();
     dsec = ABS(diff);
-    if (diff > 0) {
-        return IDLE;
-    }
+    return (diff > 0) ? IDLE : FREQ;
+}
 
+// req
+int LinkSim::sim_req(const Time* ts, int& dsec)
+{
     /* 更新统计 */
     float avgScanFreq = avgScan();
     emit new_sts(avgScanFreq, m_scanFrq, m_linkNum, m_testNum);
@@ -273,7 +291,7 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
     }
 
     /* 切换状态 */
-    stamp(ts, 1);
+    stamp(ts, m_link->scanIntv());
     m_testNum++;
     return SCAN;
 }
@@ -281,10 +299,9 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
 // scan
 int LinkSim::sim_scan(const Time* ts, int& dsec)
 {
-    int scanIntv = m_link->scanIntv();
-    int diff = ts->second() - m_te->second();
-    dsec = ABS(scanIntv - diff);
-    if (diff < scanIntv) {
+    int diff = m_te->second() - ts->second();
+    dsec = ABS(diff);
+    if (diff > 0) {
         return SCAN;
     }
 
@@ -297,9 +314,9 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
     if (rsp->used < rsp->total) {
         int glbChId = rsp->glb[rsp->used];
         m_scanFrq++;
-        EnvOut out;
 
-        /* 调用环境模型 */
+        /* 性能评估 */
+        EnvOut out;
         EnvIn ein = EnvIn(ts, glbChId);
         int flag = m_env->env(ein, out);
 
@@ -326,7 +343,7 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
 
         /* 状态切换: LINK or SCAN */
         if (flag != ENV_OK) {
-            stamp(ts, scanIntv);
+            stamp(ts, m_link->scanIntv());
             rsp->used++;
             return SCAN;
         } else {
@@ -340,7 +357,7 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
                 return LINK;
             } else {
                 /* 继续scan */
-                stamp(ts, scanIntv);
+                stamp(ts, m_link->scanIntv());
                 rsp->used++;
                 return SCAN;
             }
@@ -376,15 +393,13 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
     int diff = m_te->second() - ts->second();
     dsec = ABS(diff);
 
-    int idleIntv = m_link->idleIntv();
-
     /* 每分钟上报link信息 */
     if (dsec % 60 == 0) {
         FreqRsp* rsp = &m_rsp;
         int glbChId = rsp->glb[rsp->used];
-        EnvOut out;
 
-        /* 调用环境模型 */
+        /* 性能评估 */
+        EnvOut out;
         EnvIn in = EnvIn(ts, glbChId);
         int flag = m_env->env(in, out);
 
@@ -414,7 +429,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
 
         /* 状态切换：信道恶化断链 */
         if ((flag != ENV_OK) || (out.isValid != true)) {
-            stamp(ts, idleIntv);
+            stamp(ts, m_link->idleIntv());
             return IDLE;
         }
     }
@@ -423,7 +438,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
     if (diff > 0) {
         return LINK;
     } else {
-        stamp(ts, idleIntv);
+        stamp(ts, m_link->idleIntv());
         return IDLE;
     }
 }

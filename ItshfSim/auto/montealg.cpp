@@ -45,14 +45,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 添加聚类 */
     if (flag == true) {
-        /* 限制带宽 */
-        minGlbId = m_kmList.first();
-        maxGlbId = m_kmList.back();
-        limit(minGlbId, maxGlbId);
-
         /* f0 Menta Carlo Search Tree */
-        glbChId = m_tree[m_treeId];
-        m_treeId = (m_treeId + 1) & MAX_TREE_MSK;
+        glbChId = m_tree[m_trId];
+        m_trId = (m_trId + 1) & MAX_TREE_MSK;
         rsp->glb[fid++] = align(glbChId);
 
         if (m_lost <= 1) {
@@ -62,7 +57,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             int j = i - FST_RND_RNG / 2;
             glbChId = align(k0 + j);
             rsp->glb[fid++] = glbChId;
-            m_valid[k] = true;
+            m_valid[glbChId] = true;
 
             /* f2:第2类 */
             int n = m_kmList.size();
@@ -73,6 +68,15 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             /* f3:第1类k0 */
             rsp->glb[fid++] = k0;
         }
+
+        /* 限制带宽 */
+        int sqlMin = m_kmList.first();
+        int sqlMax = m_kmList.back();
+        int schband = m_lost * BASIC_SCH_WIN;
+        int schWin = schband / ONE_CHN_BW;
+        int halfWin = (schWin >> 1);
+        minGlbId = MAX(sqlMin - halfWin, 0);
+        maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN);
     } else {
         glbChId = initChId();
         m_valid[glbChId] = true;
@@ -234,24 +238,14 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     return m_regret;
 }
 
-// 带宽限制
-void MonteAlg::limit(int& minGlbId, int& maxGlbId)
-{
-    int sqlMin = minGlbId;
-    int sqlMax = maxGlbId;
-    int schband = m_lost * BASIC_SCH_WIN;
-    int schWin = schband / ONE_CHN_BW;
-    int halfWin = (schWin >> 1);
-    minGlbId = MAX(sqlMin - halfWin, 0);
-    maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN);
-}
-
 void MonteAlg::tree(int minGlbId, int maxGlbId)
 {
-    /* 初始化边界 */
-    memset(m_flag, 0, sizeof(m_flag));
-    m_flag[maxGlbId] = true;
-    m_flag[minGlbId] = true;
+    /* 初始化边界+随机 */
+    static bool used[MAX_GLB_CHN] = {0};
+    int rnd = qrand() % MAX_GLB_CHN;
+    used[maxGlbId] = true;
+    used[minGlbId] = true;
+    used[rnd] = true;
 
     int fid = 0;
     while (fid < MAX_TREE_LEN) {
@@ -262,7 +256,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         /* 正向 */
         int i, j, k;
         for (i = minGlbId, j = minGlbId + 1; j <= maxGlbId; j++) {
-            if (m_flag[j] == true) {
+            if (used[j] == true) {
                 k = j - i - 1;
                 if (k > maxLen) {
                     maxLen = k;
@@ -277,13 +271,22 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         if (maxLen > 4) {
             int half = maxLen >> 1;
             int quart = half >> 1;
-            m_tree[fid++] = start + qrand() % half + quart;
+            i = start + qrand() % half + quart;
+            m_tree[fid] = i;
+            used[i] = true;
         } else {
-            m_tree[fid++] = (start + stop) >> 1;
+            i = (start + stop) >> 1;
+            m_tree[fid] = i;
+            used[i] = true;
         }
+
+        /* 统计初始化 */
+        m_vld[fid] = 0;
+        m_inv[fid] = 0;
+        fid++;
     }
 
     /* 索引复位 */
-    m_treeId = 0;
+    m_trId = 0;
 }
 

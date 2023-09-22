@@ -28,16 +28,26 @@ public:
      * @param [IN] bw 最大分裂带宽KHz
      */
     KMean(int bw = 300);
+
+    /*! @brief 清样本 */
     void clear(void);
 
     /*! @brief 输入样本 */
     void push(const FreqInfo& info);
 
-    /*! * @brief 300KHz聚类 */
+    /*!
+     * @brief 300KHz聚类
+     * @param [INOUT] list 推荐列表
+     * @return int 推荐个数
+     */
     int sche(QList<int>& list);
 
-    /*! * @brief 频率推荐 */
-    int recommend(QList<int>& list);
+    /*!
+     * @brief 信道推荐
+     * @param [INOUT] list 推荐列表
+     * @return int 推荐个数
+     */
+    int opti(QList<int>& list);
 
 private:
     int group(int bw);

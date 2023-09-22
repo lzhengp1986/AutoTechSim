@@ -149,19 +149,30 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
         return ENV_INV_GLB;
     }
 
+    int i;
+    int j = MAX_FREQ_NUM - 1;
+
     /* 找MUFday/SNR */
     int snr = mufSnr;
     int mufday = mufMufday;
-    for (int i = 1; i < MAX_FREQ_NUM; i++) {
-        if (dh->fc[i].freq >= fc) {
-            mufday = dh->fc[i].mufday;
-            snr = dh->fc[i].snr;
-            break;
+    if (fc <= dh->fc[1].freq) {
+        mufday = dh->fc[1].mufday;
+        snr = dh->fc[1].snr;
+    } else if (fc >= dh->fc[j].freq) {
+        mufday = dh->fc[j].mufday;
+        snr = dh->fc[j].snr;
+    } else {
+        for (i = 1; i < j; i++) {
+            if (fc >= dh->fc[i].freq) {
+                mufday = dh->fc[i].mufday;
+                snr = dh->fc[i].snr;
+                break;
+            }
         }
     }
 
     /* 可用概率太低 */
-    if (mufday < 5) {
+    if (mufday < 10) {
         return ENV_PROB_LO;
     }
 

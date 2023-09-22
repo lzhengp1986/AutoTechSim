@@ -25,8 +25,6 @@ private:
     bool bisect(int minGlbId, int maxGlbId, int& glbChId);
     /*! @brief 选择历史样本点分层聚类 */
     bool kmean(SqlIn& in);
-    /*! @brief 带宽限制 */
-    void limit(int& minGlbId, int& maxGlbId);
     /*! @brief 搜索树 */
     void tree(int minGlbId, int maxGlbId);
 
@@ -36,8 +34,9 @@ private:
     KMean *m_kmean;
 
     /* 搜索树 */
-    int m_treeId;
-    bool m_flag[MAX_GLB_CHN];
+    int m_trId;
+    int m_vld[MAX_TREE_LEN];
+    int m_inv[MAX_TREE_LEN];
     int m_tree[MAX_TREE_LEN];
 };
 
