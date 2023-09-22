@@ -48,18 +48,19 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     int glbChId = thomp();
     int i = qrand() % FST_RND_RNG;
     int j = i - FST_RND_RNG / 2;
-    rsp->glb[fid++] = align(glbChId + j);
+    int k0 = MAX(glbChId + j, 0);
+    rsp->glb[fid++] = align(k0);
     m_valid[glbChId] = true;
 
     /* 3.聚类推荐 */
     if (flag == true) {
         if (m_lost <= 1) {
             /* f1:k0随机 */
-            int k0 = m_kmList.at(0);
+            k0 = m_kmList.at(0);
             i = qrand() % FST_RND_RNG;
             j = i - FST_RND_RNG / 2;
-            glbChId = align(k0 + j);
-            rsp->glb[fid++] = glbChId;
+            glbChId = MAX(k0 + j, 0);
+            rsp->glb[fid++] = align(glbChId);
             m_valid[glbChId] = true;
 
             /* f2:第2类 */
