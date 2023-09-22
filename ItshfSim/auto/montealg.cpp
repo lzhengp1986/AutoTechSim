@@ -37,18 +37,19 @@ void MonteAlg::restart(SqlIn& in)
 
 const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 {
-    /* 分层聚类 */
+    /* 1.分层聚类 */
     bool flag = kmean(in);
 
     FreqRsp* rsp = &m_rsp;
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
     int fid = 0, minGlbId, maxGlbId;
 
-    /* f0 MentaCarlo */
+    /* 2.f0:MentaCarlo */
     int glbChId = thomp();
     rsp->glb[fid++] = align(glbChId);
+    m_valid[glbChId] = true;
 
-    /* 添加聚类 */
+    /* 3.聚类推荐 */
     if (flag == true) {
         if (m_lost <= 1) {
             /* f1:k0随机 */
@@ -80,13 +81,11 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         minGlbId = MAX(sqlMin - halfWin, 0);
         maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN);
     } else {
-        glbChId = initChId();
-        m_valid[glbChId] = true;
         maxGlbId = MAX_GLB_CHN;
         minGlbId = 0;
     }
 
-    /* 补充二分推荐 */
+    /* 4.补充二分推荐 */
     while (fid < m) {
         if (bisect(minGlbId, maxGlbId, glbChId)) {
             rsp->glb[fid++] = align(glbChId);
