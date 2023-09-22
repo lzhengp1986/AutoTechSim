@@ -207,15 +207,11 @@ int KMean::state(void)
     int smpCnt = 0;
     int vldNum = 0;
 
-    double py;
-    int rnd = qrand();
-    double px = (double)rnd / RAND_MAX;
+    double px, py;
+    double coef = 1.0 / RAND_MAX;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
-        inf->avgSnr = INV_SNR;
-        inf->sumSnr = 0;
-        inf->beta = 0;
 
         /* 样本统计 */
         snrSum = smpCnt = vldNum = 0;
@@ -228,11 +224,16 @@ int KMean::state(void)
 
         /* 异常保护 */
         if (smpCnt <= 0) {
+            inf->avgSnr = INV_SNR;
+            inf->sumSnr = 0;
+            inf->beta = 0;
             continue;
         }
 
         /* 信息计算 */
+        j = qrand();
         k = smpCnt - vldNum;
+        px = (j + (!j)) * coef;
         py = beta(vldNum + 1, k + 1, px);
         inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;
