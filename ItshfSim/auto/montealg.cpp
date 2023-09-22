@@ -279,14 +279,14 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         if (maxLen > 4) {
             int half = maxLen >> 1;
             int quart = half >> 1;
-            i = start + qrand() % half + quart;
-            m_tree[fid] = i;
-            used[i] = true;
+            k = start + qrand() % half + quart;
         } else {
-            i = (start + stop) >> 1;
-            m_tree[fid] = i;
-            used[i] = true;
+            k = (start + stop) >> 1;
         }
+
+        /* 保存信道号 */
+        m_tree[fid] = k;
+        used[k] = true;
 
         /* 统计初始化 */
         m_vldNum[fid] = 10;
