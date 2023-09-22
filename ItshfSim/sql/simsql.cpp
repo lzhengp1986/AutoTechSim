@@ -56,26 +56,25 @@ char* SimSql::today(int tab, const Time* ts, int hr)
     int minDay, minHr;
     int maxDay, maxHr;
 
+    char* sql;
+    const char* tlist[] = {"SCAN", "LINK"};
+
     /* 计算定时 */
     maxDay = ts->day;
     maxHr = ts->hour;
     if (maxHr >= hr) {
-        minHr = maxHr - hr;
+        /* 同一天 */
         minDay = maxDay;
-    } else {
-        minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
-        minDay = maxDay - 1;
-    }
-
-    /* 生成规则 */
-    char* sql;
-    const char* tlist[] = {"SCAN", "LINK"};
-    if (minDay == maxDay) { /* 同一天 */
+        minHr = maxHr - hr;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and day=%d"
                               " and (hour>=%d and hour<=%d) order by snr desc",
                               tlist[tab], ts->year, ts->month, ts->day,
                               minHr, maxHr);
-    } else { /* 昨天+今天 */
+    } else {
+        /* 简化: 不跨月/不跨年 */
+        int md = ts->mdays();
+        minDay = (maxDay + md - 1) % md;
+        minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and ((day=%d and hour>=%d) or day=%d) order by snr desc",
                               tlist[tab], ts->year, ts->month,

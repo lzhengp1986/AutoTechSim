@@ -66,7 +66,6 @@ static double bt(double a, double b, double x)
         }
     }
 
-    printf("a or b too big !");
     return(s1);
 }
 
