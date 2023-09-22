@@ -1,4 +1,5 @@
 #include "montealg.h"
+#include "sql/beta.h"
 
 MonteAlg::MonteAlg(void)
 {
@@ -41,15 +42,14 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     FreqRsp* rsp = &m_rsp;
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
-    int fid = 0, glbChId, minGlbId, maxGlbId;
+    int fid = 0, minGlbId, maxGlbId;
+
+    /* f0 MentaCarlo */
+    int glbChId = thomp();
+    rsp->glb[fid++] = align(glbChId);
 
     /* 添加聚类 */
     if (flag == true) {
-        /* f0 Menta Carlo Search Tree */
-        glbChId = m_tree[m_trId];
-        m_trId = (m_trId + 1) & MAX_TREE_MSK;
-        rsp->glb[fid++] = align(glbChId);
-
         if (m_lost <= 1) {
             /* f1:k0随机 */
             int k0 = m_kmList.at(0);
@@ -291,9 +291,6 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         m_invNum[fid] = 0;
         fid++;
     }
-
-    /* 索引复位 */
-    m_trId = 0;
 }
 
 // thompson统计
@@ -313,4 +310,25 @@ void MonteAlg::thomp(int glbChId, bool flag)
     /* 结果统计 */
     m_vldNum[k] += (flag == true);
     m_invNum[k] += (flag == false);
+}
+
+// thompson推荐
+int MonteAlg::thomp(void)
+{
+    int k = 0;
+    double pi;
+
+    /* 取最大概率对应信道 */
+    double px = (double)qrand() / RAND_MAX;
+    double pm = beta(m_vldNum[k] + 1, m_invNum[k] + 1, px);
+    for (int i = 1; i < MAX_TREE_LEN; i++) {
+        px = (double)qrand() / RAND_MAX;
+        pi = beta(m_vldNum[i] + 1, m_invNum[i] + 1, px);
+        if (pi > pm) {
+            pm = pi;
+            k = i;
+        }
+    }
+
+    return m_tree[k];
 }

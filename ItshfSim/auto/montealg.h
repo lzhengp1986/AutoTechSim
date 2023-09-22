@@ -29,6 +29,8 @@ private:
     void tree(int minGlbId, int maxGlbId);
     /*! @brief thompson统计 */
     void thomp(int glbChId, bool flag);
+    /*! @brief thompson推荐 */
+    int thomp(void);
 
 private:
     int m_lost; /* 失锁标志 */
@@ -36,7 +38,6 @@ private:
     KMean *m_kmean;
 
     /* 搜索树 */
-    int m_trId;
     int m_vldNum[MAX_TREE_LEN];
     int m_invNum[MAX_TREE_LEN];
     int m_tree[MAX_TREE_LEN];
