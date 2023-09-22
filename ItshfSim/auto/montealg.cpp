@@ -46,7 +46,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 2.f0:MentaCarlo */
     int glbChId = thomp();
-    rsp->glb[fid++] = align(glbChId);
+    int i = qrand() % FST_RND_RNG;
+    int j = i - FST_RND_RNG / 2;
+    rsp->glb[fid++] = align(glbChId + j);
     m_valid[glbChId] = true;
 
     /* 3.聚类推荐 */
@@ -54,8 +56,8 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         if (m_lost <= 1) {
             /* f1:k0随机 */
             int k0 = m_kmList.at(0);
-            int i = qrand() % FST_RND_RNG;
-            int j = i - FST_RND_RNG / 2;
+            i = qrand() % FST_RND_RNG;
+            j = i - FST_RND_RNG / 2;
             glbChId = align(k0 + j);
             rsp->glb[fid++] = glbChId;
             m_valid[glbChId] = true;
