@@ -30,7 +30,7 @@ WLabel::WLabel(void)
 
     /* 信道 */
     m_label.at(INDEX_NAME)->setText("index");
-    m_label.at(INDEX_VALUE)->setMinimumWidth(20);
+    m_label.at(INDEX_VALUE)->setMinimumWidth(10);
     m_label.at(CHAN_NAME)->setText("glbChId");
     m_label.at(CHAN_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_NAME)->setText("fc");

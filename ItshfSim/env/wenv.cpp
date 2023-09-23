@@ -140,8 +140,10 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
     /* 计算可通频段 */
     int muf = dh->fc[0].freq;
     int maxMuf = (int)(muf * 1.25f);
+    int fot = muf * 0.80f; /* FOT */
+    int mfc = fot * 0.60f; /* MIN */
     int max = MIN(maxMuf, MAX_CHN_FREQ);
-    int min = MAX(max - m_maxband, MIN_CHN_FREQ);
+    int min = MAX(MAX(max - m_maxband, mfc), MIN_CHN_FREQ);
 
     /* 是否在可通频带 */
     int fc = GLB2FREQ(glbChId);

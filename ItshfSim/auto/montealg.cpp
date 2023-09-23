@@ -238,7 +238,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     /* 状态切换 */
     bool flag = out.isValid;
-    if (flag == true) {
+    if ((flag == true) && (out.snr > 0)) {
         m_stage = MAX(m_stage >> 1, 1);
         memset(m_valid, 0, sizeof(m_valid));
     }
