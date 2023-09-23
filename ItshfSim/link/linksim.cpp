@@ -88,6 +88,7 @@ void LinkSim::setup_time(void)
     m_timer = new QTimer;
     m_subthr = new QThread(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(on_timeout()));
+    connect(m_subthr, &QThread::finished, m_timer, &QTimer::stop);
     m_timer->start(TIMER_INTERVAL_MS);
     m_timer->moveToThread(m_subthr);
     m_subthr->start();
@@ -129,7 +130,6 @@ void LinkSim::set_time(int year, int month)
 // 释放time
 void LinkSim::free_time(void)
 {
-    m_timer->stop();
     m_subthr->quit();
     delete m_timer;
     delete m_subthr;

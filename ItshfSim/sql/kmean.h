@@ -2,6 +2,7 @@
 #define KMEAN_H
 
 #include "type.h"
+#include "env/randmng.h"
 #include <QList>
 
 /* 压缩信道个数：5个一组 */
