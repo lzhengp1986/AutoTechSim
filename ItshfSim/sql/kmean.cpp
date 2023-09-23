@@ -254,12 +254,17 @@ int KMean::sort(void)
     }
 
     /* 组排序 */
-    int sj, sk;
+    float bj, bk;
+    int gj, gk, sj, sk;
     for (i = 0; i < m_grpNum; i++) {
         for (j = i + 1, k = i; j < m_grpNum; j++) {
-            sj = m_grpInf[m_grpIdx[j]].avgSnr;
-            sk = m_grpInf[m_grpIdx[k]].avgSnr;
-            if (sj > sk) {
+            gj = m_grpIdx[j];
+            gk = m_grpIdx[k];
+            bj = m_grpInf[gj].beta;
+            bk = m_grpInf[gk].beta;
+            sj = m_grpInf[gj].avgSnr;
+            sk = m_grpInf[gk].avgSnr;
+            if (sj * bj > sk * bk) {
                 k = j;
             }
         }
