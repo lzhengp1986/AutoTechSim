@@ -279,7 +279,7 @@ int LinkSim::sim_req(const Time* ts, int& dsec)
     req->fcNum = MIN(fcNum, REQ_FREQ_NUM);
 
     /* 调用策略推荐频率 */
-    int algId = m_link->recAlg();
+    int algId = m_link->schAlg();
     int sqlRule = m_link->sqlRule();
     SqlIn ain = SqlIn(ts, m_sql, sqlRule);
     if (algId == RANDOM_SEARCH) {
@@ -307,7 +307,7 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
         return SCAN;
     }
 
-    int algId = m_link->recAlg();
+    int algId = m_link->schAlg();
     int sqlRule = m_link->sqlRule();
     SqlIn ain = SqlIn(ts, m_sql, sqlRule);
 
@@ -415,7 +415,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
 
         /* 将link结果发到alg */
         int regret = 0;
-        int algId = m_link->recAlg();
+        int algId = m_link->schAlg();
         int sqlRule = m_link->sqlRule();
         SqlIn ain = SqlIn(ts, m_sql, sqlRule);
         if (algId == RANDOM_SEARCH) {
@@ -450,7 +450,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
 // 每天重置算法
 void LinkSim::sim_reset(void)
 {
-    int algId = m_link->recAlg();
+    int algId = m_link->schAlg();
     if (algId == RANDOM_SEARCH) {
         m_rand->reset();
     } else if (algId == BISECTING_SEARCH) {

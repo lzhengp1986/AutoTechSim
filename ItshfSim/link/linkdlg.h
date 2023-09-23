@@ -19,7 +19,7 @@ public:
     int svcIntv(void) const;
     int sqlRule(void) const;
     int freqNum(void) const;
-    int recAlg(void) const;
+    int schAlg(void) const;
 
 public:
     int simDayIndex; /* 仿真天数 */
@@ -138,7 +138,7 @@ inline int LinkCfg::sqlRule(void) const
     return rule;
 }
 
-inline int LinkCfg::recAlg(void) const
+inline int LinkCfg::schAlg(void) const
 {
     int alg;
     switch (algIndex) {
