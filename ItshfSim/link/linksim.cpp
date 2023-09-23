@@ -30,7 +30,6 @@ LinkSim::~LinkSim(void)
 {
     free_time();
     free_alg();
-    quit();
 
     delete m_env;
     delete m_link;

@@ -124,6 +124,7 @@ void MainWin::setup_sim(void)
 
 void MainWin::free_sim(void)
 {
+    m_sim->quit();
     m_sim->deactive();
     delete m_time;
     delete m_sim;

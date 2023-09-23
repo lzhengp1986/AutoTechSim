@@ -180,7 +180,7 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
     int rnd = m_frqRnd.rab(glbChId, 0, 100);
     if (rnd < mufday) {
         int u = GRN_U(snr);
-        int g = GRN_G(mufday);
+        int g = GRN_G(snr);
         int expSnr = m_frqRnd.grn(glbChId, u, g);
         out.isValid = (expSnr > MIN_SNR);
         out.snr = expSnr;
