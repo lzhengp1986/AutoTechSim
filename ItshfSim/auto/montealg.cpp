@@ -121,7 +121,6 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
             for (i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
                 if ((info.hour == minHr) && (info.min >= minMin)) {
-                    m_valid[info.glbChId] = true;
                     m_kmean->push(info);
                     info.isNew = false;
                 }
@@ -135,7 +134,6 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
                 FreqInfo& info = m_sqlList[i];
                 if (((info.hour == minHr) && (info.min >= minMin))
                     || (info.hour == k)) {
-                    m_valid[info.glbChId] = true;
                     m_kmean->push(info);
                     info.isNew = false;
                 }
@@ -158,7 +156,6 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
             FreqInfo& info = m_sqlList[i];
             if ((((info.hour == minHr) && (info.min >= minMin))
                 || (info.hour == k)) && (info.isNew == true)) {
-                m_valid[info.glbChId] = true;
                 m_kmean->push(info);
                 info.isNew = false;
             }
@@ -175,7 +172,6 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     for (i = 0; i < n; i++) {
         const FreqInfo& info = m_sqlList[i];
         if (info.isNew == true) {
-            m_valid[info.glbChId] = true;
             m_kmean->push(info);
         }
     }
