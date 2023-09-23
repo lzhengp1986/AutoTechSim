@@ -4,8 +4,13 @@
 // 初始化种子
 Randi::Randi(void)
 {
+    /* 正奇数种子 */
     int ms = QTime::currentTime().msecsSinceStartOfDay();
-    m_seed = ABS(ms) + ((ms & 0x1) == 0) + (ms > 0);
+    if ((ms <= 0) || ((ms & 0x1) == 0)) {
+        m_seed = ms + 1;
+    } else {
+        m_seed = ms;
+    }
 }
 
 // 产生[a,b]均匀随机数
@@ -36,9 +41,9 @@ int Randi::rab(int a, int b)
     return p;
 }
 
+// 初始化种子
 RandMng::RandMng(void)
 {
-    /* 初始化种子 */
     int msec = QTime::currentTime().msecsSinceStartOfDay();
     qsrand((uint)msec);
 
