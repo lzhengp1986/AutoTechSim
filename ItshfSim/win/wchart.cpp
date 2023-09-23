@@ -160,16 +160,6 @@ void WChart::set_link_color(QColor color)
     m_link->setBrush(QBrush(color));
 }
 
-void WChart::set_regret_color(QColor color)
-{
-    m_regret->setColor(color);
-}
-
-void WChart::set_fcNum_color(QColor color)
-{
-    m_fcNum->setColor(color);
-}
-
 QChart* WChart::get_chart(void) const
 {
     return m_chart;
