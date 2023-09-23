@@ -59,7 +59,7 @@ signals:
     void new_day(void);
     void new_time(const Time* ts);
     void new_state(int state, int dsec);
-    void new_chan(int type, int glbChId, int snr, int n0, int regret);
+    void new_chan(int type, int index, int glbChId, int snr, int n0, int regret);
     void new_sts(float avgScan, int scanNum, int linkNum, int testNum);
 
 public:

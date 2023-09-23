@@ -115,8 +115,8 @@ void MainWin::setup_sim(void)
     connect(m_sim, SIGNAL(new_day()), this, SLOT(on_new_day()));
     connect(m_sim, SIGNAL(new_state(int, int)), this, SLOT(on_new_state(int, int)));
     connect(m_sim, SIGNAL(new_time(const Time*)), this, SLOT(on_new_time(const Time*)));
-    connect(m_sim, SIGNAL(new_chan(int, int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int, int)));
     connect(m_sim, SIGNAL(new_sts(float, int, int, int)), this, SLOT(on_new_sts(float, int, int, int)));
+    connect(m_sim, SIGNAL(new_chan(int, int, int, int, int, int)), this, SLOT(on_new_chan(int, int, int, int, int, int)));
 
     /* 启动线程 */
     m_sim->start();
@@ -189,7 +189,7 @@ void MainWin::on_new_state(int state, int dsec)
     m_label->set_state(state, dsec);
 }
 
-void MainWin::on_new_chan(int type, int glbChId, int snr, int n0, int regret)
+void MainWin::on_new_chan(int type, int index, int glbChId, int snr, int n0, int regret)
 {
     /* 绘图 */
     float hr = m_time->Hour();
@@ -211,7 +211,7 @@ void MainWin::on_new_chan(int type, int glbChId, int snr, int n0, int regret)
     ui->logText->appendPlainText(text);
 
     /* 状态栏显示 */
-    m_label->set_channel(glbChId);
+    m_label->set_channel(index, glbChId);
     m_label->set_ratio(snr);
     m_label->set_noise(n0);
 }

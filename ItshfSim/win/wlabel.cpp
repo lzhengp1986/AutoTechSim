@@ -29,13 +29,15 @@ WLabel::WLabel(void)
     m_label.at(COUNTDOWN)->setText("*");
 
     /* 信道 */
+    m_label.at(INDEX_NAME)->setText("index");
+    m_label.at(INDEX_VALUE)->setMinimumWidth(20);
     m_label.at(CHAN_NAME)->setText("glbChId");
     m_label.at(CHAN_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_NAME)->setText("fc");
     m_label.at(FREQ_VALUE)->setStyleSheet("color:red");
     m_label.at(FREQ_VALUE)->setMinimumWidth(30);
     m_label.at(FREQ_UNIT)->setText("KHz");
-    set_channel(0);
+    set_channel(0, 0);
 
     /* SNR */
     m_label.at(SNR_NAME)->setText("SNR");
@@ -113,11 +115,12 @@ void WLabel::set_state(int state, int dsec)
     }
 }
 
-void WLabel::set_channel(int glbChId)
+void WLabel::set_channel(int index, int glbChId)
 {
     int fc = GLB2FREQ(glbChId);
-    m_label.at(FREQ_VALUE)->setText(int2str(fc));
+    m_label.at(INDEX_VALUE)->setText(int2str(index));
     m_label.at(CHAN_VALUE)->setText(int2str(glbChId));
+    m_label.at(FREQ_VALUE)->setText(int2str(fc));
 }
 
 void WLabel::set_ratio(int snr)

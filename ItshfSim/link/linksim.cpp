@@ -313,8 +313,9 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
 
     /* 处理1个频率 */
     FreqRsp* rsp = &m_rsp;
-    if (rsp->used < rsp->total) {
-        int glbChId = rsp->glb[rsp->used];
+    int& index = rsp->used;
+    if (index < rsp->total) {
+        int glbChId = rsp->glb[index];
         m_scanFrq++;
 
         /* 性能评估 */
@@ -341,12 +342,12 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
         }
 
         /* 将scan结果发到MainWin */
-        emit new_chan(SCAN, glbChId, out.snr, out.n0, regret);
+        emit new_chan(SCAN, index, glbChId, out.snr, out.n0, regret);
 
         /* 状态切换: LINK or SCAN */
         if (flag != ENV_OK) {
+            index++;
             stamp(ts, m_link->scanIntv());
-            rsp->used++;
             return SCAN;
         } else {
             if (out.isValid == true) {
@@ -359,8 +360,8 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
                 return LINK;
             } else {
                 /* 继续scan */
+                index++;
                 stamp(ts, m_link->scanIntv());
-                rsp->used++;
                 return SCAN;
             }
         }
@@ -398,7 +399,8 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
     /* 每分钟上报link信息 */
     if (dsec % 60 == 0) {
         FreqRsp* rsp = &m_rsp;
-        int glbChId = rsp->glb[rsp->used];
+        int index = rsp->used;
+        int glbChId = rsp->glb[index];
 
         /* 性能评估 */
         EnvOut out;
@@ -427,7 +429,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
         }
 
         /* 将link结果发到MainWin */
-        emit new_chan(LINK, glbChId, out.snr, out.n0, regret);
+        emit new_chan(LINK, index, glbChId, out.snr, out.n0, regret);
 
         /* 状态切换：信道恶化断链 */
         if ((flag != ENV_OK) || (out.isValid != true)) {
