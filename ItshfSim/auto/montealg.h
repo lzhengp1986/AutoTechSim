@@ -24,7 +24,7 @@ private:
     /*! @brief 根据band二分搜索 */
     bool bisect(int minGlbId, int maxGlbId, int& glbChId);
     /*! @brief 选择历史样本点分层聚类 */
-    bool kmean(SqlIn& in);
+    bool kmean(SqlIn& in, int stage);
     /*! @brief 搜索树 */
     void tree(int minGlbId, int maxGlbId);
     /*! @brief thompson统计 */
@@ -33,7 +33,7 @@ private:
     int thomp(void);
 
 private:
-    int m_lost; /* 失锁标志 */
+    int m_stage; /* 失锁标志 */
     bool m_valid[MAX_GLB_CHN];
     KMean *m_kmean;
 

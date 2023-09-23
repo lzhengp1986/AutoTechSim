@@ -21,7 +21,7 @@ void MonteAlg::reset(void)
     tree(0, MAX_GLB_CHN);
 
     /* 清除状态 */
-    m_lost = MAX_SCH_WINX;
+    m_stage = MAX_SCH_WINX;
     memset(m_valid, 0, sizeof(m_valid));
 }
 
@@ -32,13 +32,13 @@ void MonteAlg::restart(SqlIn& in)
 
     /* 清除状态 */
     memset(m_valid, 0, sizeof(m_valid));
-    m_lost = MIN(m_lost << 1, MAX_SCH_WINX);
+    m_stage = MIN(m_stage << 1, MAX_SCH_WINX);
 }
 
 const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 {
     /* 1.分层聚类 */
-    bool flag = kmean(in);
+    bool flag = kmean(in, m_stage);
 
     FreqRsp* rsp = &m_rsp;
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
@@ -54,7 +54,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 3.聚类推荐 */
     if (flag == true) {
-        if (m_lost <= 1) {
+        if (m_stage <= 1) {
             /* f1:k0随机 */
             k0 = m_kmList.at(0);
             i = qrand() % FST_RND_RNG;
@@ -78,7 +78,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         /* 限制带宽 */
         int sqlMin = m_kmList.first();
         int sqlMax = m_kmList.back();
-        int schband = m_lost * BASIC_SCH_WIN;
+        int schband = m_stage * BASIC_SCH_WIN;
         int schWin = schband / ONE_CHN_BW;
         int halfWin = (schWin >> 1);
         minGlbId = MAX(sqlMin - halfWin, 0);
@@ -100,7 +100,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 }
 
 // 选择历史样本点分层聚类
-bool MonteAlg::kmean(SqlIn& in)
+bool MonteAlg::kmean(SqlIn& in, int stage)
 {
     /* 读取记录 */
     m_sqlList.clear();
@@ -115,60 +115,64 @@ bool MonteAlg::kmean(SqlIn& in)
     int n = m_sqlList.size();
     int i, k;
 
-    /* case1:30min */
     int minMin, minHr;
-    if (ts->min > 30) {
-        /* 当前小时 */
-        minHr = ts->hour;
-        minMin = ts->min - 30;
-        for (i = 0; i < n; i++) {
-            FreqInfo& info = m_sqlList[i];
-            if ((info.hour == minHr) && (info.min >= minMin)) {
-                m_valid[info.glbChId] = true;
-                m_kmean->push(info);
-                info.isNew = false;
+    if (stage <= 1) {
+        /* case1:30min */
+        if (ts->min > 30) {
+            /* 当前小时 */
+            minHr = ts->hour;
+            minMin = ts->min - 30;
+            for (i = 0; i < n; i++) {
+                FreqInfo& info = m_sqlList[i];
+                if ((info.hour == minHr) && (info.min >= minMin)) {
+                    m_valid[info.glbChId] = true;
+                    m_kmean->push(info);
+                    info.isNew = false;
+                }
+            }
+        } else {
+            /* 当前小时+前1小时 */
+            k = ts->hour;
+            minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+            minMin = (ts->min + 30) % 60;
+            for (i = 0; i < n; i++) {
+                FreqInfo& info = m_sqlList[i];
+                if (((info.hour == minHr) && (info.min >= minMin))
+                    || (info.hour == k)) {
+                    m_valid[info.glbChId] = true;
+                    m_kmean->push(info);
+                    info.isNew = false;
+                }
             }
         }
-    } else {
-        /* 当前小时+前1小时 */
+
+        /* case1样本聚类 */
+        int n30m = m_kmean->sche(m_kmList);
+        if (n30m > 0) {
+            return true;
+        }
+    }
+
+    if (stage <= 2) {
+        /* case2: 1hour */
         k = ts->hour;
+        minMin = ts->min;
         minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
-        minMin = (ts->min + 30) % 60;
         for (i = 0; i < n; i++) {
             FreqInfo& info = m_sqlList[i];
-            if (((info.hour == minHr) && (info.min >= minMin))
-                || (info.hour == k)) {
+            if ((((info.hour == minHr) && (info.min >= minMin))
+                || (info.hour == k)) && (info.isNew == true)) {
                 m_valid[info.glbChId] = true;
                 m_kmean->push(info);
                 info.isNew = false;
             }
         }
-    }
 
-    /* case1样本聚类 */
-    int n30m = m_kmean->sche(m_kmList);
-    if (n30m > 0) {
-        return true;
-    }
-
-    /* case2: 1hour */
-    k = ts->hour;
-    minMin = ts->min;
-    minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
-    for (i = 0; i < n; i++) {
-        FreqInfo& info = m_sqlList[i];
-        if ((((info.hour == minHr) && (info.min >= minMin))
-            || (info.hour == k)) && (info.isNew == true)) {
-            m_valid[info.glbChId] = true;
-            m_kmean->push(info);
-            info.isNew = false;
+        /* case2样本聚类 */
+        int n1h = m_kmean->sche(m_kmList);
+        if (n1h > 0) {
+            return true;
         }
-    }
-
-    /* case2样本聚类 */
-    int n1h = m_kmean->sche(m_kmList);
-    if (n1h > 0) {
-        return true;
     }
 
     /* case3: 所有样本 */
@@ -235,7 +239,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     /* 状态切换 */
     bool flag = out.isValid;
     if (flag == true) {
-        m_lost = MAX(m_lost >> 1, 1);
+        m_stage = MAX(m_stage >> 1, 1);
         memset(m_valid, 0, sizeof(m_valid));
     }
 

@@ -110,12 +110,12 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
     }
 
     /* 计算可用标志 */
-    int flag = estimate(in, out);
+    int flag = est(in, out);
     return flag;
 }
 
 // 根据时戳和信道号结合Model计算可用标志和SNR估计值
-int WEnv::estimate(const EnvIn& in, EnvOut& out)
+int WEnv::est(const EnvIn& in, EnvOut& out)
 {
     /* 获取底噪 */
     int glbChId = in.glbChId;
@@ -149,12 +149,12 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
         return ENV_INV_GLB;
     }
 
-    int i;
-    int j = MAX_FREQ_NUM - 1;
+    int i, j, k;
 
     /* 找MUFday/SNR */
     int snr = mufSnr;
     int mufday = mufMufday;
+    j = MAX_FREQ_NUM - 1;
     if (fc <= dh->fc[1].freq) {
         mufday = dh->fc[1].mufday;
         snr = dh->fc[1].snr;
@@ -162,13 +162,26 @@ int WEnv::estimate(const EnvIn& in, EnvOut& out)
         mufday = dh->fc[j].mufday;
         snr = dh->fc[j].snr;
     } else {
-        for (i = 1; i < j; i++) {
+        /* 从后往前找 */
+        for (i = k = j; i > 0; i--) {
             if (fc >= dh->fc[i].freq) {
-                mufday = dh->fc[i].mufday;
-                snr = dh->fc[i].snr;
+                k = i;
                 break;
             }
         }
+
+        /* 先计算占比 */
+        float fi = dh->fc[k].freq;
+        float fj = dh->fc[k + 1].freq;
+        float coef = (fc - fi) / (fj - fi);
+
+        /* 在i和i+1之间插值 */
+        float si = dh->fc[k].snr;
+        float sj = dh->fc[k + 1].snr;
+        float mi = dh->fc[k].mufday;
+        float mj = dh->fc[k + 1].mufday;
+        snr = (int)(si + (sj - si) * coef);
+        mufday = (int)(mi + (mj - mi) * coef);
     }
 
     /* 可用概率太低 */

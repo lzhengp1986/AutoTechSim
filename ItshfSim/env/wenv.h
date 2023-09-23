@@ -101,7 +101,7 @@ public:
 
 private:
     int check(const EnvIn& in);
-    int estimate(const EnvIn& in, EnvOut& out);
+    int est(const EnvIn& in, EnvOut& out);
 
 private:
     int m_maxband; /* 最大可通带宽 */
