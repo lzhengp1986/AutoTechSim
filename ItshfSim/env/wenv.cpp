@@ -98,9 +98,9 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
 {
     /* 初始化 */
     out.isValid = false;
-    out.mufVld = false;
+    out.fotVld = false;
     out.snr = INV_SNR;
-    out.mufSnr = INV_SNR;
+    out.fotSnr = INV_SNR;
     out.n0 = MIN_PN0;
 
     /* 时间检查 */
@@ -109,9 +109,11 @@ int WEnv::env(const EnvIn& in, EnvOut& out)
         return ret;
     }
 
+    /* FOT评估 */
+    fot(in, out);
+
     /* 计算可用标志 */
-    int flag = est(in, out);
-    return flag;
+    return est(in, out);
 }
 
 // 根据时戳和信道号结合Model计算可用标志和SNR估计值
@@ -124,24 +126,11 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
     /* 获取Hour信息 */
     DbHour* dh = &m_dbMonth.hr[in.hour];
 
-    /* === step1.估计MUF频点的性能 === */
-    int mufSnr = dh->fc[0].snr;
-    int mufMufday = dh->fc[0].mufday;
-    int mufRnd = m_mufRnd.rab(glbChId, 0, 100);
-    if (mufRnd < mufMufday) {
-        int u = GRN_U(mufSnr);
-        int g = GRN_G(mufSnr);
-        int expSnr = m_mufRnd.grn(glbChId, u, g);
-        out.mufVld = (expSnr > MIN_SNR);
-        out.mufSnr = expSnr;
-    }
-
-    /* === step2.估计当前频点的性能 === */
-    /* 计算可通频段 */
+    /* step1.计算可通频段 */
     int muf = dh->fc[0].freq;
     int maxMuf = (int)(muf * 1.25f);
-    int fot = muf * 0.80f; /* FOT */
-    int mfc = fot * 0.60f; /* MIN */
+    int fot = (int)(muf * 0.80f); /* FOT */
+    int mfc = (int)(fot * 0.60f); /* MIN */
     int max = MIN(maxMuf, MAX_CHN_FREQ);
     int min = MAX(MAX(max - m_maxband, mfc), MIN_CHN_FREQ);
 
@@ -151,19 +140,67 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
         return ENV_INV_GLB;
     }
 
-    int i, j, k;
+    /* step2.找MUFday/SNR */
+    int snr, mufday;
+    index(dh, fc, mufday, snr);
+
+    /* 可用概率太低 */
+    if (mufday < 10) {
+        return ENV_PROB_LO;
+    }
+
+    /* step3.随机数拟合MUFday/SNR */
+    int rnd = m_frqRnd.rab(glbChId, 0, 100);
+    if (rnd < mufday) {
+        int u = GRN_U(snr);
+        int g = GRN_G(snr);
+        int expSnr = m_frqRnd.grn(glbChId, u, g);
+        out.isValid = (expSnr > MIN_SNR);
+        out.snr = expSnr;
+    }
+
+    return ENV_OK;
+}
+
+// 根据时戳和信道号结合Model计算FOT频点性能
+void WEnv::fot(const EnvIn& in, EnvOut& out)
+{
+    /* 计算FOT */
+    DbHour* dh = &m_dbMonth.hr[in.hour];
+    int muf = dh->fc[0].freq;
+    int fx = (int)(muf * 0.80f);
 
     /* 找MUFday/SNR */
-    int snr = mufSnr;
-    int mufday = mufMufday;
+    int snr, mufday;
+    index(dh, fx, mufday, snr);
+
+    /* 随机数拟合MUFday/SNR */
+    int glbChId = in.glbChId;
+    int rnd = m_fotRnd.rab(glbChId, 0, 100);
+    if (rnd < mufday) {
+        int u = GRN_U(snr);
+        int g = GRN_G(snr);
+        int expSnr = m_fotRnd.grn(glbChId, u, g);
+        out.fotVld = (expSnr > MIN_SNR);
+        out.fotSnr = expSnr;
+    }
+}
+
+// 查找fc对应的区间，计算MUFday和SNR
+bool WEnv::index(const DbHour* dh, int fc, int& mufday, int& snr)
+{
+    int i, j, k;
+
     j = MAX_FREQ_NUM - 1;
-    if (fc <= dh->fc[1].freq) {
+    if (fc <= dh->fc[1].freq) { /* 低于最小 */
         mufday = dh->fc[1].mufday;
         snr = dh->fc[1].snr;
-    } else if (fc >= dh->fc[j].freq) {
+        return false;
+    } else if (fc >= dh->fc[j].freq) { /* 大于最大 */
         mufday = dh->fc[j].mufday;
         snr = dh->fc[j].snr;
-    } else {
+        return false;
+    } else { /* 在中间 */
         /* 从后往前找 */
         for (i = k = j; i > 0; i--) {
             if (fc >= dh->fc[i].freq) {
@@ -184,24 +221,8 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
         float mj = dh->fc[k + 1].mufday;
         snr = (int)(si + (sj - si) * coef);
         mufday = (int)(mi + (mj - mi) * coef);
+        return true;
     }
-
-    /* 可用概率太低 */
-    if (mufday < 10) {
-        return ENV_PROB_LO;
-    }
-
-    /* 随机数拟合MUFday/SNR */
-    int rnd = m_frqRnd.rab(glbChId, 0, 100);
-    if (rnd < mufday) {
-        int u = GRN_U(snr);
-        int g = GRN_G(snr);
-        int expSnr = m_frqRnd.grn(glbChId, u, g);
-        out.isValid = (expSnr > MIN_SNR);
-        out.snr = expSnr;
-    }
-
-    return ENV_OK;
 }
 
 // 根据信道号获取底噪

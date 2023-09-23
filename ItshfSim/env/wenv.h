@@ -42,8 +42,8 @@ typedef struct {
     int n0; /* 预估底噪 */
 
     /* 策略评估 */
-    bool mufVld; /* 最优标志 */
-    int mufSnr; /* 最优SNR */
+    bool fotVld; /* 最优标志 */
+    int fotSnr; /* 最优SNR */
 } EnvOut;
 
 /* DB频点信息 */
@@ -102,12 +102,14 @@ public:
 private:
     int check(const EnvIn& in);
     int est(const EnvIn& in, EnvOut& out);
+    void fot(const EnvIn& in, EnvOut& out);
+    bool index(const DbHour* dh, int fc, int& mufday, int& snr);
 
 private:
     int m_maxband; /* 最大可通带宽 */
     DbMonth m_dbMonth; /* 月DB模型 */
     RandMng m_frqRnd; /* 使用频点的随机数发生器 */
-    RandMng m_mufRnd; /* MUF的随机数发生器 */
+    RandMng m_fotRnd; /* FOT的随机数发生器 */
 };
 
 #endif // WENV_H

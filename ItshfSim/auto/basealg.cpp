@@ -88,17 +88,17 @@ int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     int frqSnr = out.snr;
     bool frqVld = out.isValid;
-    bool mufVld = out.mufVld;
-    int mufSnr = out.mufSnr;
+    bool fotVld = out.fotVld;
+    int fotSnr = out.fotSnr;
 
     /* 性能差异比较 */
     int delta;
-    if ((frqVld == true) && (mufVld == true)) {
-        delta = mufSnr - frqSnr;
-    } else if ((frqVld == true) && (mufVld == false)) {
+    if ((frqVld == true) && (fotVld == true)) {
+        delta = fotSnr - frqSnr;
+    } else if ((frqVld == true) && (fotVld == false)) {
         delta = -frqSnr;
-    } else if ((frqVld == false) && (mufVld == true)) {
-        delta = mufSnr;
+    } else if ((frqVld == false) && (fotVld == true)) {
+        delta = fotSnr;
     } else {
         delta = 0;
     }
