@@ -45,11 +45,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     int fid = 0, minGlbId, maxGlbId;
 
     /* 2.f0:MentaCarlo */
-    int glbChId = thomp();
-    int i = qrand() % FST_RND_RNG;
-    int j = i - FST_RND_RNG / 2;
-    int k0 = MAX(glbChId + j, 0);
-    rsp->glb[fid++] = align(k0);
+    int k0 = thomp();
+    int glbChId = chId300K(k0);
+    rsp->glb[fid++] = glbChId;
     m_valid[glbChId] = true;
 
     /* 3.聚类推荐 */
@@ -57,10 +55,8 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         if (m_stage <= 1) {
             /* f1:k0随机 */
             k0 = m_kmList.at(0);
-            i = qrand() % FST_RND_RNG;
-            j = i - FST_RND_RNG / 2;
-            glbChId = MAX(k0 + j, 0);
-            rsp->glb[fid++] = align(glbChId);
+            glbChId = chId300K(k0);
+            rsp->glb[fid++] = glbChId;
             m_valid[glbChId] = true;
 
             /* f2:第2类 */
@@ -221,7 +217,8 @@ bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        glbChId = start + qrand() % half + quart;
+        int r = m_randi.rab(0, half);
+        glbChId = start + r + quart;
     } else {
         glbChId = (start + stop) >> 1;
     }
@@ -255,7 +252,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
 {
     /* 初始化边界+随机 */
     static bool used[MAX_GLB_CHN] = {0};
-    int rnd = qrand() % MAX_GLB_CHN;
+    int rnd = m_randi.rab(0, MAX_GLB_CHN - 1);
     used[maxGlbId] = true;
     used[minGlbId] = true;
     used[rnd] = true;
@@ -284,7 +281,8 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         if (maxLen > 4) {
             int half = maxLen >> 1;
             int quart = half >> 1;
-            k = start + qrand() % half + quart;
+            int r = m_randi.rab(0, half);
+            k = start + r + quart;
         } else {
             k = (start + stop) >> 1;
         }
@@ -326,13 +324,12 @@ int MonteAlg::thomp(void)
     double pi;
 
     /* 取最大概率对应信道 */
-    int rnd = qrand();
-    double recp = 1.0 / RAND_MAX;
-    double px = (double)(rnd + (!rnd)) * recp;
+    int r = m_randi.rab(0, 99);
+    double px = (double)(r + (!r)) * 0.01;
     double pm = beta(m_vldNum[k] + 1, m_invNum[k] + 1, px);
     for (int i = 1; i < MAX_TREE_LEN; i++) {
-        rnd = qrand();
-        px = (double)(rnd + (!rnd)) * recp;
+        r = m_randi.rab(0, 99);
+        px = (double)(r + (!r)) * 0.01;
         pi = beta(m_vldNum[i] + 1, m_invNum[i] + 1, px);
         if (pi > pm) {
             pm = pi;

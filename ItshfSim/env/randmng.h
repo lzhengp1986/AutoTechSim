@@ -3,8 +3,19 @@
 
 #include "macro.h"
 
-class RandMng
-{
+class Randi {
+public:
+    Randi(void);
+
+    /*! @brief 产生均匀随机数 */
+    int rab(int a, int b);
+
+private:
+    int m_seed;
+
+};
+
+class RandMng {
 public:
     RandMng(void);
 

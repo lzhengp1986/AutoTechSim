@@ -1,6 +1,4 @@
 #include "basealg.h"
-#include <QtGlobal>
-#include <QTime>
 
 // 构造
 BaseAlg::BaseAlg(void)
@@ -26,8 +24,6 @@ void BaseAlg::reset(void)
 void BaseAlg::restart(SqlIn& in)
 {
     Q_UNUSED(in);
-    int msec = QTime::currentTime().msecsSinceStartOfDay();
-    qsrand((uint)msec);
 }
 
 // 随机搜索
@@ -38,21 +34,31 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
     int n = req.fcNum;
     set_head(n);
 
-    int glbChId;
-    for (int i = 0; i < n; i++) {
-        glbChId = qrand() % MAX_GLB_CHN;
-        rsp->glb[i] = align(glbChId);
+    int i, j;
+    for (i = 0; i < n; i++) {
+        j = m_randi.rab(0, MAX_GLB_CHN - 1);
+        rsp->glb[i] = align(j);
     }
 
     return m_rsp;
 }
 
+// 15MHz附近产生随机信道
 int BaseAlg::initChId(void)
 {
     int half = MAX_GLB_CHN / 2;
     int win = BASIC_SCH_WIN / ONE_CHN_BW;
-    int rand = qrand() % win - (win >> 1);
+    int r = m_randi.rab(0, MAX_GLB_CHN);
+    int rand = r % win - (win >> 1);
     return align(half + rand);
+}
+
+// 300KHz附近产生随机信道
+int BaseAlg::chId300K(int chId)
+{
+    int rnd = m_randi.rab(0, FST_RND_RNG - 1);
+    int glbChId = MAX(chId + rnd - FST_RND_RNG / 2, 0);
+    return align(MIN(glbChId, MAX_GLB_CHN - 1));
 }
 
 // snr差值分段

@@ -43,13 +43,12 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
     /* 300KHz附近选点 */
-    int rnd = qrand() % FST_RND_RNG;
-    int glbChId = m_prvGlbChId + rnd - FST_RND_RNG / 2;
-    rsp->glb[0] = align(MIN(MAX(glbChId, 0), MAX_GLB_CHN - 1));
+    rsp->glb[0] = chId300K(m_prvGlbChId);
     rsp->glb[1] = align(m_prvGlbChId);
 
     /* 搜索带宽3M/6M/9M */
     int schband;
+    int rnd = m_randi.rab(0, 99);
     int maxWin = BASIC_SCH_WIN * MAX_SCH_WINX;
     if (rnd < 40) { /* 40% */
         schband = (maxWin >> 3);
@@ -71,8 +70,8 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     }
 
     /* 二分搜索 */
-    int i, j;
     bool flag;
+    int i, j, glbChId;
     for (i = j = 2; i < n; i++) {
         flag = bisect(minGlbId, maxGlbId, glbChId);
         if (flag == false) {
@@ -82,7 +81,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     }
 
     /* 将二分频点提前 */
-    rnd = qrand() % 100;
+    rnd = m_randi.rab(0, 99);
     if (rnd < 40) {
         int tmp1 = rsp->glb[3];
         rsp->glb[3] = rsp->glb[1];
@@ -167,7 +166,8 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        glbChId = start + qrand() % half + quart;
+        int r = m_randi.rab(0, maxLen);
+        glbChId = start + r % half + quart;
     } else {
         glbChId = (start + stop) >> 1;
     }

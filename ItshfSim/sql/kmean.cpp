@@ -1,6 +1,5 @@
 #include "kmean.h"
 #include "beta.h"
-#include <QtGlobal>
 
 KMean::KMean(int bw)
     : MAX_KM_BW(bw)
@@ -208,7 +207,6 @@ int KMean::state(void)
     int vldNum = 0;
 
     double px, py;
-    double coef = 1.0 / RAND_MAX;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
@@ -231,9 +229,9 @@ int KMean::state(void)
         }
 
         /* 信息计算 */
-        j = qrand();
         k = smpCnt - vldNum;
-        px = (j + (!j)) * coef;
+        j = m_randi.rab(0, 99);
+        px = (j + (!j)) * 0.01;
         py = beta(vldNum + 1, k + 1, px);
         inf->sumSnr = snrSum;
         inf->avgSnr = snrSum / smpCnt;

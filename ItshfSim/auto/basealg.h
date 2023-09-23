@@ -2,6 +2,7 @@
 #define BASEALG_H
 
 #include "env/wenv.h"
+#include "env/randmng.h"
 #include "sql/simsql.h"
 #include <QList>
 
@@ -36,12 +37,14 @@ public:
 
 protected:
     int initChId(void);
+    int chId300K(int chId);
     static int level(int snrDelta);
     static int align(int glbChId);
     void set_head(int n);
 
 protected:
     FreqRsp m_rsp;
+    Randi m_randi;
     unsigned m_regret; /* 懊悔值 */
     QList<int> m_kmList; /* KMean列表 */
     QList<FreqInfo> m_sqlList; /* SQL列表 */
