@@ -21,7 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     type.cpp \
-    sql/beta.cpp \
+    sql/util.cpp \
     sql/kmean.cpp \
     sql/simsql.cpp \
     sql/sqlite3.c \
@@ -44,7 +44,7 @@ SOURCES += \
 HEADERS += \
     macro.h \
     type.h \
-    sql/beta.h \
+    sql/util.h \
     sql/kmean.h \
     sql/simsql.h \
     sql/sqlite3.h \

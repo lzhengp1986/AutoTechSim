@@ -4,6 +4,7 @@
 #include "env/wenv.h"
 #include "env/randmng.h"
 #include "sql/simsql.h"
+#include "sql/util.h"
 #include <QList>
 
 class BaseAlg
@@ -44,10 +45,10 @@ protected:
 
 protected:
     FreqRsp m_rsp;
-    Randi m_randi;
     unsigned m_regret; /* 懊悔值 */
     QList<int> m_kmList; /* KMean列表 */
     QList<FreqInfo> m_sqlList; /* SQL列表 */
+    int m_seedi; /* 整数随机种子 */
 };
 
 // 填写消息头

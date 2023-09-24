@@ -48,7 +48,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 搜索带宽3M/6M/9M */
     int schband;
-    int rnd = m_randi.rab(0, 99);
+    int rnd = rab1(0, 99, &m_seedi);
     int maxWin = BASIC_SCH_WIN * MAX_SCH_WINX;
     if (rnd < 40) { /* 40% */
         schband = (maxWin >> 3);
@@ -81,7 +81,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     }
 
     /* 将二分频点提前 */
-    rnd = m_randi.rab(0, 99);
+    rnd = rab1(0, 99, &m_seedi);
     if (rnd < 40) {
         int tmp1 = rsp->glb[3];
         rsp->glb[3] = rsp->glb[1];
@@ -166,7 +166,7 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        int r = m_randi.rab(0, maxLen);
+        int r = rab1(0, maxLen, &m_seedi);
         glbChId = start + r % half + quart;
     } else {
         glbChId = (start + stop) >> 1;

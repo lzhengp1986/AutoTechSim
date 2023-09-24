@@ -38,6 +38,7 @@ private:
     KMean *m_kmean;
 
     /* 搜索树 */
+    double m_seed[MAX_TREE_LEN];
     int m_vldNum[MAX_TREE_LEN];
     int m_invNum[MAX_TREE_LEN];
     int m_tree[MAX_TREE_LEN];

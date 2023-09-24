@@ -267,6 +267,8 @@ int LinkSim::sim_idle(const Time* ts, int& dsec)
 // req
 int LinkSim::sim_req(const Time* ts, int& dsec)
 {
+    Q_UNUSED(dsec);
+
     /* 更新统计 */
     float avgScanFreq = avgScan();
     emit new_sts(avgScanFreq, m_scanFrq, m_linkNum, m_testNum);

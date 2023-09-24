@@ -1,5 +1,4 @@
 #include "montealg.h"
-#include "sql/beta.h"
 
 MonteAlg::MonteAlg(void)
 {
@@ -213,7 +212,7 @@ bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        int r = m_randi.rab(0, half);
+        int r = rab1(0, half, &m_seedi);
         glbChId = start + r + quart;
     } else {
         glbChId = (start + stop) >> 1;
@@ -246,9 +245,14 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
 void MonteAlg::tree(int minGlbId, int maxGlbId)
 {
+    /* 质数表 */
+    static int prime[500] = {
+        #include "auto/prime.txt"
+    };
+
     /* 初始化边界+随机 */
     static bool used[MAX_GLB_CHN] = {0};
-    int rnd = m_randi.rab(0, MAX_GLB_CHN - 1);
+    int rnd = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
     used[maxGlbId] = true;
     used[minGlbId] = true;
     used[rnd] = true;
@@ -277,7 +281,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         if (maxLen > 4) {
             int half = maxLen >> 1;
             int quart = half >> 1;
-            int r = m_randi.rab(0, half);
+            int r = rab1(0, half, &m_seedi);
             k = start + r + quart;
         } else {
             k = (start + stop) >> 1;
@@ -288,6 +292,8 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         used[k] = true;
 
         /* 统计初始化 */
+        i = qrand() % MAX_TREE_LEN;
+        m_seed[fid] = prime[fid];
         m_vldNum[fid] = 10;
         m_invNum[fid] = 1;
         fid++;
@@ -320,13 +326,9 @@ int MonteAlg::thomp(void)
     double pi;
 
     /* 取最大概率对应信道 */
-    int r = m_randi.rab(0, 99);
-    double px = (double)(r + (!r)) * 0.01;
-    double pm = beta(m_vldNum[k] + 1, m_invNum[k] + 1, px);
+    double pm = rbeta(m_vldNum[k] + 1, m_invNum[k] + 1, m_seed);
     for (int i = 1; i < MAX_TREE_LEN; i++) {
-        r = m_randi.rab(0, 99);
-        px = (double)(r + (!r)) * 0.01;
-        pi = beta(m_vldNum[i] + 1, m_invNum[i] + 1, px);
+        pi = rbeta(m_vldNum[i] + 1, m_invNum[i] + 1, m_seed + i);
         if (pi > pm) {
             pm = pi;
             k = i;

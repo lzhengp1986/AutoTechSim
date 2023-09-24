@@ -1,5 +1,5 @@
 #include "kmean.h"
-#include "beta.h"
+#include "sql/util.h"
 
 KMean::KMean(int bw)
     : MAX_KM_BW(bw)
@@ -10,6 +10,7 @@ KMean::KMean(int bw)
 // 样本清零
 void KMean::clear(void)
 {
+    m_seed = 18181;
     memset(m_snrSum, 0, sizeof(m_snrSum));
     memset(m_smpCnt, 0, sizeof(m_smpCnt));
     memset(m_vldCnt, 0, sizeof(m_vldCnt));
@@ -206,7 +207,7 @@ int KMean::state(void)
     int smpCnt = 0;
     int vldNum = 0;
 
-    double px, py;
+    double px;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
@@ -230,12 +231,10 @@ int KMean::state(void)
 
         /* 信息计算 */
         k = smpCnt - vldNum;
-        j = m_randi.rab(0, 99);
-        px = (j + (!j)) * 0.01;
-        py = beta(vldNum + 1, k + 1, px);
-        inf->sumSnr = snrSum;
+        px = rbeta(vldNum + 1, k + 1, &m_seed);
         inf->avgSnr = snrSum / smpCnt;
-        inf->beta = (float)py;
+        inf->sumSnr = snrSum;
+        inf->beta = (float)px;
     }
 
     return m_grpNum;

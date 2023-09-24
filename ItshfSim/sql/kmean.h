@@ -73,7 +73,7 @@ private:
     int m_grpIdx[MAX_KM_NUM];
     KGInd m_grpInd[MAX_KM_NUM];
     KGInf m_grpInf[MAX_KM_NUM];
-    Randi m_randi;
+    double m_seed;
 };
 
 #endif // KMEAN_H
