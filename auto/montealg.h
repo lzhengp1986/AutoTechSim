@@ -35,7 +35,7 @@ private:
 private:
     int m_stage; /* 失锁标志 */
     bool m_valid[MAX_GLB_CHN];
-    KMean *m_kmean;
+    KMean *m_cluster;
 
     /* 搜索树 */
     double m_seed[MAX_TREE_LEN];

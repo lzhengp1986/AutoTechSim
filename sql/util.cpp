@@ -1,4 +1,5 @@
 #include <math.h>
+#include "boost/math/distributions.hpp"
 
 /* X样本个数 */
 #define BETA_SMPL_NUM 128
@@ -175,37 +176,9 @@ double rnd1(double *r)
 // 生成1个beta分布随机数
 double rbeta(double a, double b, double *r)
 {
-    int i, j;
-    double x, y;
-
-    /* 对概率函数采样 */
-    double pr[BETA_SMPL_NUM] = {0};
-    for (i = 1; i < BETA_SMPL_NUM; i ++) {
-        x = (double)i / BETA_SMPL_NUM;
-        y = beta(a, b, x);
-        pr[i] = pr[i - 1] + y;
-    }
-
-    /* 产生均匀分布随机数 */
-    double sum = pr[BETA_SMPL_NUM - 1];
-    double rx = rnd1(r) * sum;
-
-    /* 判断r所在区间 */
-    if (rx <= 0) {
-        j = 0;
-    } else if (rx >= sum) {
-        j = BETA_SMPL_NUM - 1;
-    } else {
-        for (i = j = BETA_SMPL_NUM - 1; i > 0; i--) {
-            if (rx >= pr[i]) {
-                j = i;
-                break;
-            }
-        }
-    }
-
-    /* 计算x值 */
-    x = (double)j / BETA_SMPL_NUM;
-    return x;
+    double rx = rnd1(r);
+    boost::math::beta_distribution<> dist(a + 1, b + 1);
+    double ry = boost::math::quantile(dist, rx);
+    return ry;
 }
 

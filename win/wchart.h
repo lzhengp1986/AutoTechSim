@@ -1,11 +1,11 @@
 #ifndef QWCHART_H
 #define QWCHART_H
 
-#include <qchart.h>
+#include <QChart>
 #include <QValueAxis>
 #include <QLineSeries>
 #include <QScatterSeries>
-using namespace QtCharts;
+#include <QSplineSeries>
 
 class WChart {
 public:
@@ -18,6 +18,7 @@ public:
     void set_link_color(QColor color);
 
     /* plot */
+    void plot(QList<int>& h, QList<int>& u, QList<int>& l);
     void plot_scan(float hour, float fc, int snr);
     void plot_link(float hour, float fc, int snr);
     void plot_regret(float hour, int regret);
@@ -31,6 +32,8 @@ public:
 private:
     QChart *m_chart;
     QValueAxis *m_axisX1;
+    QSplineSeries *m_upper;
+    QSplineSeries *m_lower;
 
     /* 数据点 */
     QLineSeries *m_fcNum;

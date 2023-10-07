@@ -251,17 +251,10 @@ int KMean::sort(void)
     }
 
     /* 组排序 */
-    float bj, bk;
-    int gj, gk, sj, sk;
     for (i = 0; i < m_grpNum; i++) {
         for (j = i + 1, k = i; j < m_grpNum; j++) {
-            gj = m_grpIdx[j];
-            gk = m_grpIdx[k];
-            bj = m_grpInf[gj].beta;
-            bk = m_grpInf[gk].beta;
-            sj = m_grpInf[gj].avgSnr;
-            sk = m_grpInf[gk].avgSnr;
-            if (sj * bj > sk * bk) {
+            l = compare(j, k);
+            if (l > 0) {
                 k = j;
             }
         }
@@ -272,8 +265,8 @@ int KMean::sort(void)
         }
 
         /* SNR太小时不使用 */
-        sk = m_grpInf[m_grpIdx[i]].avgSnr;
-        if (sk < MIN_SNR) {
+        j = m_grpIdx[i];
+        if (m_grpInf[j].avgSnr < MIN_SNR) {
             break;
         }
     }
@@ -281,3 +274,40 @@ int KMean::sort(void)
     m_grpNum = i;
     return i;
 }
+
+// 第i组和第j组排序比较
+int KMean::compare(int i, int j)
+{
+    int gi = m_grpIdx[i];
+    int gj = m_grpIdx[j];
+    int si = m_grpInf[gi].avgSnr;
+    int sj = m_grpInf[gj].avgSnr;
+    if (si > sj) {
+        return +1;
+    } else if (si < sj) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+// 第i组和第j组排序比较
+int KBeta::compare(int i, int j)
+{
+    int gi = m_grpIdx[i];
+    int gj = m_grpIdx[j];
+    int si = m_grpInf[gi].avgSnr;
+    int sj = m_grpInf[gj].avgSnr;
+    float bi = m_grpInf[gi].beta;
+    float bj = m_grpInf[gj].beta;
+    float xi = si * bi;
+    float xj = sj * bj;
+    if (xi > xj) {
+        return +1;
+    } else if (xi < xj) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+

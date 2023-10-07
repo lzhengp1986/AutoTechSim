@@ -29,6 +29,7 @@ public:
      * @param [IN] bw 最大分裂带宽KHz
      */
     KMean(int bw = 300);
+    virtual ~KMean(void) {}
 
     /*! @brief 清样本 */
     void clear(void);
@@ -50,7 +51,16 @@ public:
      */
     int opti(QList<int>& list);
 
-private:
+protected:
+    /*!
+     * @brief 第i组和第j组排序比较
+     * @param [IN] i 第i组索引
+     * @param [IN] j 第j组索引
+     * @return int 比较结果
+     */
+    virtual int compare(int i, int j);
+
+protected:
     int group(int bw);
     int length(int gid);
     int middle(int gid);
@@ -60,7 +70,7 @@ private:
     int state(void);
     int sort(void);
 
-private:
+protected:
     /* 原始样本 */
     const int MAX_KM_BW;
     int m_snrSum[MAX_KM_NUM];
@@ -74,6 +84,13 @@ private:
     KGInd m_grpInd[MAX_KM_NUM];
     KGInf m_grpInf[MAX_KM_NUM];
     double m_seed;
+};
+
+// 以加权SNR均值排序
+class KBeta : public KMean
+{
+protected:
+    virtual int compare(int i, int j);
 };
 
 #endif // KMEAN_H

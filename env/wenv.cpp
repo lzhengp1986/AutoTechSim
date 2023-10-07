@@ -2,6 +2,11 @@
 #include "sql/sqlite3.h"
 #include <QMessageBox>
 
+// 系数
+#define FOT_COEF 0.80f
+#define MUF_COEF 1.10f
+#define LUF_COEF 0.50f
+
 // 构造
 WEnv::WEnv(void)
 {
@@ -124,15 +129,14 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
     out.n0 = noise(glbChId);
 
     /* 获取Hour信息 */
-    DbHour* dh = &m_dbMonth.hr[in.hour];
+    const DbHour* dh = &m_dbMonth.hr[in.hour];
 
     /* step1.计算可通频段 */
     int muf = dh->fc[0].freq;
-    int maxMuf = (int)(muf * 1.25f);
-    int fot = (int)(muf * 0.80f); /* FOT */
-    int mfc = (int)(fot * 0.60f); /* MIN */
-    int max = MIN(maxMuf, MAX_CHN_FREQ);
-    int min = MAX(MAX(max - m_maxband, mfc), MIN_CHN_FREQ);
+    int maxFc = upper(muf);
+    int minFc = lower(muf);
+    int max = MIN(maxFc, MAX_CHN_FREQ);
+    int min = MAX(MAX(max - m_maxband, minFc), MIN_CHN_FREQ);
 
     /* 是否在可通频带 */
     int fc = GLB2FREQ(glbChId);
@@ -166,9 +170,8 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
 void WEnv::fot(const EnvIn& in, EnvOut& out)
 {
     /* 计算FOT */
-    DbHour* dh = &m_dbMonth.hr[in.hour];
-    int muf = dh->fc[0].freq;
-    int fx = (int)(muf * 0.80f);
+    const DbHour* dh = &m_dbMonth.hr[in.hour];
+    int fx = (int)(dh->fc[0].freq * FOT_COEF);
 
     /* 找MUFday/SNR */
     int snr, mufday;
@@ -223,6 +226,24 @@ bool WEnv::index(const DbHour* dh, int fc, int& mufday, int& snr)
         mufday = (int)(mi + (mj - mi) * coef);
         return true;
     }
+}
+
+// 获取MUF值KHz
+int WEnv::muf(int hour) const
+{
+    return m_dbMonth.hr[hour].fc[0].freq;
+}
+
+// 频率上限KHz
+int WEnv::upper(int muf)
+{
+    return (int)MIN(muf * MUF_COEF, MAX_CHN_FREQ);
+}
+
+// 频率下限KHz
+int WEnv::lower(int muf)
+{
+    return (int)MAX(muf * LUF_COEF, MIN_CHN_FREQ);
 }
 
 // 根据信道号获取底噪

@@ -93,6 +93,13 @@ public:
     /*! @brief 根据时戳和信道号结合Model计算可用标志和SNR估计值 */
     int env(const EnvIn& in, EnvOut& out);
 
+    /*! @brief 获取MUF值KHz */
+    int muf(int hour) const;
+    /*! @brief 频率上限KHz */
+    static int upper(int muf);
+    /*! @brief 频率下限KHz */
+    static int lower(int muf);
+
     /*! @brief 根据信道号获取底噪 */
     static int noise(int glbChId);
 

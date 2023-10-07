@@ -83,6 +83,16 @@ int MainWin::update_model(const ModelCfg* cfg)
         return rc;
     }
 
+    /* 更新火柴棍 */
+    QList<int> hr, up, low;
+    for (int i = 0; i < MAX_HOUR_NUM; i++) {
+        int muf = m_sim->m_env->muf(i);
+        low << WEnv::lower(muf);
+        up << WEnv::upper(muf);
+        hr << i;
+    }
+    m_chart->plot(hr, low, up);
+
     /* 更新底噪数据 */
     if (cfg->withNoise == true) {
         const int* pnoise = WEnv::noise();
@@ -126,6 +136,7 @@ void MainWin::free_sim(void)
 {
     m_sim->quit();
     m_sim->deactive();
+    m_sim->wait();
     delete m_time;
     delete m_sim;
     m_sim = nullptr;
@@ -194,10 +205,10 @@ void MainWin::on_new_chan(int type, int index, int glbChId, int snr, int n0, int
     float hr = m_time->Hour();
     float fc = GLB2FREQ(glbChId) / 1000.0f;
     m_chart->plot_regret(hr, regret);
-    if (type == LINK) {
-        m_chart->plot_link(hr, fc, snr);
-    } else {
+    if ((type == SCAN) || (snr <= INV_SNR)) {
         m_chart->plot_scan(hr, fc, snr);
+    } else {
+        m_chart->plot_link(hr, fc, snr);
     }
 
     /* 日志 */

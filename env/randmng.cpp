@@ -1,17 +1,18 @@
 #include "randmng.h"
 #include "sql/util.h"
+#include <QRandomGenerator>
 #include <QTime>
 
 // 初始化种子
 RandMng::RandMng(void)
 {
     int msec = QTime::currentTime().msecsSinceStartOfDay();
-    qsrand((uint)msec);
+    QRandomGenerator rnd((uint)msec);
 
-    int i, j;
+    int i, j, k = INT32_MAX;
     for (i = 0; i <= MAX_GLB_CHN; i++) {
-        j = qrand();
-        m_fseed[i] = qrand();
+        j = rnd.bounded(k);
+        m_fseed[i] = rnd.bounded(k);
         if ((j <= 0) || ((j & 0x1) == 0)) {
             m_iseed[i] = j + 1;
         } else {

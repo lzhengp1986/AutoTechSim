@@ -22,10 +22,10 @@ WLabel::WLabel(void)
 
     /* 状态 */
     m_label.at(STATE)->setStyleSheet("color:blue;font-weight:bold");
-    m_label.at(STATE)->setMinimumWidth(30);
+    m_label.at(STATE)->setMinimumWidth(35);
     m_label.at(STATE)->setText("WAIT");
     m_label.at(COUNTDOWN)->setStyleSheet("color:blue");
-    m_label.at(COUNTDOWN)->setMinimumWidth(30);
+    m_label.at(COUNTDOWN)->setMinimumWidth(20);
     m_label.at(COUNTDOWN)->setText("*");
 
     /* 信道 */
@@ -94,7 +94,7 @@ void WLabel::set_state(int state, int dsec)
     m_label.at(STATE)->setText(text);
 
     /* 倒计时 */
-    if ((state == IDLE) 
+    if ((state == IDLE) 
         || (state == SCAN)
         || (state == LINK)) {
         QString ts;

@@ -12,7 +12,19 @@ WChart::WChart(void)
     chart->removeAllSeries();
     m_chart = chart;
 
-    /* step2.设置散点 */
+    /* step2.设置通带 */
+    m_upper = new QSplineSeries;
+    m_lower = new QSplineSeries;
+    m_upper->setName("upper");
+    m_lower->setName("lower");
+    m_upper->setOpacity(0.2);
+    m_lower->setOpacity(0.2);
+    m_upper->setPen(QPen(Qt::black, 1, Qt::DotLine));
+    m_lower->setPen(QPen(Qt::black, 1, Qt::DotLine));
+    chart->addSeries(m_upper);
+    chart->addSeries(m_lower);
+
+    /* 设置策略散点 */
     m_scan = new QScatterSeries;
     m_scan->setName("scan");
     m_scan->setOpacity(0.7);
@@ -73,6 +85,7 @@ WChart::WChart(void)
     x1->setTitleVisible(false);
     x1->setMinorGridLineVisible(false);
     x1->setGridLineVisible(false);
+    x1->setLabelsFont(QFont("Arial", 6));
     x1->setLabelsVisible(true);
     x1->setVisible(true);
     m_axisX1 = x1;
@@ -86,6 +99,7 @@ WChart::WChart(void)
     x2->setTitleVisible(false);
     x2->setMinorGridLineVisible(false);
     x2->setGridLineVisible(false);
+    x2->setLabelsFont(QFont("Arial", 6));
     x2->setLabelsVisible(true);
     x2->setVisible(true);
 
@@ -112,6 +126,7 @@ WChart::WChart(void)
     y1->setTitleVisible(false);
     y1->setMinorGridLineVisible(false);
     y1->setGridLineVisible(false);
+    y1->setLabelsFont(QFont("Arial", 6));
     y1->setLabelsVisible(true);
     y1->setVisible(true);
 
@@ -121,6 +136,10 @@ WChart::WChart(void)
     chart->addAxis(x2, Qt::AlignRight);
     chart->addAxis(y0, Qt::AlignBottom);
     chart->addAxis(y1, Qt::AlignTop);
+    m_upper->attachAxis(x0);
+    m_upper->attachAxis(y0);
+    m_lower->attachAxis(x0);
+    m_lower->attachAxis(y0);
     m_scan->attachAxis(x0);
     m_scan->attachAxis(y0);
     m_link->attachAxis(x0);
@@ -163,6 +182,24 @@ void WChart::set_link_color(QColor color)
 QChart* WChart::get_chart(void) const
 {
     return m_chart;
+}
+
+void WChart::plot(QList<int>& h, QList<int>& u, QList<int>& l)
+{
+    int i;
+    qreal fc, hr;
+    m_upper->clear();
+    m_lower->clear();
+    for (i = 0; i < u.size(); i++) {
+        hr = h.at(i);
+        fc = KHZ2MHZ(u.at(i));
+        m_upper->append(hr, fc);
+    }
+    for (i = 0; i < l.size(); i++) {
+        hr = h.at(i);
+        fc = KHZ2MHZ(l.at(i));
+        m_lower->append(hr, fc);
+    }
 }
 
 void WChart::plot_scan(float hour, float fc, int snr)

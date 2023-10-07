@@ -1,15 +1,16 @@
 #include "montealg.h"
+#include <QRandomGenerator>
 
 MonteAlg::MonteAlg(void)
 {
     reset();
-    m_kmean = new KMean;
+    m_cluster = new KBeta;
 }
 
 MonteAlg::~MonteAlg(void)
 {
-    delete m_kmean;
-    m_kmean = nullptr;
+    delete m_cluster;
+    m_cluster = nullptr;
 }
 
 void MonteAlg::reset(void)
@@ -106,7 +107,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     }
 
     /* 样本清零 */
-    m_kmean->clear();
+    m_cluster->clear();
     int n = m_sqlList.size();
     int i, k;
 
@@ -119,8 +120,11 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
             minMin = ts->min - 30;
             for (i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
+                if (info.isNew == false) {
+                    continue;
+                }
                 if ((info.hour == minHr) && (info.min >= minMin)) {
-                    m_kmean->push(info);
+                    m_cluster->push(info);
                     info.isNew = false;
                 }
             }
@@ -128,19 +132,22 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
             /* 当前小时+前1小时 */
             k = ts->hour;
             minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
-            minMin = (ts->min + 30) % 60;
+            minMin = (ts->min + 60 - 30) % 60;
             for (i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
+                if (info.isNew == false) {
+                    continue;
+                }
                 if (((info.hour == minHr) && (info.min >= minMin))
-                    || (info.hour == k)) {
-                    m_kmean->push(info);
+                    || ((info.hour == k) && (info.min <= ts->min))) {
+                    m_cluster->push(info);
                     info.isNew = false;
                 }
             }
         }
 
         /* case1样本聚类 */
-        int n30m = m_kmean->sche(m_kmList);
+        int n30m = m_cluster->sche(m_kmList);
         if (n30m > 0) {
             return true;
         }
@@ -153,15 +160,18 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
         minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
         for (i = 0; i < n; i++) {
             FreqInfo& info = m_sqlList[i];
-            if ((((info.hour == minHr) && (info.min >= minMin))
-                || (info.hour == k)) && (info.isNew == true)) {
-                m_kmean->push(info);
+            if (info.isNew == false) {
+                continue;
+            }
+            if (((info.hour == minHr) && (info.min >= minMin))
+                || ((info.hour == k) && (info.min <= minMin))) {
+                m_cluster->push(info);
                 info.isNew = false;
             }
         }
 
         /* case2样本聚类 */
-        int n1h = m_kmean->sche(m_kmList);
+        int n1h = m_cluster->sche(m_kmList);
         if (n1h > 0) {
             return true;
         }
@@ -170,13 +180,14 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     /* case3: 所有样本 */
     for (i = 0; i < n; i++) {
         const FreqInfo& info = m_sqlList[i];
-        if (info.isNew == true) {
-            m_kmean->push(info);
+        if (info.isNew == false) {
+            continue;
         }
+        m_cluster->push(info);
     }
 
     /* case2样本聚类 */
-    k = m_kmean->sche(m_kmList);
+    k = m_cluster->sche(m_kmList);
     return (k > 0);
 }
 
@@ -292,7 +303,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         used[k] = true;
 
         /* 统计初始化 */
-        i = qrand() % MAX_TREE_LEN;
+        i = QRandomGenerator::global()->bounded(0, (int)MAX_TREE_LEN - 1);
         m_seed[fid] = prime[fid];
         m_vldNum[fid] = 10;
         m_invNum[fid] = 1;

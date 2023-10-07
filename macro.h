@@ -27,5 +27,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define ABS(a) ((a) > 0 ? (a) : -(a))
 #define GLB2FREQ(g) ((g) * ONE_CHN_BW + MIN_CHN_FREQ)
+#define KHZ2MHZ(f) ((qreal)(f) / 1000)
 
 #endif // MACRO_H

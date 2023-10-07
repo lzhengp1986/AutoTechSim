@@ -3,6 +3,7 @@
 
 #include "type.h"
 #include <QDialog>
+#include <QRandomGenerator>
 
 namespace Ui {
 class LinkDlg;
@@ -76,8 +77,8 @@ inline int LinkCfg::svcIntv(void) const
 {
     int svcIntv = 0;
     switch (svcIntvIndex) {
-    case 0: svcIntv = ABS(qrand() % 5 + 1); break;
-    case 1: svcIntv = ABS(qrand() % 10 + 1); break;
+    case 0: svcIntv = ABS(QRandomGenerator::global()->bounded(0u, 4u) + 1); break;
+    case 1: svcIntv = ABS(QRandomGenerator::global()->bounded(0u, 9u) + 1); break;
     case 2: svcIntv = 2; break;
     case 3: svcIntv = 5; break;
     case 4: svcIntv = 10; break;
@@ -94,8 +95,8 @@ inline int LinkCfg::idleIntv(void) const
 {
     int idleIntv = 0;
     switch (idleIntvIndex) {
-    case 0: idleIntv = ABS(qrand() % 5 + 1); break;
-    case 1: idleIntv = ABS(qrand() % 10 + 1); break;
+    case 0: idleIntv = ABS(QRandomGenerator::global()->bounded(0u, 4u) + 1); break;
+    case 1: idleIntv = ABS(QRandomGenerator::global()->bounded(0u, 9u) + 1); break;
     case 2: idleIntv = 1; break;
     case 3: idleIntv = 2; break;
     case 4: idleIntv = 5; break;
