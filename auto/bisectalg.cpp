@@ -97,13 +97,13 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     if (flag == true) {
         m_prvGlbChId = optChId;
         m_valid[m_prvGlbChId] = true;
+        m_firstStage = false;
     }
 
     /* 捕获成功切状态 */
     if (out.isValid == true) {
         memset(m_valid, 0, sizeof(m_valid));
         m_valid[m_prvGlbChId] = true;
-        m_firstStage = false;
     }
     return m_regret;
 }
