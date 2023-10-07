@@ -47,25 +47,11 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     rsp->glb[0] = chId300K(m_prvGlbChId);
     rsp->glb[1] = align(m_prvGlbChId);
 
-    /* 搜索带宽3M/6M/9M */
-    int schband;
-    int rnd = rab1(0, 99, &m_seedi);
-    int maxWin = BASIC_SCH_WIN * MAX_SCH_WINX;
-    if (rnd < 40) { /* 40% */
-        schband = (maxWin >> 3);
-    } else if (rnd < 60) { /* 20% */
-        schband = (maxWin >> 2);
-    } else if (rnd < 80) { /* 20% */
-        schband = (maxWin >> 1);
-    } else { /* 20% */
-        schband = maxWin;
-    }
-    int schWin = schband / ONE_CHN_BW;
-
-    /* 限制搜索范围2M */
+    /* 限制搜索范围3M */
     int minGlbId = 0;
     int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
+        int schWin = BASIC_SCH_WIN / ONE_CHN_BW;
         minGlbId = MAX(m_prvGlbChId - schWin / 2, 0);
         maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
     }
@@ -82,7 +68,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     }
 
     /* 将二分频点提前 */
-    rnd = rab1(0, 99, &m_seedi);
+    int rnd = rab1(0, 99, &m_seedi);
     if (rnd < 40) {
         int tmp1 = rsp->glb[3];
         rsp->glb[3] = rsp->glb[1];

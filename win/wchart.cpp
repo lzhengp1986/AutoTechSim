@@ -17,8 +17,6 @@ WChart::WChart(void)
     m_lower = new QSplineSeries;
     m_upper->setName("upper");
     m_lower->setName("lower");
-    m_upper->setOpacity(0.2);
-    m_lower->setOpacity(0.2);
     m_upper->setPen(QPen(Qt::black, 1, Qt::DotLine));
     m_lower->setPen(QPen(Qt::black, 1, Qt::DotLine));
     chart->addSeries(m_upper);
