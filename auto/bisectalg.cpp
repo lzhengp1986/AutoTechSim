@@ -13,11 +13,11 @@ void BisectAlg::reset(void)
 
     /* 初始中心 */
     m_prvGlbChId = initChId();
-    m_firstStage = true;
 
     /* 清状态 */
     memset(m_valid, 0, sizeof(m_valid));
     m_valid[m_prvGlbChId] = true;
+    m_firstStage = true;
 }
 
 // 重新找中心点
@@ -33,6 +33,7 @@ void BisectAlg::restart(SqlIn& in)
     /* 清状态 */
     memset(m_valid, 0, sizeof(m_valid));
     m_valid[m_prvGlbChId] = true;
+    m_firstStage = true;
 }
 
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
@@ -179,11 +180,13 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
 // 找最好的中心
 bool BisectAlg::best(SqlIn& in, int& optChId)
 {
+    bool flag = false;
+
     /* 读取历史记录 */
     in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
     int n = m_sqlList.size();
     if (n <= 0) {
-        return false;
+        return flag;
     }
 
     /* 样本清零 */
@@ -214,18 +217,19 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
 
     /* 最大均值 */
     int maxIdx = 0;
-    float maxAvg = 0;
+    float maxAvg = INV_SNR;
     for (i = 0; i < n; i++) {
         glbChId = m_sqlList.at(i).glbChId;
         float snr = avgSnr(glbChId);
         if (snr > maxAvg) {
             maxIdx = glbChId;
             maxAvg = snr;
+            flag = true;
         }
     }
 
     optChId = maxIdx;
-    return true;
+    return flag;
 }
 
 // 平均snr
