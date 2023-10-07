@@ -25,8 +25,8 @@ WChart::WChart(void)
     /* 设置策略散点 */
     m_scan = new QScatterSeries;
     m_scan->setName("scan");
-    m_scan->setOpacity(0.7);
-    m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_scan->setOpacity(0.5);
+    m_scan->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scan->setBrush(QBrush(Qt::black));
     m_scan->setBorderColor(Qt::black);
     m_scan->setMarkerSize(1);
