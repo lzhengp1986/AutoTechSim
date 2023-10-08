@@ -145,8 +145,9 @@ inline int LinkCfg::schAlg(void) const
     switch (algIndex) {
     case 0: alg = RANDOM_SEARCH; break;
     case 1: alg = BISECTING_SEARCH; break;
-    case 2: alg = MONTE_CARLO_TREE; break;
-    case 3: alg = ITS_HF_PROPAGATION; break;
+    case 2: alg = BISEC_PLUS_SEARCH; break;
+    case 3: alg = MONTE_CARLO_TREE; break;
+    case 4: alg = ITS_HF_PROPAGATION; break;
     default: alg = RANDOM_SEARCH; break;
     }
     return alg;

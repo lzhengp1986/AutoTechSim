@@ -3,11 +3,7 @@
 // 构造
 BaseAlg::BaseAlg(void)
 {
-    set_head(0);
-    m_seedi = 1987;
-    m_regret = 0;
-    m_kmList.clear();
-    m_sqlList.clear();
+    reset();
 }
 
 // 析构
@@ -18,8 +14,11 @@ BaseAlg::~BaseAlg(void)
 // 复位函数
 void BaseAlg::reset(void)
 {
+    set_head(0);
     m_regret = 0;
     m_seedi = 1987;
+    m_kmList.clear();
+    m_sqlList.clear();
 }
 
 // 算法状态重置

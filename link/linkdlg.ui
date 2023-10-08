@@ -330,6 +330,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Bisecting+ Search</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Monte Carlo Tree</string>
          </property>
         </item>

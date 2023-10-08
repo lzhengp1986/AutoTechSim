@@ -79,10 +79,7 @@ private:
     Time *m_to; /* 定时器时间 */
 
     /* 算法实例化 */
-    BaseAlg *m_rand;
-    BisectAlg *m_sect;
-    ItshfAlg *m_itshf;
-    MonteAlg *m_mont;
+    BaseAlg *m_alg;
     SimSql *m_sql;
 
     /* 状态机 */

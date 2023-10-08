@@ -26,6 +26,7 @@ public:
 typedef enum {
     RANDOM_SEARCH = 0,
     BISECTING_SEARCH,
+    BISEC_PLUS_SEARCH,
     MONTE_CARLO_TREE,
     ITS_HF_PROPAGATION
 } AlgType;
