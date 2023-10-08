@@ -413,7 +413,7 @@ void LinkSim::sim_reset(void)
     } else if (algId == BISECTING_SEARCH) {
         m_alg = new BisectAlg;
     } else if (algId == BISEC_PLUS_SEARCH) {
-        m_alg = new BisectAlg;
+        m_alg = new BisectPlus;
     } else if (algId == MONTE_CARLO_TREE) {
         m_alg = new MonteAlg;
     } else if (algId == ITS_HF_PROPAGATION) {
