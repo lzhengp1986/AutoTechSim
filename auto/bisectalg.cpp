@@ -20,20 +20,11 @@ void BisectAlg::reset(void)
     m_firstStage = true;
 }
 
-// 重新找中心点
+// 复位
 void BisectAlg::restart(SqlIn& in)
 {
-    /* 找最好的中心 */
-    int optChId;
-    bool flag = best(in, optChId);
-    if (flag == true) {
-        m_prvGlbChId = optChId;
-    }
-
-    /* 清状态 */
-    memset(m_valid, 0, sizeof(m_valid));
-    m_valid[m_prvGlbChId] = true;
-    m_firstStage = true;
+    Q_UNUSED(in);
+    reset();
 }
 
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
@@ -67,17 +58,6 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
         rsp->glb[j++] = align(glbChId);
     }
 
-    /* 将二分频点提前 */
-    int rnd = rab1(0, 99, &m_seedi);
-    if (rnd < 40) {
-        int tmp1 = rsp->glb[3];
-        rsp->glb[3] = rsp->glb[1];
-        rsp->glb[1] = tmp1;
-        int tmp2 = rsp->glb[2];
-        rsp->glb[2] = rsp->glb[0];
-        rsp->glb[0] = tmp2;
-    }
-
     set_head(j);
     return m_rsp;
 }
@@ -91,19 +71,12 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     /* 能效评估 */
     BaseAlg::notify(in, glbChId, out);
 
-    /* 获取历史最优 */
-    int optChId;
-    bool flag = best(in, optChId);
-    if (flag == true) {
-        m_prvGlbChId = optChId;
-        m_valid[m_prvGlbChId] = true;
-        m_firstStage = false;
-    }
-
     /* 捕获成功切状态 */
     if (out.isValid == true) {
+        m_prvGlbChId = glbChId;
         memset(m_valid, 0, sizeof(m_valid));
         m_valid[m_prvGlbChId] = true;
+        m_firstStage = false;
     }
     return m_regret;
 }
@@ -163,8 +136,65 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
     return true;
 }
 
+// 重新找中心点
+void BisectPlus::restart(SqlIn& in)
+{
+    /* 找最好的中心 */
+    int optChId;
+    bool flag = best(in, optChId);
+    if (flag == true) {
+        m_prvGlbChId = optChId;
+    }
+
+    /* 清状态 */
+    memset(m_valid, 0, sizeof(m_valid));
+    m_valid[m_prvGlbChId] = true;
+    m_firstStage = true;
+}
+
+const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)
+{
+    /* 先调用基础二分算法 */
+    m_rsp = BisectAlg::bandit(in, req);
+
+    /* 50%将二分频点提前 */
+    int rnd = rab1(0, 99, &m_seedi);
+    if (rnd < 50) {
+        swap(0, 2);
+        swap(1, 3);
+    }
+
+    return m_rsp;
+}
+
+int BisectPlus::notify(SqlIn& in, int glbChId, const EnvOut& out)
+{
+    if (glbChId >= MAX_GLB_CHN) {
+        return m_regret;
+    }
+
+    /* 能效评估 */
+    BaseAlg::notify(in, glbChId, out);
+
+    /* 获取历史最优 */
+    int optChId;
+    bool flag = best(in, optChId);
+    if (flag == true) {
+        m_prvGlbChId = optChId;
+        m_valid[m_prvGlbChId] = true;
+        m_firstStage = false;
+    }
+
+    /* 捕获成功切状态 */
+    if (out.isValid == true) {
+        memset(m_valid, 0, sizeof(m_valid));
+        m_valid[m_prvGlbChId] = true;
+    }
+    return m_regret;
+}
+
 // 找最好的中心
-bool BisectAlg::best(SqlIn& in, int& optChId)
+bool BisectPlus::best(SqlIn& in, int& optChId)
 {
     bool flag = false;
 
@@ -181,24 +211,14 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
         glbChId = m_sqlList.at(i).glbChId;
         m_snrSum[glbChId] = 0;
         m_snrNum[glbChId] = 0;
-        m_vldNum[glbChId] = 0;
-        m_invNum[glbChId] = 0;
     }
 
     /* 样本统计 */
-    bool valid;
     for (i = 0; i < n; i++) {
         const FreqInfo& info = m_sqlList.at(i);
         glbChId = info.glbChId;
-        valid = info.valid;
-
-        /* SNR统计 */
         m_snrSum[glbChId] += info.snr;
         m_snrNum[glbChId] ++;
-
-        /* thompson统计 */
-        m_vldNum[glbChId] += (valid == true);
-        m_invNum[glbChId] += (valid == false);
     }
 
     /* 最大均值 */
@@ -219,7 +239,7 @@ bool BisectAlg::best(SqlIn& in, int& optChId)
 }
 
 // 平均snr
-float BisectAlg::avgSnr(int i)
+inline float BisectPlus::avgSnr(int i)
 {
     float avg = 0;
     if (m_snrNum[i] <= 0) {
@@ -228,5 +248,13 @@ float BisectAlg::avgSnr(int i)
 
     avg = (float)m_snrSum[i] / m_snrNum[i];
     return avg;
+}
+
+// 数据交换
+inline void BisectPlus::swap(int i, int j)
+{
+    int t = m_rsp.glb[i];
+    m_rsp.glb[i] = m_rsp.glb[j];
+    m_rsp.glb[j] = t;
 }
 
