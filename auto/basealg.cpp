@@ -49,7 +49,7 @@ int BaseAlg::initChId(void)
 {
     int half = MAX_GLB_CHN / 2;
     int win = BASIC_SCH_WIN / ONE_CHN_BW;
-    int r = rab1(0, MAX_GLB_CHN, &m_seedi);
+    int r = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
     int rand = r % win - (win >> 1);
     return align(half + rand);
 }

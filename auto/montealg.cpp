@@ -18,7 +18,7 @@ void MonteAlg::reset(void)
     BaseAlg::reset();
 
     /* 搜索树 */
-    tree(0, MAX_GLB_CHN);
+    tree(0, MAX_GLB_CHN - 1);
 
     /* 清除状态 */
     m_stage = MAX_SCH_WINX;
@@ -77,9 +77,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         int schWin = schband / ONE_CHN_BW;
         int halfWin = (schWin >> 1);
         minGlbId = MAX(sqlMin - halfWin, 0);
-        maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN);
+        maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN - 1);
     } else {
-        maxGlbId = MAX_GLB_CHN;
+        maxGlbId = MAX_GLB_CHN - 1;
         minGlbId = 0;
     }
 
@@ -261,7 +261,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
     };
 
     /* 初始化边界+随机 */
-    static bool used[MAX_GLB_CHN] = {0};
+    static bool used[MAX_GLB_CHN + 1] = {0};
     int rnd = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
     used[maxGlbId] = true;
     used[minGlbId] = true;
