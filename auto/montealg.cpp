@@ -99,7 +99,6 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 bool MonteAlg::kmean(SqlIn& in, int stage)
 {
     /* 读取记录 */
-    m_sqlList.clear();
     const Time* ts = in.stamp;
     in.mysql->select(SMPL_LINK, ts, in.myRule, m_sqlList);
     if (m_sqlList.isEmpty()) {
