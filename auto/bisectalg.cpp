@@ -24,7 +24,14 @@ void BisectAlg::reset(void)
 void BisectAlg::restart(SqlIn& in)
 {
     Q_UNUSED(in);
-    reset();
+
+    /* 初始中心 */
+    m_prvGlbChId = initChId();
+
+    /* 清状态 */
+    memset(m_valid, 0, sizeof(m_valid));
+    m_valid[m_prvGlbChId] = true;
+    m_firstStage = true;
 }
 
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
