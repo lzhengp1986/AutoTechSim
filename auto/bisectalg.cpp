@@ -25,12 +25,7 @@ void BisectAlg::restart(SqlIn& in)
 {
     Q_UNUSED(in);
 
-    /* 初始中心 */
-    m_prvGlbChId = initChId();
-
     /* 清状态 */
-    memset(m_valid, 0, sizeof(m_valid));
-    m_valid[m_prvGlbChId] = true;
     m_firstStage = true;
 }
 
@@ -42,8 +37,8 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
     /* 300KHz附近选点 */
-    rsp->glb[0] = chId300K(m_prvGlbChId);
-    rsp->glb[1] = align(m_prvGlbChId);
+    rsp->glb[0] = align(m_prvGlbChId);
+    rsp->glb[1] = chId300K(m_prvGlbChId);
 
     /* 限制搜索范围3M */
     int minGlbId = 0;
@@ -154,8 +149,6 @@ void BisectPlus::restart(SqlIn& in)
     }
 
     /* 清状态 */
-    memset(m_valid, 0, sizeof(m_valid));
-    m_valid[m_prvGlbChId] = true;
     m_firstStage = true;
 }
 
