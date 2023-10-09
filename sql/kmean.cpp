@@ -300,12 +300,23 @@ int KBeta::compare(int i, int j)
     int sj = m_grpInf[gj].avgSnr;
     float bi = m_grpInf[gi].beta;
     float bj = m_grpInf[gj].beta;
-    float xi = si * bi;
-    float xj = sj * bj;
-    if (xi > xj) {
-        return +1;
-    } else if (xi < xj) {
-        return -1;
+
+    if (si > sj) {
+        if (sj > 0) {
+            float xi = si * bi;
+            float xj = sj * bj;
+            return (xi > xj) ? +1 : -1;
+        } else {
+            return +1;
+        }
+    } else if (si < sj) {
+        if (si > 0) {
+            float xi = si * bi;
+            float xj = sj * bj;
+            return (xi < xj) ? -1 : +1;
+        } else {
+            return -1;
+        }
     } else {
         return 0;
     }
