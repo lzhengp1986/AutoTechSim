@@ -111,7 +111,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     int i, k;
 
     int minMin, minHr;
-    if (stage <= 1) {
+    if (stage >= (MAX_SCH_WINX >> 1)) {
         /* case1:30min */
         if (ts->min > 30) {
             /* 当前小时 */
@@ -152,7 +152,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
         }
     }
 
-    if (stage <= 2) {
+    if (stage >= (MAX_SCH_WINX >> 2)) {
         /* case2: 1hour */
         k = ts->hour;
         minMin = ts->min;
