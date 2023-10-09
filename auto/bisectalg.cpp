@@ -138,6 +138,17 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
     return true;
 }
 
+BisectPlus::BisectPlus(void)
+{
+    m_cluster = new KMean;
+}
+
+BisectPlus::~BisectPlus(void)
+{
+    delete m_cluster;
+    m_cluster = nullptr;
+}
+
 // 重新找中心点
 void BisectPlus::restart(SqlIn& in)
 {
@@ -196,58 +207,78 @@ int BisectPlus::notify(SqlIn& in, int glbChId, const EnvOut& out)
 // 找最好的中心
 bool BisectPlus::best(SqlIn& in, int& optChId)
 {
-    bool flag = false;
-
     /* 读取历史记录 */
-    in.mysql->select(SMPL_LINK, in.stamp, in.myRule, m_sqlList);
-    int n = m_sqlList.size();
-    if (n <= 0) {
-        return flag;
+    const Time* ts = in.stamp;
+    in.mysql->select(SMPL_LINK, ts, in.myRule, m_sqlList);
+    if (m_sqlList.isEmpty()) {
+        return false;
     }
 
     /* 样本清零 */
-    int i, glbChId;
-    for (i = 0; i < n; i++) {
-        glbChId = m_sqlList.at(i).glbChId;
-        m_snrSum[glbChId] = 0;
-        m_snrNum[glbChId] = 0;
-    }
+    m_cluster->clear();
+    int n = m_sqlList.size();
+    int i, k;
 
-    /* 样本统计 */
-    for (i = 0; i < n; i++) {
-        const FreqInfo& info = m_sqlList.at(i);
-        glbChId = info.glbChId;
-        m_snrSum[glbChId] += info.snr;
-        m_snrNum[glbChId] ++;
-    }
+    int minMin, minHr;
+    if (m_firstStage == false) {
+        /* case1:30min */
+        if (ts->min > 30) {
+            /* 当前小时 */
+            minHr = ts->hour;
+            minMin = ts->min - 30;
+            for (i = 0; i < n; i++) {
+                FreqInfo& info = m_sqlList[i];
+                if (info.isNew == false) {
+                    continue;
+                }
+                if ((info.hour == minHr) && (info.min >= minMin)) {
+                    m_cluster->push(info);
+                    info.isNew = false;
+                }
+            }
+        } else {
+            /* 当前小时+前1小时 */
+            k = ts->hour;
+            minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+            minMin = (ts->min + 60 - 30) % 60;
+            for (i = 0; i < n; i++) {
+                FreqInfo& info = m_sqlList[i];
+                if (info.isNew == false) {
+                    continue;
+                }
+                if (((info.hour == minHr) && (info.min >= minMin))
+                    || ((info.hour == k) && (info.min <= ts->min))) {
+                    m_cluster->push(info);
+                    info.isNew = false;
+                }
+            }
+        }
 
-    /* 最大均值 */
-    int maxIdx = 0;
-    float maxAvg = INV_SNR;
-    for (i = 0; i < n; i++) {
-        glbChId = m_sqlList.at(i).glbChId;
-        float snr = avgSnr(glbChId);
-        if (snr > maxAvg) {
-            maxIdx = glbChId;
-            maxAvg = snr;
-            flag = true;
+        /* case1样本聚类 */
+        int n30m = m_cluster->sche(m_kmList);
+        if (n30m > 0) {
+            optChId = m_kmList.at(0);
+            return true;
         }
     }
 
-    optChId = maxIdx;
-    return flag;
-}
-
-// 平均snr
-inline float BisectPlus::avgSnr(int i)
-{
-    float avg = 0;
-    if (m_snrNum[i] <= 0) {
-        return avg;
+    /* case2: 所有样本 */
+    for (i = 0; i < n; i++) {
+        const FreqInfo& info = m_sqlList[i];
+        if (info.isNew == false) {
+            continue;
+        }
+        m_cluster->push(info);
     }
 
-    avg = (float)m_snrSum[i] / m_snrNum[i];
-    return avg;
+    /* case2样本聚类 */
+    int n1h = m_cluster->sche(m_kmList);
+    if (n1h > 0) {
+        optChId = m_kmList.at(0);
+        return true;
+    }
+
+    return false;
 }
 
 // 数据交换

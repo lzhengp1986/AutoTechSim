@@ -3,6 +3,7 @@
 
 #include "macro.h"
 #include "basealg.h"
+#include "sql/kmean.h"
 #include <string.h>
 
 class BisectAlg : public BaseAlg
@@ -29,6 +30,10 @@ protected:
 class BisectPlus : public BisectAlg
 {
 public:
+    BisectPlus(void);
+    ~BisectPlus(void);
+
+    /* api */
     virtual void restart(SqlIn& in);
     virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
@@ -37,12 +42,9 @@ private:
     /*! @brief 搜索SNR均值最优信道 */
     bool best(SqlIn& in, int& optChId);
     void swap(int i, int j);
-    float avgSnr(int i);
 
 private:
-    /* SNR统计 */
-    int m_snrSum[MAX_GLB_CHN];
-    int m_snrNum[MAX_GLB_CHN];
+    KMean *m_cluster;
 };
 
 #endif // BISECTALG_H
