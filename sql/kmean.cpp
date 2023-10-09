@@ -318,7 +318,7 @@ int KBeta::compare(int i, int j)
             return -1;
         }
     } else {
-        return 0;
+        return (bi > bj) ? +1 : -1;
     }
 }
 
