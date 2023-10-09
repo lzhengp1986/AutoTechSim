@@ -363,7 +363,7 @@ int LinkSim::sim_link(const Time* ts, int& dsec)
     dsec = ABS(diff);
 
     /* 每分钟上报link信息 */
-    if (dsec % 60 == 0) {
+    if (dsec % 60 == 30) {
         FreqRsp* rsp = &m_rsp;
         int index = rsp->used;
         int glbChId = rsp->glb[index];
