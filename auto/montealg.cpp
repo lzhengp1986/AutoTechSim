@@ -240,7 +240,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     /* 状态切换 */
     bool flag = out.isValid;
-    if ((flag == true) && (out.snr > 0)) {
+    if (flag == true) {
         m_stage = MAX(m_stage >> 1, 1);
         memset(m_valid, 0, sizeof(m_valid));
     }
@@ -304,8 +304,8 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         /* 统计初始化 */
         i = QRandomGenerator::global()->bounded(0, (int)MAX_TREE_LEN - 1);
         m_seed[fid] = prime[fid];
-        m_vldNum[fid] = 10;
-        m_invNum[fid] = 1;
+        m_vldNum[fid] = 0;
+        m_invNum[fid] = 0;
         fid++;
     }
 }
