@@ -23,8 +23,8 @@ public:
 private:
     /*! @brief 根据类型生成selec规则 */
     char* regular(int tab, const Time* ts, int rule);
-    char* today(int tab, const Time* ts, int hr);
-    char* month(int tab, const Time* ts, int hr);
+    char* backward(int tab, const Time* ts, int hr);
+    char* forward(int tab, const Time* ts, int hr);
 
 private:
     sqlite3* m_handle;

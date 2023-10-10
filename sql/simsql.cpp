@@ -51,7 +51,7 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
     return SQLITE_OK;
 }
 
-char* SimSql::today(int tab, const Time* ts, int hr)
+char* SimSql::backward(int tab, const Time* ts, int hr)
 {
     char* sql;
     int minDay, minHr;
@@ -72,7 +72,7 @@ char* SimSql::today(int tab, const Time* ts, int hr)
     } else {
         /* 简化: 不跨月/不跨年 */
         int md = ts->mdays();
-        minDay = (maxDay + md - 1) % md;
+        minDay = (maxDay + md - 1) % md + 1;
         minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and ((day=%d and hour>=%d) or day=%d) order by snr desc",
@@ -83,7 +83,7 @@ char* SimSql::today(int tab, const Time* ts, int hr)
     return sql;
 }
 
-char* SimSql::month(int tab, const Time* ts, int hr)
+char* SimSql::forward(int tab, const Time* ts, int hr)
 {
     char* sql;
     int minHr = ts->hour;
@@ -113,13 +113,13 @@ char* SimSql::regular(int tab, const Time* ts, int rule)
 {
     char* sql;
     switch (rule) {
-    case MONTH_4_HOUR: sql = month(tab, ts, 4); break;
-    case MONTH_2_HOUR: sql = month(tab, ts, 2); break;
-    case MONTH_1_HOUR: sql = month(tab, ts, 1); break;
-    case DAY_4_HOUR: sql = today(tab, ts, 4); break;
-    case DAY_2_HOUR: sql = today(tab, ts, 2); break;
-    case DAY_1_HOUR: sql = today(tab, ts, 1); break;
-    default: sql = month(tab, ts, 2); break;
+    case FORWARD_4HOUR: sql = forward(tab, ts, 4); break;
+    case FORWARD_2HOUR: sql = forward(tab, ts, 2); break;
+    case FORWARD_1HOUR: sql = forward(tab, ts, 1); break;
+    case BACKWARD_4HOUR: sql = backward(tab, ts, 4); break;
+    case BACKWARD_2HOUR: sql = backward(tab, ts, 2); break;
+    case BACKWARD_1HOUR: sql = backward(tab, ts, 1); break;
+    default: sql = forward(tab, ts, 2); break;
     }
 
     return sql;

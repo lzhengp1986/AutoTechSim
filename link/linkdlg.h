@@ -127,13 +127,13 @@ inline int LinkCfg::sqlRule(void) const
 {
     int rule = 0;
     switch (sqlRuleIndex) {
-    case 0: rule = DAY_4_HOUR; break;
-    case 1: rule = DAY_2_HOUR; break;
-    case 2: rule = DAY_1_HOUR; break;
-    case 3: rule = MONTH_4_HOUR; break;
-    case 4: rule = MONTH_2_HOUR; break;
-    case 5: rule = MONTH_1_HOUR; break;
-    default: rule = MONTH_4_HOUR; break;
+    case 0: rule = BACKWARD_4HOUR; break;
+    case 1: rule = BACKWARD_2HOUR; break;
+    case 2: rule = BACKWARD_1HOUR; break;
+    case 3: rule = FORWARD_1HOUR; break;
+    case 4: rule = FORWARD_2HOUR; break;
+    case 5: rule = FORWARD_4HOUR; break;
+    default: rule = FORWARD_1HOUR; break;
     }
 
     return rule;
@@ -164,6 +164,9 @@ public:
     /* api */
     void dlg2para(LinkCfg* cfg, QString& algName, QString& sqlRule);
     void para2dlg(const LinkCfg* cfg);
+
+private slots:
+    void on_alg_currentIndexChanged(int index);
 
 private:
     Ui::LinkDlg *ui;
