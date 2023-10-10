@@ -137,7 +137,7 @@
            <property name="styleSheet">
             <string notr="true">background-color:transparent;
 border-color:gray;
-color:blue;</string>
+color:black;</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
