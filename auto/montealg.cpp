@@ -31,7 +31,6 @@ void MonteAlg::restart(SqlIn& in)
     Q_UNUSED(in);
 
     /* 清除状态 */
-    memset(m_valid, 0, sizeof(m_valid));
     m_stage = MIN(m_stage << 1, MAX_SCH_WINX);
 }
 

@@ -32,7 +32,6 @@ void BisectAlg::restart(SqlIn& in)
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
 {
     Q_UNUSED(in);
-
     FreqRsp* rsp = &m_rsp;
     int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
