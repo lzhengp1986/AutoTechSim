@@ -53,10 +53,9 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
 
 char* SimSql::today(int tab, const Time* ts, int hr)
 {
+    char* sql;
     int minDay, minHr;
     int maxDay, maxHr;
-
-    char* sql;
     const char* tlist[] = {"SCAN", "LINK"};
 
     /* 计算定时 */
@@ -87,20 +86,19 @@ char* SimSql::today(int tab, const Time* ts, int hr)
 char* SimSql::month(int tab, const Time* ts, int hr)
 {
     char* sql;
-    int maxHr = ts->hour;
+    int minHr = ts->hour;
+    int maxHr = minHr + hr;
     const char* tlist[] = {"SCAN", "LINK"};
 
-    /* 不跨24小时 */
-    if (maxHr >= hr) {
-        /* 只有1段 */
-        int minHr = maxHr - hr;
+    if (maxHr < MAX_HOUR_NUM) {
+        /* 不跨24小时，只有1段 */
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and (hour>=%d and hour<=%d) order by snr desc",
                               tlist[tab], ts->year, ts->month,
                               minHr, maxHr);
     } else {
         /* 2段定时: min~24, 0~max */
-        int minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
+        maxHr %= MAX_HOUR_NUM;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and (hour>=%d or hour<=%d) order by snr desc",
                               tlist[tab], ts->year, ts->month,
