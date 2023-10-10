@@ -127,12 +127,10 @@ inline int LinkCfg::sqlRule(void) const
 {
     int rule = 0;
     switch (sqlRuleIndex) {
-    case 0: rule = BACKWARD_4HOUR; break;
-    case 1: rule = BACKWARD_2HOUR; break;
-    case 2: rule = BACKWARD_1HOUR; break;
-    case 3: rule = FORWARD_1HOUR; break;
-    case 4: rule = FORWARD_2HOUR; break;
-    case 5: rule = FORWARD_4HOUR; break;
+    case 0: rule = FORWARD_30MIN; break;
+    case 1: rule = FORWARD_1HOUR; break;
+    case 2: rule = FORWARD_2HOUR; break;
+    case 3: rule = FORWARD_4HOUR; break;
     default: rule = FORWARD_1HOUR; break;
     }
 

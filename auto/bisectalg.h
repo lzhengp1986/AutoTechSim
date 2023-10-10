@@ -36,7 +36,6 @@ public:
     /* api */
     virtual void restart(SqlIn& in);
     virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
-    virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
 private:
     /*! @brief 搜索SNR均值最优信道 */

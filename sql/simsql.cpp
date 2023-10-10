@@ -51,39 +51,34 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
     return SQLITE_OK;
 }
 
-char* SimSql::backward(int tab, const Time* ts, int hr)
+char* SimSql::fwdMin(int tab, const Time* ts, int min)
 {
     char* sql;
-    int minDay, minHr;
-    int maxDay, maxHr;
+    int minHr = ts->hour;
+    int minMin = ts->min;
+    int maxMin = minMin + min;
     const char* tlist[] = {"SCAN", "LINK"};
 
-    /* 计算定时 */
-    maxDay = ts->day;
-    maxHr = ts->hour;
-    if (maxHr >= hr) {
-        /* 同一天 */
-        minDay = maxDay;
-        minHr = maxHr - hr;
-        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and day=%d"
-                              " and (hour>=%d and hour<=%d) order by snr desc",
-                              tlist[tab], ts->year, ts->month, ts->day,
-                              minHr, maxHr);
+    if (maxMin < 60) {
+        /* 不跨小时 */
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and hour=%d"
+                              " and (min>=%d and min<=%d) order by snr desc",
+                              tlist[tab], ts->year, ts->month, minHr,
+                              minMin, maxMin);
     } else {
-        /* 简化: 不跨月/不跨年 */
-        int md = ts->mdays();
-        minDay = (maxDay + md - 1) % md + 1;
-        minHr = (maxHr + MAX_HOUR_NUM - hr) % MAX_HOUR_NUM;
-        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
-                              " and ((day=%d and hour>=%d) or day=%d) order by snr desc",
+        /* 2段定时 */
+        maxMin %= 60;
+        int maxHr = (minHr + 1) % MAX_HOUR_NUM;
+        sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and ((hour==%d and min>=%d)"
+                              " or (hour==%d and min<=%d)) order by snr desc",
                               tlist[tab], ts->year, ts->month,
-                              minDay, minHr, maxDay);
+                              minHr, minMin, maxHr, maxMin);
     }
 
     return sql;
 }
 
-char* SimSql::forward(int tab, const Time* ts, int hr)
+char* SimSql::fwdHour(int tab, const Time* ts, int hr)
 {
     char* sql;
     int minHr = ts->hour;
@@ -113,13 +108,11 @@ char* SimSql::regular(int tab, const Time* ts, int rule)
 {
     char* sql;
     switch (rule) {
-    case FORWARD_4HOUR: sql = forward(tab, ts, 4); break;
-    case FORWARD_2HOUR: sql = forward(tab, ts, 2); break;
-    case FORWARD_1HOUR: sql = forward(tab, ts, 1); break;
-    case BACKWARD_4HOUR: sql = backward(tab, ts, 4); break;
-    case BACKWARD_2HOUR: sql = backward(tab, ts, 2); break;
-    case BACKWARD_1HOUR: sql = backward(tab, ts, 1); break;
-    default: sql = forward(tab, ts, 2); break;
+    case FORWARD_30MIN: sql = fwdMin(tab, ts, 30); break;
+    case FORWARD_1HOUR: sql = fwdHour(tab, ts, 1); break;
+    case FORWARD_2HOUR: sql = fwdHour(tab, ts, 2); break;
+    case FORWARD_4HOUR: sql = fwdHour(tab, ts, 4); break;
+    default: sql = fwdHour(tab, ts, 2); break;
     }
 
     return sql;

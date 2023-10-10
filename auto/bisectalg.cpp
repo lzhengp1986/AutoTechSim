@@ -27,6 +27,7 @@ void BisectAlg::restart(SqlIn& in)
 
     /* 清状态 */
     m_firstStage = true;
+    memset(m_valid, 0, sizeof(m_valid));
 }
 
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
@@ -36,8 +37,12 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int n = MIN(req.fcNum, RSP_FREQ_NUM);
 
     /* 300KHz附近选点 */
-    rsp->glb[0] = align(m_prvGlbChId);
-    rsp->glb[1] = chId300K(m_prvGlbChId);
+    int f0 = align(m_prvGlbChId);
+    int f1 = chId300K(m_prvGlbChId);
+    m_valid[f0] = true;
+    m_valid[f1] = true;
+    rsp->glb[0] = f0;
+    rsp->glb[1] = f1;
 
     /* 限制搜索范围3M */
     int minGlbId = 0;
@@ -74,9 +79,8 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     /* 捕获成功切状态 */
     if (out.isValid == true) {
-        m_prvGlbChId = glbChId;
         memset(m_valid, 0, sizeof(m_valid));
-        m_valid[m_prvGlbChId] = true;
+        m_prvGlbChId = glbChId;
         m_firstStage = false;
     }
     return m_regret;
@@ -160,10 +164,18 @@ void BisectPlus::restart(SqlIn& in)
 
     /* 清状态 */
     m_firstStage = true;
+    memset(m_valid, 0, sizeof(m_valid));
 }
 
 const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)
 {
+    /* 获取历史最优 */
+    int optChId;
+    bool flag = best(in, optChId);
+    if (flag == true) {
+        m_prvGlbChId = optChId;
+    }
+
     /* 先调用基础二分算法 */
     m_rsp = BisectAlg::bandit(in, req);
 
@@ -175,32 +187,6 @@ const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)
     }
 
     return m_rsp;
-}
-
-int BisectPlus::notify(SqlIn& in, int glbChId, const EnvOut& out)
-{
-    if (glbChId >= MAX_GLB_CHN) {
-        return m_regret;
-    }
-
-    /* 能效评估 */
-    BaseAlg::notify(in, glbChId, out);
-
-    /* 获取历史最优 */
-    int optChId;
-    bool flag = best(in, optChId);
-    if (flag == true) {
-        m_prvGlbChId = optChId;
-        m_valid[m_prvGlbChId] = true;
-        m_firstStage = false;
-    }
-
-    /* 捕获成功切状态 */
-    if (out.isValid == true) {
-        memset(m_valid, 0, sizeof(m_valid));
-        m_valid[m_prvGlbChId] = true;
-    }
-    return m_regret;
 }
 
 // 找最好的中心
