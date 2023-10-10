@@ -50,3 +50,13 @@ void LinkDlg::para2dlg(const LinkCfg* cfg)
     ui->sqlRule->setCurrentIndex(cfg->sqlRuleIndex);
     ui->alg->setCurrentIndex(cfg->algIndex);
 }
+
+void LinkDlg::on_alg_currentIndexChanged(int index)
+{
+    if ((index == 0) || (index == 1)) {
+        ui->sqlRule->setEnabled(false);
+    } else {
+        ui->sqlRule->setEnabled(true);
+    }
+}
+

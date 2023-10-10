@@ -349,32 +349,32 @@
        <widget class="QComboBox" name="sqlRule">
         <item>
          <property name="text">
-          <string>day4h</string>
+          <string>-4hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>day2h</string>
+          <string>-2hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>day1h</string>
+          <string>-1hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>month4h</string>
+          <string>+1hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>month2h</string>
+          <string>+2hour</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>month1h</string>
+          <string>+4hour</string>
          </property>
         </item>
        </widget>
