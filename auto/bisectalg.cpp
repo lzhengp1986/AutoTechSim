@@ -3,6 +3,8 @@
 
 BisectAlg::BisectAlg(void)
 {
+    /* 短二搜索2MHz */
+    m_schWin = 2000;
     reset();
 }
 
@@ -21,13 +23,16 @@ void BisectAlg::reset(void)
 }
 
 // 复位
-void BisectAlg::restart(SqlIn& in)
+void BisectAlg::restart(SqlIn& in, unsigned& failNum)
 {
     Q_UNUSED(in);
-
-    /* 清状态 */
-    m_firstStage = true;
-    memset(m_valid, 0, sizeof(m_valid));
+    /* 短二每次探210个频率 */
+    const int restartThr = 20;
+    if (failNum >= restartThr) {
+        memset(m_valid, 0, sizeof(m_valid));
+        m_firstStage = true;
+        failNum = 0;
+    }
 }
 
 const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
@@ -44,13 +49,13 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     rsp->glb[0] = f0;
     rsp->glb[1] = f1;
 
-    /* 限制搜索范围3M */
+    /* 限制搜索范围 */
     int minGlbId = 0;
     int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
-        int schWin = BASIC_SCH_WIN / ONE_CHN_BW;
-        minGlbId = MAX(m_prvGlbChId - schWin / 2, 0);
-        maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
+        int schRng = m_schWin / ONE_CHN_BW + 1;
+        minGlbId = MAX(m_prvGlbChId - schRng / 2, 0);
+        maxGlbId = MIN(minGlbId + schRng, MAX_GLB_CHN - 1);
     }
 
     /* 二分搜索 */
@@ -143,6 +148,7 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
 
 BisectPlus::BisectPlus(void)
 {
+    m_schWin = OPT_SCH_WIN;
     m_cluster = new KMean;
 }
 
@@ -153,18 +159,21 @@ BisectPlus::~BisectPlus(void)
 }
 
 // 重新找中心点
-void BisectPlus::restart(SqlIn& in)
+void BisectPlus::restart(SqlIn& in, unsigned& failNum)
 {
-    /* 找最好的中心 */
-    int optChId;
-    bool flag = best(in, optChId);
-    if (flag == true) {
-        m_prvGlbChId = optChId;
-    }
+    if (failNum >= OPT_RESTART_THR) {
+        /* 找最好的中心 */
+        int optChId;
+        bool flag = best(in, optChId);
+        if (flag == true) {
+            m_prvGlbChId = optChId;
+        }
 
-    /* 清状态 */
-    m_firstStage = true;
-    memset(m_valid, 0, sizeof(m_valid));
+        /* 清状态 */
+        memset(m_valid, 0, sizeof(m_valid));
+        m_firstStage = true;
+        failNum = 0;
+    }
 }
 
 const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)

@@ -22,9 +22,10 @@ void BaseAlg::reset(void)
 }
 
 // 算法状态重置
-void BaseAlg::restart(SqlIn& in)
+void BaseAlg::restart(SqlIn& in, unsigned& failNum)
 {
     Q_UNUSED(in);
+    Q_UNUSED(failNum);
 }
 
 // 随机搜索
@@ -48,7 +49,7 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
 int BaseAlg::initChId(void)
 {
     int half = MAX_GLB_CHN / 2;
-    int win = BASIC_SCH_WIN / ONE_CHN_BW;
+    int win = OPT_SCH_WIN / ONE_CHN_BW;
     int r = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
     int rand = r % win - (win >> 1);
     return align(half + rand);
@@ -57,8 +58,9 @@ int BaseAlg::initChId(void)
 // 300KHz附近产生随机信道
 int BaseAlg::chId300K(int chId)
 {
-    int rnd = rab1(0, FST_RND_RNG, &m_seedi);
-    int glbChId = MAX(chId + rnd - FST_RND_RNG / 2, 0);
+    const int rndRng = 100;
+    int rnd = rab1(0, rndRng, &m_seedi);
+    int glbChId = MAX(chId + rnd - rndRng / 2, 0);
     return align(MIN(glbChId, MAX_GLB_CHN - 1));
 }
 

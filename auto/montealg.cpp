@@ -26,13 +26,14 @@ void MonteAlg::reset(void)
 }
 
 // 重头开始
-void MonteAlg::restart(SqlIn& in)
+void MonteAlg::restart(SqlIn& in, unsigned& failNum)
 {
     Q_UNUSED(in);
-
-    /* 清除状态 */
-    memset(m_valid, 0, sizeof(m_valid));
-    m_stage = MIN(m_stage << 1, MAX_SCH_WINX);
+    if (failNum >= OPT_RESTART_THR) {
+        memset(m_valid, 0, sizeof(m_valid));
+        m_stage = MIN(m_stage << 1, MAX_SCH_WINX);
+        failNum = 0;
+    }
 }
 
 const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
@@ -73,7 +74,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         /* 限制带宽 */
         int sqlMin = m_kmList.first();
         int sqlMax = m_kmList.back();
-        int schband = m_stage * BASIC_SCH_WIN;
+        int schband = m_stage * OPT_SCH_WIN;
         int schWin = schband / ONE_CHN_BW;
         int halfWin = (schWin >> 1);
         minGlbId = MAX(sqlMin - halfWin, 0);

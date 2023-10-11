@@ -4,6 +4,9 @@
 #include "basealg.h"
 #include "sql/kmean.h"
 
+/* 最大搜索窗系数 */
+#define MAX_SCH_WINX 8
+
 /* 搜索树大小 */
 #define MAX_TREE_LEN 128
 #define MAX_TREE_MSK 127
@@ -16,7 +19,7 @@ public:
 
     /* api */
     virtual void reset(void);
-    virtual void restart(SqlIn& in);
+    virtual void restart(SqlIn& in, unsigned& failNum);
     virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 

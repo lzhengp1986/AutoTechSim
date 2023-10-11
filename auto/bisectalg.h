@@ -13,7 +13,7 @@ public:
 
     /* api */
     virtual void reset(void);
-    virtual void restart(SqlIn& in);
+    virtual void restart(SqlIn& in, unsigned& failNum);
     virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
@@ -22,6 +22,7 @@ protected:
     bool bisect(int min, int max, int& glbChId);
 
 protected:
+    int m_schWin;
     int m_prvGlbChId;
     bool m_firstStage;
     bool m_valid[MAX_GLB_CHN];
@@ -34,7 +35,7 @@ public:
     ~BisectPlus(void);
 
     /* api */
-    virtual void restart(SqlIn& in);
+    virtual void restart(SqlIn& in, unsigned& failNum);
     virtual const FreqRsp& bandit(SqlIn& in, const FreqReq& req);
 
 private:

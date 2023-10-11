@@ -345,10 +345,7 @@ int LinkSim::sim_scan(const Time* ts, int& dsec)
         m_scanNok++;
 
         /* 失败次数过多，复位状态 */
-        if (m_scanNok >= MAX_SCAN_FAIL_THR) {
-            m_alg->restart(ain);
-            m_scanNok = 0;
-        }
+        m_alg->restart(ain, m_scanNok);
 
         /* 超时打点 */
         stamp(ts, m_link->idleIntv());

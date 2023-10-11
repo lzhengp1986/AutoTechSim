@@ -7,6 +7,11 @@
 #include "sql/util.h"
 #include <QList>
 
+/* 基本探索窗KHz */
+#define OPT_SCH_WIN 3000
+/* 扫频最大失败次数 */
+#define OPT_RESTART_THR 5
+
 class BaseAlg
 {
 public:
@@ -17,7 +22,7 @@ public:
     virtual void reset(void);
 
     /*! @brief 算法状态重置 */
-    virtual void restart(SqlIn& in);
+    virtual void restart(SqlIn& in, unsigned& failNum);
 
     /*!
      * @brief 推荐算法调度
