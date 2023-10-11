@@ -109,37 +109,38 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     /* 样本清零 */
     m_cluster->clear();
     int n = m_sqlList.size();
-    int i, k;
 
-    int minMin, minHr;
+    int i, maxMin, maxHr;
+    int minMin = ts->min;
+    int minHr = ts->hour;
     if (stage >= (MAX_SCH_WINX >> 1)) {
         /* case1:30min */
-        if (ts->min > 30) {
+        if (minMin < 30) {
             /* 当前小时 */
-            minHr = ts->hour;
-            minMin = ts->min - 30;
-            for (i = 0; i < n; i++) {
+            maxMin = minMin + 30;
+            for (int i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
                 if (info.isNew == false) {
                     continue;
                 }
-                if ((info.hour == minHr) && (info.min >= minMin)) {
+                if ((info.hour == minHr)
+                    && (info.min >= minMin)
+                    && (info.min <= maxMin)) {
                     m_cluster->push(info);
                     info.isNew = false;
                 }
             }
         } else {
-            /* 当前小时+前1小时 */
-            k = ts->hour;
-            minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
-            minMin = (ts->min + 60 - 30) % 60;
-            for (i = 0; i < n; i++) {
+            /* 当前小时+后1小时 */
+            maxMin = (minMin + 30) % 60;
+            maxHr = (minHr + 1) % MAX_HOUR_NUM;
+            for (int i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
                 if (info.isNew == false) {
                     continue;
                 }
                 if (((info.hour == minHr) && (info.min >= minMin))
-                    || ((info.hour == k) && (info.min <= ts->min))) {
+                    || ((info.hour == maxHr) && (info.min <= maxMin))) {
                     m_cluster->push(info);
                     info.isNew = false;
                 }
@@ -155,16 +156,14 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
 
     if (stage >= (MAX_SCH_WINX >> 2)) {
         /* case2: 1hour */
-        k = ts->hour;
-        minMin = ts->min;
-        minHr = (k + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+        maxHr = (minHr + 1) % MAX_HOUR_NUM;
         for (i = 0; i < n; i++) {
             FreqInfo& info = m_sqlList[i];
             if (info.isNew == false) {
                 continue;
             }
             if (((info.hour == minHr) && (info.min >= minMin))
-                || ((info.hour == k) && (info.min <= minMin))) {
+                || ((info.hour == maxHr) && (info.min <= minMin))) {
                 m_cluster->push(info);
                 info.isNew = false;
             }
