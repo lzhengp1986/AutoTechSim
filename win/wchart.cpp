@@ -26,7 +26,7 @@ WChart::WChart(void)
     m_scan = new QScatterSeries;
     m_scan->setName("scan");
     m_scan->setOpacity(0.5);
-    m_scan->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_scan->setMarkerShape(QScatterSeries::MarkerShapeTriangle);
     m_scan->setBrush(QBrush(Qt::black));
     m_scan->setBorderColor(Qt::black);
     m_scan->setMarkerSize(1);
@@ -34,7 +34,7 @@ WChart::WChart(void)
 
     m_link = new QScatterSeries;
     m_link->setName("link");
-    m_link->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    m_link->setMarkerShape(QScatterSeries::MarkerShapePentagon);
     m_link->setBrush(QBrush(Qt::blue));
     m_link->setBorderColor(Qt::blue);
     m_link->setMarkerSize(1);

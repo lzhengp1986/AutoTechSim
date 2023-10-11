@@ -186,7 +186,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     }
 
     /* case2样本聚类 */
-    k = m_cluster->sche(m_kmList);
+    int k = m_cluster->sche(m_kmList);
     return (k > 0);
 }
 
