@@ -53,11 +53,10 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     int minGlbId, maxGlbId;
     if (flag == true) {
         if (m_stage <= 1) {
-            /* f1:k0随机 */
+            /* f1:第1类k0 */
             k0 = m_kmList.at(0);
-            glbChId = chId300K(k0);
-            rsp->glb[fid++] = glbChId;
-            m_valid[glbChId] = true;
+            rsp->glb[fid++] = k0;
+            m_valid[k0] = true;
 
             /* f2:第2类 */
             if (m_kmList.size() > 1) {
@@ -66,9 +65,10 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
                 m_valid[glbChId] = true;
             }
 
-            /* f3:第1类k0 */
-            rsp->glb[fid++] = k0;
-            m_valid[k0] = true;
+            /* f3:k0随机 */
+            glbChId = chId300K(k0);
+            rsp->glb[fid++] = glbChId;
+            m_valid[glbChId] = true;
         }
 
         /* 限制带宽 */
