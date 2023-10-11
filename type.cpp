@@ -3,7 +3,7 @@
 // 初始日期
 #define INIT_YEAR  2023
 #define INIT_MONTH 1
-#define INIT_DAY   5
+#define INIT_DAY   1
 
 // 构造
 Time::Time(void)
