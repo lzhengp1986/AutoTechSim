@@ -51,7 +51,8 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int minGlbId = 0;
     int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
-        int schRng = 3000 / ONE_CHN_BW + 1;
+        const int schWin = 3000; /* KHz */
+        int schRng = schWin / ONE_CHN_BW + 1;
         minGlbId = MAX(m_prvGlbChId - schRng / 2, 0);
         maxGlbId = MIN(minGlbId + schRng, MAX_GLB_CHN - 1);
     }
