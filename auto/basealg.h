@@ -10,6 +10,9 @@
 /* 扫频最大失败次数 */
 #define OPT_RESTART_THR 5
 
+/* 基础搜索带宽KHz */
+#define BASIC_SCH_WIN 2000
+
 class BaseAlg
 {
 public:
@@ -40,8 +43,8 @@ public:
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
 protected:
+    int initChId(void);
     int chId300K(int chId);
-    int initChId(int win = 6000);
     static int level(int snrDelta);
     static int align(int glbChId);
     void set_head(int n);

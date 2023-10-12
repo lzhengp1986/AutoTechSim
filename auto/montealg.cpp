@@ -48,8 +48,8 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     int minGlbId, maxGlbId;
 
     /* 2.计算搜索带宽 */
-    int schband = m_stage * OPT_SCH_WIN;
-    int schWin = schband / ONE_CHN_BW;
+    int schRng = m_stage * BASIC_SCH_WIN;
+    int schWin = schRng / ONE_CHN_BW;
     int halfWin = (schWin >> 1);
 
     /* 3.聚类推荐 */

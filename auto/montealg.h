@@ -4,8 +4,7 @@
 #include "basealg.h"
 #include "sql/kmean.h"
 
-/* 最大搜索窗 */
-#define OPT_SCH_WIN 3000
+/* 最大搜索等级 */
 #define MAX_STAGE_NUM 16
 
 /* 搜索树大小 */

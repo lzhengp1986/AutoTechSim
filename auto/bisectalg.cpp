@@ -51,10 +51,9 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int minGlbId = 0;
     int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
-        const int schWin = 3000; /* KHz */
-        int schRng = schWin / ONE_CHN_BW + 1;
-        minGlbId = MAX(m_prvGlbChId - schRng / 2, 0);
-        maxGlbId = MIN(minGlbId + schRng, MAX_GLB_CHN - 1);
+        int schWin = BASIC_SCH_WIN / ONE_CHN_BW;
+        minGlbId = MAX(m_prvGlbChId - schWin / 2, 0);
+        maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
     }
 
     /* 二分搜索 */
