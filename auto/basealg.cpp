@@ -46,13 +46,11 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
 }
 
 // 15MHz附近产生随机信道
-int BaseAlg::initChId(void)
+int BaseAlg::initChId(int win)
 {
-    int half = MAX_GLB_CHN / 2;
-    int win = OPT_SCH_WIN / ONE_CHN_BW;
+    int chWin = win / ONE_CHN_BW;
     int r = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
-    int rand = r % win - (win >> 1);
-    return align(half + rand);
+    return align(MAX_GLB_CHN / 2 - (chWin >> 1) + (r % chWin));
 }
 
 // 300KHz附近产生随机信道
