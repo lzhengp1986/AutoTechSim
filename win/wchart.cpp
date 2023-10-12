@@ -34,7 +34,7 @@ WChart::WChart(void)
 
     m_link = new QScatterSeries;
     m_link->setName("link");
-    m_link->setMarkerShape(QScatterSeries::MarkerShapePentagon);
+    m_link->setMarkerShape(QScatterSeries::MarkerShapeStar);
     m_link->setBrush(QBrush(Qt::blue));
     m_link->setBorderColor(Qt::blue);
     m_link->setMarkerSize(1);

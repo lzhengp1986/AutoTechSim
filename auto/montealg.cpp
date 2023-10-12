@@ -24,7 +24,7 @@ void MonteAlg::reset(void)
     tree(0, MAX_GLB_CHN - 1);
 
     /* 清除状态 */
-    m_stage = MAX_SCH_WINX;
+    m_stage = MAX_STAGE_NUM;
     memset(m_valid, 0, sizeof(m_valid));
 }
 
@@ -34,7 +34,7 @@ void MonteAlg::restart(SqlIn& in, unsigned& failNum)
     Q_UNUSED(in);
     if (failNum >= OPT_RESTART_THR) {
         memset(m_valid, 0, sizeof(m_valid));
-        m_stage = MIN(m_stage << 1, MAX_SCH_WINX);
+        m_stage = MIN(m_stage << 1, MAX_STAGE_NUM);
         failNum = 0;
     }
 }
@@ -55,7 +55,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 3.聚类推荐 */
     FreqRsp* rsp = &m_rsp;
     if (flag == true) {
-        if (m_stage <= (MAX_SCH_WINX >> 1)) {
+        if (m_stage <= (MAX_STAGE_NUM >> 1)) {
             /* f0:第1类 */
             int f0 = m_kmList.at(0);
             rsp->glb[fid++] = f0;
@@ -119,7 +119,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     int i, maxMin, maxHr;
     int minMin = ts->min;
     int minHr = ts->hour;
-    if (stage >= (MAX_SCH_WINX >> 1)) {
+    if (stage >= (MAX_STAGE_NUM >> 1)) {
         /* case1:30min */
         if (minMin < 30) {
             /* 当前小时 */
@@ -160,7 +160,7 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
         }
     }
 
-    if (stage >= (MAX_SCH_WINX >> 2)) {
+    if (stage >= (MAX_STAGE_NUM >> 2)) {
         /* case2: 1hour */
         maxHr = (minHr + 1) % MAX_HOUR_NUM;
         for (i = 0; i < n; i++) {
