@@ -5,7 +5,7 @@
 #include "sql/kmean.h"
 
 /* 最大搜索窗系数 */
-#define MAX_SCH_WINX 8
+#define MAX_SCH_WINX 16
 
 /* 搜索树大小 */
 #define MAX_TREE_LEN 128
@@ -38,6 +38,7 @@ private:
 private:
     int m_stage; /* 失锁标志 */
     bool m_valid[MAX_GLB_CHN];
+    int m_prvGlbChId;
     KMean *m_cluster;
 
     /* 搜索树 */
