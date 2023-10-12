@@ -3,8 +3,6 @@
 
 BisectAlg::BisectAlg(void)
 {
-    /* 短二搜索2MHz */
-    m_schWin = 2000;
     reset();
 }
 
@@ -53,7 +51,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
     int minGlbId = 0;
     int maxGlbId = MAX_GLB_CHN - 1;
     if (m_firstStage == false) {
-        int schRng = m_schWin / ONE_CHN_BW + 1;
+        int schRng = 3000 / ONE_CHN_BW + 1;
         minGlbId = MAX(m_prvGlbChId - schRng / 2, 0);
         maxGlbId = MIN(minGlbId + schRng, MAX_GLB_CHN - 1);
     }
@@ -148,7 +146,6 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
 
 BisectPlus::BisectPlus(void)
 {
-    m_schWin = OPT_SCH_WIN;
     m_cluster = new KMean;
 }
 
