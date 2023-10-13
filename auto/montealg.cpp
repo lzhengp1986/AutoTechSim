@@ -59,16 +59,16 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             /* f0:第1类 */
             int f0 = m_kmList.at(0);
 
-            /* f1.MentaCarlo */
-            int f1 = thomp();
-            f1 = chId300K(f1);
-
-            /* f2:第2类 */
+            /* f1:第2类或f0随机 */
             if (m_kmList.size() > 1) {
-                f2 = m_kmList.at(1);
+                f1 = m_kmList.at(1);
             } else {
-                f2 = chId300K(f0);
+                f1 = chId300K(f0);
             }
+
+            /* f2.MentaCarlo */
+            f2 = thomp();
+            f2 = chId300K(f2);
 
             rsp->glb[fid++] = f0;
             rsp->glb[fid++] = f1;
@@ -77,7 +77,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             m_valid[f1] = true;
             m_valid[f2] = true;
 
-            /* f3:第3类或f0随机 */
+            /* f3:第3类 */
             if (m_kmList.size() > 2) {
                 f3 = m_kmList.at(2);
                 rsp->glb[fid++] = f3;
