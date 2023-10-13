@@ -159,7 +159,8 @@ BisectPlus::~BisectPlus(void)
 // 重新找中心点
 void BisectPlus::restart(SqlIn& in, unsigned& failNum)
 {
-    if (failNum >= OPT_RESTART_THR) {
+    const int restartThr = 5;
+    if (failNum >= restartThr) {
         /* 找最好的中心 */
         int optChId;
         bool flag = best(in, optChId);

@@ -32,7 +32,7 @@ void MonteAlg::reset(void)
 void MonteAlg::restart(SqlIn& in, unsigned& failNum)
 {
     Q_UNUSED(in);
-    if (failNum >= OPT_RESTART_THR) {
+    if (failNum >= m_stage) {
         memset(m_valid, 0, sizeof(m_valid));
         m_stage = MIN(m_stage << 1, MAX_STAGE_NUM);
         failNum = 0;

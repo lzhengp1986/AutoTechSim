@@ -7,9 +7,6 @@
 #include "sql/util.h"
 #include <QList>
 
-/* 扫频最大失败次数 */
-#define OPT_RESTART_THR 5
-
 /* 基础搜索带宽KHz */
 #define BASIC_SCH_WIN 2000
 
