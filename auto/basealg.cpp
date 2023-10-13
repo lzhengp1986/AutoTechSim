@@ -19,6 +19,7 @@ void BaseAlg::reset(void)
     m_seedi = 1987;
     m_kmList.clear();
     m_sqlList.clear();
+    m_positive = true;
 }
 
 // 算法状态重置

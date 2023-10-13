@@ -91,37 +91,38 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
 bool BisectAlg::bisect(int min, int max, int& glbChId)
 {
-    /* 二分搜索 */
-    int maxLen = 0;
+    int maxLen = -1;
     int start = m_prvGlbChId;
     int stop = m_prvGlbChId;
     m_valid[min] = true;
     m_valid[max] = true;
 
-    /* 正向 */
+    /* 二分搜索 */
     int i, j, k;
-    for (i = start, j = start + 1; j <= max; j++) {
-        if (m_valid[j] == true) {
-            k = j - i - 1;
-            if (k > maxLen) {
-                maxLen = k;
-                start = i;
-                stop = j;
+    m_positive ^= true;
+    if (m_positive == true) {
+        for (i = min, j = min + 1; j <= max; j++) {
+            if (m_valid[j] == true) {
+                k = j - i - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = i;
+                    stop = j;
+                }
+                i = j;
             }
-            i = j;
         }
-    }
-
-    /* 反向 */
-    for (i = m_prvGlbChId, j = m_prvGlbChId - 1; j >= min; j--) {
-        if (m_valid[j] == true) {
-            k = i - j - 1;
-            if (k > maxLen) {
-                maxLen = k;
-                start = j;
-                stop = i;
+    } else {
+        for (i = max, j = max - 1; j >= min; j--) {
+            if (m_valid[j] == true) {
+                k = i - j - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = j;
+                    stop = i;
+                }
+                i = j;
             }
-            i = j;
         }
     }
 
