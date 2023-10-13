@@ -44,9 +44,6 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 1.分层聚类 */
     bool flag = kmean(in, m_stage);
 
-    int glbChId, fid = 0;
-    int minGlbId, maxGlbId;
-
     /* 2.计算搜索带宽 */
     int schRng = m_stage * BASIC_SCH_WIN;
     int schWin = schRng / ONE_CHN_BW;
@@ -54,24 +51,38 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 
     /* 3.聚类推荐 */
     FreqRsp* rsp = &m_rsp;
+    int minGlbId, maxGlbId;
+    int f0, f1, f2, f3, fid = 0;
+
     if (flag == true) {
         if (m_stage <= (MAX_STAGE_NUM >> 1)) {
             /* f0:第1类 */
             int f0 = m_kmList.at(0);
-            rsp->glb[fid++] = f0;
-            m_valid[f0] = true;
 
-            /* f1:第2类 */
+            /* f1.MentaCarlo */
+            int f1 = thomp();
+            f1 = chId300K(f1);
+
+            /* f2:第2类 */
             if (m_kmList.size() > 1) {
-                glbChId = m_kmList.at(1);
-                rsp->glb[fid++] = glbChId;
-                m_valid[glbChId] = true;
+                f2 = m_kmList.at(1);
+            } else {
+                f2 = chId300K(f0);
             }
 
-            /* f2:f0随机 */
-            glbChId = chId300K(f0);
-            rsp->glb[fid++] = glbChId;
-            m_valid[glbChId] = true;
+            rsp->glb[fid++] = f0;
+            rsp->glb[fid++] = f1;
+            rsp->glb[fid++] = f2;
+            m_valid[f0] = true;
+            m_valid[f1] = true;
+            m_valid[f2] = true;
+
+            /* f3:第3类或f0随机 */
+            if (m_kmList.size() > 2) {
+                f3 = m_kmList.at(2);
+                rsp->glb[fid++] = f3;
+                m_valid[f3] = true;
+            }
         }
 
         /* 限制带宽 */
@@ -82,19 +93,19 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     } else {
         minGlbId = MAX(m_prvGlbChId - halfWin, 0);
         maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
-    }
 
-    /* 4.f3:MentaCarlo */
-    int f3 = thomp();
-    glbChId = chId300K(f3);
-    rsp->glb[fid++] = glbChId;
-    m_valid[glbChId] = true;
+        /* f0:MentaCarlo */
+        f0 = thomp();
+        f0 = chId300K(f0);
+        rsp->glb[fid++] = f0;
+        m_valid[f0] = true;
+    }
 
     /* 5.补充二分推荐 */
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
     while (fid < m) {
-        if (bisect(minGlbId, maxGlbId, glbChId)) {
-            rsp->glb[fid++] = align(glbChId);
+        if (bisect(minGlbId, maxGlbId, f0)) {
+            rsp->glb[fid++] = f0;
         }
     }
 
@@ -225,15 +236,17 @@ bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
     }
 
     /* 二分位 */
+    int median;
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
         int r = rab1(0, half, &m_seedi);
-        glbChId = start + r + quart;
+        median = start + r + quart;
     } else {
-        glbChId = (start + stop) >> 1;
+        median = (start + stop) >> 1;
     }
 
+    glbChId = align(median);
     m_valid[glbChId] = true;
     return true;
 }

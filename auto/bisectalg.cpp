@@ -64,7 +64,7 @@ const FreqRsp& BisectAlg::bandit(SqlIn& in, const FreqReq& req)
         if (flag == false) {
             break;
         }
-        rsp->glb[j++] = align(glbChId);
+        rsp->glb[j++] = glbChId;
     }
 
     set_head(j);
@@ -132,15 +132,17 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
     }
 
     /* 二分位 */
+    int median;
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
         int r = rab1(0, maxLen, &m_seedi);
-        glbChId = start + r % half + quart;
+        median = start + r % half + quart;
     } else {
-        glbChId = (start + stop) >> 1;
+        median = (start + stop) >> 1;
     }
 
+    glbChId = align(median);
     m_valid[glbChId] = true;
     return true;
 }
