@@ -36,7 +36,7 @@ private:
     int thomp(void);
 
 private:
-    int m_stage; /* 失锁标志 */
+    unsigned m_stage;
     bool m_valid[MAX_GLB_CHN];
     int m_prvGlbChId;
     KMean *m_cluster;
