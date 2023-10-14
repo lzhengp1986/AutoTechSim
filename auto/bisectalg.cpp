@@ -2,8 +2,8 @@
 #include <QtGlobal>
 
 BisectAlg::BisectAlg(void)
+    : m_bisect(new Bisecting)
 {
-    m_bisect = new Bisecting;
     reset();
 }
 
@@ -96,8 +96,8 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 }
 
 BisectPlus::BisectPlus(void)
+    : m_cluster(new KMean)
 {
-    m_cluster = new KMean;
 }
 
 BisectPlus::~BisectPlus(void)

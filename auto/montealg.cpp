@@ -2,10 +2,10 @@
 #include <QRandomGenerator>
 
 MonteAlg::MonteAlg(void)
+    : m_bisect(new Bisecting)
+    , m_cluster(new KBeta)
 {
     reset();
-    m_cluster = new KBeta;
-    m_bisect = new Bisecting;
 }
 
 MonteAlg::~MonteAlg(void)
