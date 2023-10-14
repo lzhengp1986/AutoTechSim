@@ -3,14 +3,20 @@
 
 KMean::KMean(int bw)
     : MAX_KM_BW(bw)
+    , m_rand(new RandGen(18181))
 {
     clear();
+}
+
+KMean::~KMean(void)
+{
+    delete m_rand;
+    m_rand = nullptr;
 }
 
 // 样本清零
 void KMean::clear(void)
 {
-    m_seed = 18181;
     memset(m_snrSum, 0, sizeof(m_snrSum));
     memset(m_smpCnt, 0, sizeof(m_smpCnt));
     memset(m_vldCnt, 0, sizeof(m_vldCnt));
@@ -207,7 +213,6 @@ int KMean::state(void)
     int smpCnt = 0;
     int vldNum = 0;
 
-    double px;
     for (i = 0; i < m_grpNum; i++) {
         ind = m_grpInd + i;
         inf = m_grpInf + i;
@@ -231,10 +236,10 @@ int KMean::state(void)
 
         /* 信息计算 */
         k = smpCnt - vldNum;
-        px = rbeta(vldNum + 1, k + 1, &m_seed);
+        BetaDist beta(vldNum + 1, k + 1);
+        inf->beta = (float)beta(*m_rand);
         inf->avgSnr = snrSum / smpCnt;
         inf->sumSnr = snrSum;
-        inf->beta = (float)px;
     }
 
     return m_grpNum;

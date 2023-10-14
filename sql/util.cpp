@@ -173,12 +173,3 @@ double rnd1(double *r)
     return p;
 }
 
-// 生成1个beta分布随机数
-double rbeta(double a, double b, double *r)
-{
-    double rx = rnd1(r);
-    boost::math::beta_distribution<> dist(a + 1, b + 1);
-    double ry = boost::math::quantile(dist, rx);
-    return ry;
-}
-

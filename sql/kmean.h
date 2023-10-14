@@ -2,7 +2,7 @@
 #define KMEAN_H
 
 #include "type.h"
-#include "env/randmng.h"
+#include "util.h"
 #include <QList>
 
 /* 压缩信道个数：5个一组 */
@@ -29,7 +29,7 @@ public:
      * @param [IN] bw 最大分裂带宽KHz
      */
     KMean(int bw = 300);
-    virtual ~KMean(void) {}
+    virtual ~KMean(void);
 
     /*! @brief 清样本 */
     void clear(void);
@@ -83,7 +83,7 @@ protected:
     int m_grpIdx[MAX_KM_NUM];
     KGInd m_grpInd[MAX_KM_NUM];
     KGInf m_grpInf[MAX_KM_NUM];
-    double m_seed;
+    RandGen* m_rand;
 };
 
 // 以加权SNR均值排序

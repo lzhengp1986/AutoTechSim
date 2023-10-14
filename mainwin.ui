@@ -212,7 +212,7 @@ color:blue;</string>
             <bool>true</bool>
            </property>
            <property name="maximumBlockCount">
-            <number>16</number>
+            <number>128</number>
            </property>
           </widget>
          </item>
@@ -381,7 +381,7 @@ color:blue;</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSim">

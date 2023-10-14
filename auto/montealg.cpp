@@ -4,16 +4,19 @@
 MonteAlg::MonteAlg(void)
     : m_bisect(new Bisecting)
     , m_cluster(new KBeta)
+    , m_rand(new RandGen(1987))
 {
     reset();
 }
 
 MonteAlg::~MonteAlg(void)
 {
+    delete m_rand;
     delete m_bisect;
     delete m_cluster;
     m_cluster = nullptr;
     m_bisect = nullptr;
+    m_rand = nullptr;
 }
 
 void MonteAlg::reset(void)
@@ -227,11 +230,6 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
 void MonteAlg::tree(int minGlbId, int maxGlbId)
 {
-    /* 质数表 */
-    static int prime[500] = {
-        #include "auto/prime.txt"
-    };
-
     /* 初始化边界+随机 */
     static bool used[MAX_GLB_CHN + 1] = {0};
     int rnd = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
@@ -274,8 +272,6 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
         used[k] = true;
 
         /* 统计初始化 */
-        i = QRandomGenerator::global()->bounded(0, (int)MAX_TREE_LEN - 1);
-        m_seed[fid] = prime[fid];
         m_vldNum[fid] = 0;
         m_invNum[fid] = 0;
         fid++;
@@ -297,20 +293,23 @@ void MonteAlg::thomp(int glbChId, bool flag)
     }
 
     /* 结果统计 */
-    m_vldNum[k] += (flag == true);
-    m_invNum[k] += (flag == false);
+    if (flag == true) {
+        m_vldNum[k]++;
+    } else {
+        m_invNum[k]++;
+    }
 }
 
 // thompson推荐
 int MonteAlg::thomp(void)
 {
     int k = 0;
-    double pi;
-
     /* 取最大概率对应信道 */
-    double pm = rbeta(m_vldNum[k] + 1, m_invNum[k] + 1, m_seed);
+    BetaDist beta(m_vldNum[k] + 1, m_invNum[k] + 1);
+    double pi, pm = beta(*m_rand);
     for (int i = 1; i < MAX_TREE_LEN; i++) {
-        pi = rbeta(m_vldNum[i] + 1, m_invNum[i] + 1, m_seed + i);
+        BetaDist beta(m_vldNum[i] + 1, m_invNum[i] + 1);
+        pi = beta(*m_rand);
         if (pi > pm) {
             pm = pi;
             k = i;
