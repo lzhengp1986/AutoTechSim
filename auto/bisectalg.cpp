@@ -92,15 +92,15 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 bool BisectAlg::bisect(int min, int max, int& glbChId)
 {
     int maxLen = -1;
-    int start = m_prvGlbChId;
-    int stop = m_prvGlbChId;
     m_valid[min] = true;
     m_valid[max] = true;
 
     /* 二分搜索 */
     int i, j, k;
+    int start, stop;
     m_positive ^= true;
     if (m_positive == true) {
+        start = stop = min;
         for (i = min, j = min + 1; j <= max; j++) {
             if (m_valid[j] == true) {
                 k = j - i - 1;
@@ -113,6 +113,7 @@ bool BisectAlg::bisect(int min, int max, int& glbChId)
             }
         }
     } else {
+        start = stop = max;
         for (i = max, j = max - 1; j >= min; j--) {
             if (m_valid[j] == true) {
                 k = i - j - 1;
