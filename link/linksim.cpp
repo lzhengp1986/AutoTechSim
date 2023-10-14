@@ -140,9 +140,14 @@ void LinkSim::free_time(void)
 // 定时器超时处理
 void LinkSim::on_timeout(void)
 {
+    /* 历史消息还未处理 */
+    if (m_active == true) {
+        return;
+    }
+
     /* 控制速度 */
     int msec = TIMER_INTERVAL_MS;
-    if ((m_state == IDLE) || (m_state == LINK)) {
+    if (m_state != WAIT) {
         int speed = m_link->timerSpeed();
         msec = speed * TIMER_INTERVAL_MS;
     }
@@ -199,11 +204,9 @@ void LinkSim::on_timeout(void)
     m_to->year++;
 
 SIMULATE:
+    *m_ts = *m_to;
     emit new_time(m_ts);
-    if (m_active == false) {
-        *m_ts = *m_to;
-        m_active = true;
-    }
+    m_active = true;
 }
 
 // 主调度函数
