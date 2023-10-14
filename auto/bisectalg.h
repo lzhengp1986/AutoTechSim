@@ -10,6 +10,7 @@ class BisectAlg : public BaseAlg
 {
 public:
     BisectAlg(void);
+    ~BisectAlg(void);
 
     /* api */
     virtual void reset(void);
@@ -18,14 +19,9 @@ public:
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
 protected:
-    /*! @brief 根据band二分搜索 */
-    bool bisect(int min, int max, int& glbChId);
-
-protected:
     int m_prvGlbChId;
     bool m_firstStage;
-    bool m_valid[MAX_GLB_CHN];
-    bool m_positive; /* 方向 */
+    Bisecting *m_bisect;
 };
 
 class BisectPlus : public BisectAlg

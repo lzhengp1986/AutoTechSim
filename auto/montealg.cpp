@@ -5,12 +5,15 @@ MonteAlg::MonteAlg(void)
 {
     reset();
     m_cluster = new KBeta;
+    m_bisect = new Bisecting;
 }
 
 MonteAlg::~MonteAlg(void)
 {
+    delete m_bisect;
     delete m_cluster;
     m_cluster = nullptr;
+    m_bisect = nullptr;
 }
 
 void MonteAlg::reset(void)
@@ -25,8 +28,7 @@ void MonteAlg::reset(void)
 
     /* 清除状态 */
     m_stage = MAX_STAGE_NUM;
-    memset(m_valid, 0, sizeof(m_valid));
-    m_positive = true;
+    m_bisect->clear();
 }
 
 // 重头开始
@@ -34,8 +36,8 @@ void MonteAlg::restart(SqlIn& in, unsigned& failNum)
 {
     Q_UNUSED(in);
     if (failNum >= m_stage) {
-        memset(m_valid, 0, sizeof(m_valid));
         m_stage = MIN(m_stage << 1, MAX_STAGE_NUM);
+        m_bisect->clear();
         failNum = 0;
     }
 }
@@ -74,9 +76,9 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             rsp->glb[fid++] = f0;
             rsp->glb[fid++] = f1;
             rsp->glb[fid++] = f2;
-            m_valid[f0] = true;
-            m_valid[f1] = true;
-            m_valid[f2] = true;
+            m_bisect->setValid(f0);
+            m_bisect->setValid(f1);
+            m_bisect->setValid(f2);
         }
 
         /* 限制带宽 */
@@ -92,13 +94,13 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         f0 = thomp();
         f0 = chId300K(f0);
         rsp->glb[fid++] = f0;
-        m_valid[f0] = true;
+        m_bisect->setValid(f0);
     }
 
     /* 4.补充二分推荐 */
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
     while (fid < m) {
-        if (bisect(minGlbId, maxGlbId, f0)) {
+        if (m_bisect->sche(minGlbId, maxGlbId, f0)) {
             rsp->glb[fid++] = f0;
         }
     }
@@ -201,65 +203,6 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     return (k > 0);
 }
 
-bool MonteAlg::bisect(int min, int max, int& glbChId)
-{
-    int maxLen = -1;
-    m_valid[min] = true;
-    m_valid[max] = true;
-
-    /* 二分搜索 */
-    int i, j, k;
-    int start, stop;
-    m_positive ^= true;
-    if (m_positive == true) {
-        start = stop = min;
-        for (i = min, j = min + 1; j <= max; j++) {
-            if (m_valid[j] == true) {
-                k = j - i - 1;
-                if (k > maxLen) {
-                    maxLen = k;
-                    start = i;
-                    stop = j;
-                }
-                i = j;
-            }
-        }
-    } else {
-        start = stop = max;
-        for (i = max, j = max - 1; j >= min; j--) {
-            if (m_valid[j] == true) {
-                k = i - j - 1;
-                if (k > maxLen) {
-                    maxLen = k;
-                    start = j;
-                    stop = i;
-                }
-                i = j;
-            }
-        }
-    }
-
-    /* 无可用频率 */
-    if (maxLen <= 1) {
-        return false;
-    }
-
-    /* 二分位 */
-    int median;
-    if (maxLen > 4) {
-        int half = maxLen >> 1;
-        int quart = half >> 1;
-        int r = rab1(0, maxLen, &m_seedi);
-        median = start + r % half + quart;
-    } else {
-        median = (start + stop) >> 1;
-    }
-
-    glbChId = align(median);
-    m_valid[glbChId] = true;
-    return true;
-}
-
 int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 {
     if (glbChId >= MAX_GLB_CHN) {
@@ -270,8 +213,8 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     bool flag = out.isValid;
     if (flag == true) {
         m_stage = MAX(m_stage >> 1, 1);
-        memset(m_valid, 0, sizeof(m_valid));
         m_prvGlbChId = glbChId;
+        m_bisect->clear();
     }
 
     /* thompson统计 */

@@ -39,11 +39,13 @@ public:
      */
     virtual int notify(SqlIn& in, int glbChId, const EnvOut& out);
 
+    /*! @brief 信道号按15KHz对齐 */
+    static int align(int glbChId);
+
 protected:
     int initChId(void);
     int chId300K(int chId);
     static int level(int snrDelta);
-    static int align(int glbChId);
     void set_head(int n);
 
 protected:
@@ -66,6 +68,39 @@ inline void BaseAlg::set_head(int n)
 inline int BaseAlg::align(int glbChId)
 {
     return (glbChId / CHN_SCAN_STEP) * CHN_SCAN_STEP;
+}
+
+// 基本二分算法
+class Bisecting
+{
+public:
+    Bisecting(void);
+    void clear(void);
+    void setValid(int glbChId);
+
+    /*!
+     * @brief 二分随机推荐算法
+     * @param [IN] min 最小全局信道号
+     * @param [IN] max 最大全局信道号
+     * @param [INOUT] glbChId 推荐信道
+     * @return bool 推荐是否有效
+     */
+    bool sche(int min, int max, int& glbChId);
+
+private:
+    bool m_valid[MAX_GLB_CHN];
+    bool m_positive; /* 方向 */
+    int m_seedi;
+};
+
+inline void Bisecting::clear(void)
+{
+    memset(m_valid, 0, sizeof(m_valid));
+}
+
+inline void Bisecting::setValid(int glbChId)
+{
+    m_valid[glbChId] = true;
 }
 
 #endif // BASEALG_H

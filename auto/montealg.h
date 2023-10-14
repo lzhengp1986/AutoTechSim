@@ -36,10 +36,9 @@ private:
     int thomp(void);
 
 private:
-    unsigned m_stage;
-    bool m_positive; /* 方向 */
-    bool m_valid[MAX_GLB_CHN];
     int m_prvGlbChId;
+    unsigned m_stage;
+    Bisecting *m_bisect;
     KMean *m_cluster;
 
     /* 搜索树 */

@@ -110,3 +110,70 @@ int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     return m_regret;
 }
 
+Bisecting::Bisecting(void)
+{
+    m_positive = true;
+    m_seedi = 1987;
+    clear();
+}
+
+// 二分随机推荐算法
+bool Bisecting::sche(int min, int max, int& glbChId)
+{
+    int maxLen = -1;
+    m_valid[min] = true;
+    m_valid[max] = true;
+
+    /* 二分搜索 */
+    int i, j, k;
+    int start, stop;
+    m_positive ^= true;
+    if (m_positive == true) {
+        start = stop = min;
+        for (i = min, j = min + 1; j <= max; j++) {
+            if (m_valid[j] == true) {
+                k = j - i - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = i;
+                    stop = j;
+                }
+                i = j;
+            }
+        }
+    } else {
+        start = stop = max;
+        for (i = max, j = max - 1; j >= min; j--) {
+            if (m_valid[j] == true) {
+                k = i - j - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = j;
+                    stop = i;
+                }
+                i = j;
+            }
+        }
+    }
+
+    /* 无可用频率 */
+    if (maxLen <= 1) {
+        return false;
+    }
+
+    /* 二分位 */
+    int median;
+    if (maxLen > 4) {
+        int half = maxLen >> 1;
+        int quart = half >> 1;
+        int r = rab1(0, maxLen, &m_seedi);
+        median = start + r % half + quart;
+    } else {
+        median = (start + stop) >> 1;
+    }
+
+    glbChId = BaseAlg::align(median);
+    m_valid[glbChId] = true;
+    return true;
+}
+
