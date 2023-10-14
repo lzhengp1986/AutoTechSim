@@ -76,13 +76,6 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
             m_valid[f0] = true;
             m_valid[f1] = true;
             m_valid[f2] = true;
-
-            /* f3:第3类 */
-            if (m_kmList.size() > 2) {
-                f3 = m_kmList.at(2);
-                rsp->glb[fid++] = f3;
-                m_valid[f3] = true;
-            }
         }
 
         /* 限制带宽 */
@@ -101,7 +94,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         m_valid[f0] = true;
     }
 
-    /* 5.补充二分推荐 */
+    /* 4.补充二分推荐 */
     int m = MIN(req.fcNum, RSP_FREQ_NUM);
     while (fid < m) {
         if (bisect(minGlbId, maxGlbId, f0)) {
@@ -207,26 +200,41 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     return (k > 0);
 }
 
-bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
+bool MonteAlg::bisect(int min, int max, int& glbChId)
 {
-    /* 二分搜索 */
-    int maxLen = 0;
-    int start = minGlbId;
-    int stop = maxGlbId;
-    m_valid[minGlbId] = true;
-    m_valid[maxGlbId] = true;
+    int maxLen = -1;
+    m_valid[min] = true;
+    m_valid[max] = true;
 
-    /* 正向 */
+    /* 二分搜索 */
     int i, j, k;
-    for (i = minGlbId, j = minGlbId + 1; j <= maxGlbId; j++) {
-        if (m_valid[j] == true) {
-            k = j - i - 1;
-            if (k > maxLen) {
-                maxLen = k;
-                start = i;
-                stop = j;
+    int start, stop;
+    m_positive ^= true;
+    if (m_positive == true) {
+        start = stop = min;
+        for (i = min, j = min + 1; j <= max; j++) {
+            if (m_valid[j] == true) {
+                k = j - i - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = i;
+                    stop = j;
+                }
+                i = j;
             }
-            i = j;
+        }
+    } else {
+        start = stop = max;
+        for (i = max, j = max - 1; j >= min; j--) {
+            if (m_valid[j] == true) {
+                k = i - j - 1;
+                if (k > maxLen) {
+                    maxLen = k;
+                    start = j;
+                    stop = i;
+                }
+                i = j;
+            }
         }
     }
 
@@ -240,8 +248,8 @@ bool MonteAlg::bisect(int minGlbId, int maxGlbId, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        int r = rab1(0, half, &m_seedi);
-        median = start + r + quart;
+        int r = rab1(0, maxLen, &m_seedi);
+        median = start + r % half + quart;
     } else {
         median = (start + stop) >> 1;
     }
