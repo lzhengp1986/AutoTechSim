@@ -37,6 +37,7 @@ private:
 
 private:
     unsigned m_stage;
+    bool m_positive; /* 方向 */
     bool m_valid[MAX_GLB_CHN];
     int m_prvGlbChId;
     KMean *m_cluster;

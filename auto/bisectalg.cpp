@@ -18,6 +18,7 @@ void BisectAlg::reset(void)
     memset(m_valid, 0, sizeof(m_valid));
     m_valid[m_prvGlbChId] = true;
     m_firstStage = true;
+    m_positive = true;
 }
 
 // 复位

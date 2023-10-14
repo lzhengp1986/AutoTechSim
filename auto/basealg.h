@@ -51,7 +51,6 @@ protected:
     unsigned m_regret; /* 懊悔值 */
     QList<int> m_kmList; /* KMean列表 */
     QList<FreqInfo> m_sqlList; /* SQL列表 */
-    bool m_positive; /* 二分搜索方向 */
     int m_seedi; /* 整数随机种子 */
 };
 

@@ -25,6 +25,7 @@ protected:
     int m_prvGlbChId;
     bool m_firstStage;
     bool m_valid[MAX_GLB_CHN];
+    bool m_positive; /* 方向 */
 };
 
 class BisectPlus : public BisectAlg

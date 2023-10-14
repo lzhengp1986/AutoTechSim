@@ -26,6 +26,7 @@ void MonteAlg::reset(void)
     /* 清除状态 */
     m_stage = MAX_STAGE_NUM;
     memset(m_valid, 0, sizeof(m_valid));
+    m_positive = true;
 }
 
 // 重头开始
@@ -52,7 +53,7 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     /* 3.聚类推荐 */
     FreqRsp* rsp = &m_rsp;
     int minGlbId, maxGlbId;
-    int f0, f1, f2, f3, fid = 0;
+    int f0, f1, f2, fid = 0;
 
     if (flag == true) {
         if (m_stage <= (MAX_STAGE_NUM >> 1)) {
