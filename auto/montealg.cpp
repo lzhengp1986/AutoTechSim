@@ -51,7 +51,11 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
     bool flag = kmean(in, m_stage);
 
     /* 2.计算搜索带宽 */
-    int schRng = m_stage * BASIC_SCH_WIN;
+    UnifIntDist dist(0, 99);
+    int rnd = dist(*m_gen[RSV]);
+    int stageX2 = MIN(m_stage << 1, MAX_STAGE_NUM);
+    int stage = (rnd < 50) ? m_stage : stageX2;
+    int schRng = stage * BASIC_SCH_WIN;
     int schWin = schRng / ONE_CHN_BW;
     int halfWin = (schWin >> 1);
 
