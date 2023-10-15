@@ -323,8 +323,7 @@ bool DbDlg::db_open(sqlite3** db)
 
     /* 创建表格 */
     const char *sql2 = "CREATE TABLE IF NOT EXISTS ITU(year INTEGER, month INTEGER, ssn INTEGER, hour INTEGER,"
-                       "freq INTEGER, mufday INTEGER, dbu INTEGER, snr INTEGER, rel INTEGER, sprb INTEGER,"
-                       "UNIQUE(year, month, ssn, hour, freq) ON CONFLICT IGNORE)";
+                       "freq INTEGER, mufday INTEGER, dbu INTEGER, snr INTEGER, rel INTEGER, sprb INTEGER)";
     int rc2 = sqlite3_exec(*db, sql2, 0, 0, &errMsg);
     if (rc2 != SQLITE_OK) {
         QString info = QString(QLatin1String(errMsg));

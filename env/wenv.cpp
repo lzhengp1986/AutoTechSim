@@ -154,7 +154,7 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
     }
 
     /* step3.随机数拟合MUFday/SNR */
-    int rnd = m_frqRnd.rab(glbChId, 0, 100);
+    int rnd = m_frqRnd.rab(glbChId, 0, 99);
     if (rnd < mufday) {
         int u = GRN_U(snr);
         int g = GRN_G(snr);
