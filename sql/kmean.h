@@ -83,7 +83,7 @@ protected:
     int m_grpIdx[MAX_KM_NUM];
     KGInd m_grpInd[MAX_KM_NUM];
     KGInf m_grpInf[MAX_KM_NUM];
-    RandGen* m_rand;
+    RandGen* m_gen;
 };
 
 // 以加权SNR均值排序

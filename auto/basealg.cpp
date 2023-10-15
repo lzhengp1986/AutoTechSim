@@ -3,12 +3,20 @@
 // 构造
 BaseAlg::BaseAlg(void)
 {
+    int seed[] = {1987, 1997, 2017, 2087, 2137};
+    for (int i = 0; i < NUM; i++) {
+        m_gen[i] = new RandGen(seed[i]);
+    }
     reset();
 }
 
 // 析构
 BaseAlg::~BaseAlg(void)
 {
+    for (int i = 0; i < NUM; i++) {
+        delete m_gen[i];
+        m_gen[i] = nullptr;
+    }
 }
 
 // 复位函数
@@ -16,7 +24,6 @@ void BaseAlg::reset(void)
 {
     set_head(0);
     m_regret = 0;
-    m_seedi = 1987;
     m_kmList.clear();
     m_sqlList.clear();
 }
@@ -37,8 +44,9 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
     set_head(n);
 
     int i, j;
+    UnifIntDist dist(0, MAX_GLB_CHN - 1);
     for (i = 0; i < n; i++) {
-        j = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
+        j = dist(*m_gen[ALG]);
         rsp->glb[i] = align(j);
     }
 
@@ -48,17 +56,25 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
 // 15MHz附近产生随机信道
 int BaseAlg::initChId(void)
 {
+    /* 随机数 */
     int chWin = BASIC_SCH_WIN / ONE_CHN_BW;
-    int r = rab1(0, MAX_GLB_CHN - 1, &m_seedi);
-    return align(MAX_GLB_CHN / 2 - (chWin >> 1) + (r % chWin));
+    UnifIntDist dist(0, chWin - 1);
+    int rnd = dist(*m_gen[INIT]);
+
+    /* 频段中心随机偏移 */
+    return align(MAX_GLB_CHN / 2 - (chWin >> 1) + rnd);
 }
 
 // 300KHz附近产生随机信道
 int BaseAlg::chId300K(int chId)
 {
+    /* 随机数 */
     const int rndRng = 100;
-    int rnd = rab1(0, rndRng, &m_seedi);
-    int glbChId = MAX(chId + rnd - rndRng / 2, 0);
+    UnifIntDist dist(0, rndRng);
+    int rnd = dist(*m_gen[K300]);
+
+    /* 随机偏移 */
+    int glbChId = MAX(chId + rnd - (rndRng >> 1), 0);
     return align(MIN(glbChId, MAX_GLB_CHN - 1));
 }
 
@@ -111,10 +127,16 @@ int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 }
 
 Bisecting::Bisecting(void)
+    : m_gen(new RandGen(1987))
 {
     m_positive = true;
-    m_seedi = 1987;
     clear();
+}
+
+Bisecting::~Bisecting(void)
+{
+    delete m_gen;
+    m_gen = nullptr;
 }
 
 // 二分随机推荐算法
@@ -166,8 +188,9 @@ bool Bisecting::sche(int min, int max, int& glbChId)
     if (maxLen > 4) {
         int half = maxLen >> 1;
         int quart = half >> 1;
-        int r = rab1(0, maxLen, &m_seedi);
-        median = start + r % half + quart;
+        UnifIntDist dist(0, half);
+        int rnd = dist(*m_gen);
+        median = start + rnd + quart;
     } else {
         median = (start + stop) >> 1;
     }

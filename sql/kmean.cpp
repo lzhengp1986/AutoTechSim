@@ -3,15 +3,15 @@
 
 KMean::KMean(int bw)
     : MAX_KM_BW(bw)
-    , m_rand(new RandGen(18181))
+    , m_gen(new RandGen(18181))
 {
     clear();
 }
 
 KMean::~KMean(void)
 {
-    delete m_rand;
-    m_rand = nullptr;
+    delete m_gen;
+    m_gen = nullptr;
 }
 
 // 样本清零
@@ -237,7 +237,7 @@ int KMean::state(void)
         /* 信息计算 */
         k = smpCnt - vldNum;
         BetaDist beta(vldNum + 1, k + 1);
-        inf->beta = (float)beta(*m_rand);
+        inf->beta = (float)beta(*m_gen);
         inf->avgSnr = snrSum / smpCnt;
         inf->sumSnr = snrSum;
     }

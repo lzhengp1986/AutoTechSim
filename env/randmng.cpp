@@ -9,14 +9,21 @@ RandMng::RandMng(void)
     int msec = QTime::currentTime().msecsSinceStartOfDay();
     QRandomGenerator rnd((uint)msec);
 
-    int i, j, k = INT32_MAX;
-    for (i = 0; i <= MAX_GLB_CHN; i++) {
-        j = rnd.bounded(k);
-        m_fseed[i] = rnd.bounded(k);
-        if ((j <= 0) || ((j & 0x1) == 0)) {
-            m_iseed[i] = j + 1;
-        } else {
-            m_iseed[i] = j;
+    int i, j, k;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j <= MAX_GLB_CHN; j++) {
+            k = rnd.bounded(INT32_MAX);
+            m_gen[i][j] = new RandGen(k);
+        }
+    }
+}
+
+RandMng::~RandMng(void)
+{
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j <= MAX_GLB_CHN; j++) {
+            delete m_gen[i][j];
         }
     }
 }
@@ -29,10 +36,8 @@ int RandMng::rab(int glbChId, int a, int b)
     }
 
     /* 生成随机数 */
-    int seed = m_iseed[glbChId];
-    int data = rab1(a, b, &seed);
-    m_iseed[glbChId] = seed;
-    return data;
+    UnifIntDist dist(a, b);
+    return dist(*m_gen[0][glbChId]);
 }
 
 int RandMng::grn(int glbChId, int u, int g)
@@ -43,9 +48,8 @@ int RandMng::grn(int glbChId, int u, int g)
     }
 
     /* 生成随机数 */
-    double seed = m_fseed[glbChId];
-    double data = grn1(u, g, &seed);
-    m_fseed[glbChId] = seed;
+    NormDist dist(u, g);
+    double data = dist(*m_gen[1][glbChId]);
     return (int)data;
 }
 

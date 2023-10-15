@@ -53,7 +53,9 @@ protected:
     unsigned m_regret; /* 懊悔值 */
     QList<int> m_kmList; /* KMean列表 */
     QList<FreqInfo> m_sqlList; /* SQL列表 */
-    int m_seedi; /* 整数随机种子 */
+
+    enum {INIT = 0, K300, ALG, RSV, NUM};
+    RandGen *m_gen[NUM]; /* 随机数生成器 */
 };
 
 // 填写消息头
@@ -75,7 +77,11 @@ class Bisecting
 {
 public:
     Bisecting(void);
+    ~Bisecting(void);
+
+    /*! @brief 清标志 */
     void clear(void);
+    /*! @brief 置标志 */
     void setValid(int glbChId);
 
     /*!
@@ -90,7 +96,7 @@ public:
 private:
     bool m_valid[MAX_GLB_CHN];
     bool m_positive; /* 方向 */
-    int m_seedi;
+    RandGen *m_gen;
 };
 
 inline void Bisecting::clear(void)

@@ -138,7 +138,8 @@ const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)
     m_rsp = BisectAlg::bandit(in, req);
 
     /* 50%将二分频点提前 */
-    int rnd = rab1(0, 99, &m_seedi);
+    UnifIntDist dist(0, 99);
+    int rnd = dist(*m_gen[RSV]);
     if (rnd < 50) {
         swap(0, 2);
         swap(1, 3);
