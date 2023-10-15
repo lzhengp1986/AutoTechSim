@@ -45,19 +45,26 @@ void MonteAlg::restart(SqlIn& in, unsigned& failNum)
     }
 }
 
+// 计算搜索带宽
+inline int MonteAlg::schWin(void)
+{
+    UnifIntDist dist(0, 99);
+    int rnd = dist(*m_gen[RSV]);
+    int stageX2 = MIN(m_stage << 1, MAX_STAGE_NUM);
+    int stage = (rnd < 50) ? m_stage : stageX2;
+    int schRng = stage * BASIC_SCH_WIN;
+    int schWidth = schRng / ONE_CHN_BW;
+    return schWidth;
+}
+
 const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
 {
     /* 1.分层聚类 */
     bool flag = kmean(in, m_stage);
 
     /* 2.计算搜索带宽 */
-    UnifIntDist dist(0, 99);
-    int rnd = dist(*m_gen[RSV]);
-    int stageX2 = MIN(m_stage << 1, MAX_STAGE_NUM);
-    int stage = (rnd < 50) ? m_stage : stageX2;
-    int schRng = stage * BASIC_SCH_WIN;
-    int schWin = schRng / ONE_CHN_BW;
-    int halfWin = (schWin >> 1);
+    int schWidth = schWin();
+    int halfWidth = (schWidth >> 1);
 
     /* 3.聚类推荐 */
     FreqRsp* rsp = &m_rsp;
@@ -91,11 +98,11 @@ const FreqRsp& MonteAlg::bandit(SqlIn& in, const FreqReq& req)
         /* 限制带宽 */
         int sqlMin = m_kmList.first();
         int sqlMax = m_kmList.back();
-        minGlbId = MAX(sqlMin - halfWin, 0);
-        maxGlbId = MIN(MAX(sqlMax + halfWin, minGlbId + schWin), MAX_GLB_CHN - 1);
+        minGlbId = MAX(sqlMin - halfWidth, 0);
+        maxGlbId = MIN(MAX(sqlMax + halfWidth, minGlbId + schWidth), MAX_GLB_CHN - 1);
     } else {
-        minGlbId = MAX(m_prvGlbChId - halfWin, 0);
-        maxGlbId = MIN(minGlbId + schWin, MAX_GLB_CHN - 1);
+        minGlbId = MAX(m_prvGlbChId - halfWidth, 0);
+        maxGlbId = MIN(minGlbId + schWidth, MAX_GLB_CHN - 1);
 
         /* f0:MentaCarlo */
         f0 = thomp();

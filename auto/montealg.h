@@ -34,6 +34,8 @@ private:
     void thomp(int glbChId, bool flag);
     /*! @brief thompson推荐 */
     int thomp(void);
+    /*! @brief 搜索带宽 */
+    int schWin(void);
 
 private:
     int m_prvGlbChId;
