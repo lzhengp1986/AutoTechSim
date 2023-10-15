@@ -19,7 +19,7 @@ public:
     int dbIndex; /* DB索引号 */
     int bandIndex; /* 最大可用带宽 */
     bool withNoise; /* 带底噪 */
-    QStringList dbDesc; /* DB名称列表 */
+    QString dbDesc; /* DB名称 */
 };
 
 // inline

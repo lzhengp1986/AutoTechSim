@@ -54,7 +54,28 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="3">
-    <widget class="QComboBox" name="list"/>
+    <widget class="QComboBox" name="list">
+     <item>
+      <property name="text">
+       <string>成都市区-乐山沐川</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>成都市区-陕西西安</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>成都市区-海南三亚</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>成都市区-西藏拉萨</string>
+      </property>
+     </item>
+    </widget>
    </item>
    <item row="1" column="5">
     <widget class="QSpinBox" name="year">

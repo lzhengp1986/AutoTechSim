@@ -148,7 +148,7 @@ void MainWin::display(const QString& algName, const QString& sqlRule)
     ui->infoText->clear();
 
     /* 模型参数 */
-    QString db = m_model->dbDesc.at(m_model->dbIndex);
+    QString db = m_model->dbDesc;
     QString date = QString("%1-%2").arg(m_model->year, 5).arg(m_model->month, 2, 10, QLatin1Char('0'));
     QString misc = QString("noise:%1 maxBW:%2").arg(m_model->withNoise).arg(m_model->get_maxband());
     ui->infoText->appendPlainText(db + date);
