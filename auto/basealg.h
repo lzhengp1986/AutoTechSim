@@ -95,8 +95,8 @@ public:
 
 private:
     bool m_valid[MAX_GLB_CHN];
-    bool m_positive; /* 方向 */
-    RandGen *m_gen;
+    enum {DIR = 0, ALG, NUM};
+    RandGen *m_gen[NUM];
 };
 
 inline void Bisecting::clear(void)
