@@ -40,7 +40,7 @@ int RandMng::rab(int glbChId, int a, int b)
     return dist(*m_gen[0][glbChId]);
 }
 
-int RandMng::grn(int glbChId, int u, int g)
+int RandMng::grn(int glbChId, double u, double g)
 {
     /* 参数检查 */
     if ((glbChId < 0) || (glbChId >= MAX_GLB_CHN)) {

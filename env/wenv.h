@@ -77,8 +77,8 @@ typedef struct {
 #define NOISE_NUM 640
 
 /* grn函数的入参模型 */
-#define GRN_U(snr) ((((snr) - 60) * 4.0f + 5) / 10)
-#define GRN_G(snr) (8 + 100.0f / MAX(ABS((snr) - 60), 10))
+#define GRN_U(snr) ((((snr) - 60) * 4.0 + 5) / 10)
+#define GRN_G(snr) (8 + 100.0 / MAX(ABS((snr) - 60), 10))
 
 class WEnv
 {

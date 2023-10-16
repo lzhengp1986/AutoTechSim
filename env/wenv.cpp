@@ -156,8 +156,8 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
     /* step3.随机数拟合MUFday/SNR */
     int rnd = m_frqRnd.rab(glbChId, 0, 99);
     if (rnd < mufday) {
-        int u = GRN_U(snr);
-        int g = GRN_G(snr);
+        double u = GRN_U(snr);
+        double g = GRN_G(snr);
         int expSnr = m_frqRnd.grn(glbChId, u, g);
         out.isValid = (expSnr > MIN_SNR);
         out.snr = expSnr;
@@ -181,8 +181,8 @@ void WEnv::fot(const EnvIn& in, EnvOut& out)
     int glbChId = in.glbChId;
     int rnd = m_fotRnd.rab(glbChId, 0, 100);
     if (rnd < mufday) {
-        int u = GRN_U(snr);
-        int g = GRN_G(snr);
+        double u = GRN_U(snr);
+        double g = GRN_G(snr);
         int expSnr = m_fotRnd.grn(glbChId, u, g);
         out.fotVld = (expSnr > MIN_SNR);
         out.fotSnr = expSnr;

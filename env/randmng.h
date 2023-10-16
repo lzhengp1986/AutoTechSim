@@ -11,7 +11,7 @@ public:
 
     /* api */
     int rab(int glbChId, int a, int b);
-    int grn(int glbChId, int u, int g);
+    int grn(int glbChId, double u, double g);
 
 private:
     RandGen *m_gen[2][MAX_GLB_CHN + 1];
