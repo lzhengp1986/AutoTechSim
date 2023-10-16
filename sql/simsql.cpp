@@ -54,25 +54,21 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
 char* SimSql::regMin(int tab, const Time* ts, int min)
 {
     char* sql;
-    int minHr = ts->hour;
-    int minMin = ts->min;
-    int maxMin = minMin + min;
+    int half = MIN(min, 59) >> 1;
+    Time prv = subMin(ts, half);
+    Time nxt = addMin(ts, half);
     const char* tlist[] = {"SCAN", "LINK"};
 
-    if (maxMin < 60) {
+    if (prv.hour == nxt.hour) {
         /* 不跨小时 */
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and hour=%d"
-                              " and (min>=%d and min<=%d) order by snr desc",
-                              tlist[tab], ts->year, ts->month, minHr,
-                              minMin, maxMin);
+                              " and (min>=%d and min<=%d) order by snr desc", tlist[tab],
+                              prv.year, prv.month, prv.hour, prv.min, nxt.min);
     } else {
         /* 2段定时 */
-        maxMin %= 60;
-        int maxHr = (minHr + 1) % MAX_HOUR_NUM;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d and ((hour==%d and min>=%d)"
-                              " or (hour==%d and min<=%d)) order by snr desc",
-                              tlist[tab], ts->year, ts->month,
-                              minHr, minMin, maxHr, maxMin);
+                              " or (hour==%d and min<=%d)) order by snr desc", tlist[tab],
+                              prv.year, prv.month, prv.hour, prv.min, nxt.hour, nxt.min);
     }
 
     return sql;
@@ -81,23 +77,21 @@ char* SimSql::regMin(int tab, const Time* ts, int min)
 char* SimSql::regHour(int tab, const Time* ts, int hr)
 {
     char* sql;
-    int minHr = ts->hour;
-    int maxHr = minHr + hr;
+    int half = MAX(hr, 2) >> 1;
+    Time prv = subHour(ts, half);
+    Time nxt = addHour(ts, half);
     const char* tlist[] = {"SCAN", "LINK"};
 
-    if (maxHr < MAX_HOUR_NUM) {
+    if (prv.day == nxt.day) {
         /* 不跨24小时，只有1段 */
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and (hour>=%d and hour<=%d) order by snr desc",
-                              tlist[tab], ts->year, ts->month,
-                              minHr, maxHr);
+                              tlist[tab], prv.year, prv.month, prv.hour, nxt.hour);
     } else {
         /* 2段定时: min~24, 0~max */
-        maxHr %= MAX_HOUR_NUM;
         sql = sqlite3_mprintf("select * from %s where year=%d and month=%d"
                               " and (hour>=%d or hour<=%d) order by snr desc",
-                              tlist[tab], ts->year, ts->month,
-                              minHr, maxHr);
+                              tlist[tab], prv.year, prv.month, prv.hour, nxt.hour);
     }
 
     return sql;
@@ -109,13 +103,123 @@ char* SimSql::regular(int tab, const Time* ts, int rule)
     char* sql;
     switch (rule) {
     case SQL_WIN_30MIN: sql = regMin(tab, ts, 30); break;
-    case SQL_WIN_1HOUR: sql = regHour(tab, ts, 1); break;
+    case SQL_WIN_1HOUR: sql = regMin(tab, ts, 60); break;
     case SQL_WIN_2HOUR: sql = regHour(tab, ts, 2); break;
     case SQL_WIN_4HOUR: sql = regHour(tab, ts, 4); break;
-    default: sql = regHour(tab, ts, 2); break;
+    default: sql = regMin(tab, ts, 60); break;
     }
 
     return sql;
+}
+
+// 减少x分钟
+Time SimSql::subMin(const Time* ts, int min)
+{
+    Time prv = *ts;
+
+    /* 足够抵消 */
+    if (ts->min >= min) {
+        prv.min = ts->min - min;
+        return prv;
+    }
+
+    /* hour抵扣 */
+    if (ts->hour > 0) {
+        prv.hour--;
+        prv.min = ts->min + 60 - min;
+        return prv;
+    }
+
+    /* day抵扣 */
+    if (ts->day > 1) {
+        prv.day--;
+        prv.hour = 23;
+        prv.min = ts->min + 60 - min;
+        return prv;
+    }
+
+    /* 回到原点 */
+    prv.min = 0;
+    return prv;
+}
+
+// 增加x分钟
+Time SimSql::addMin(const Time* ts, int min)
+{
+    Time next = *ts;
+
+    /* 不进位 */
+    next.min = ts->min + min;
+    if (next.min < 60) {
+        return next;
+    }
+    next.min -= 60;
+    next.hour++;
+
+    /* hour进位 */
+    if (next.hour < MAX_HOUR_NUM) {
+        return next;
+    }
+    next.hour -= MAX_HOUR_NUM;
+    next.day++;
+
+    /* day进位 */
+    int md = ts->mdays();
+    if (next.day <= md) {
+        return next;
+    }
+
+    /* 年月不进位 */
+    next.day -= md;
+    return next;
+}
+
+// 减少x小时
+Time SimSql::subHour(const Time* ts, int hr)
+{
+    Time prv = *ts;
+
+    /* 足够抵扣 */
+    if (ts->hour > hr) {
+        prv.hour = ts->hour - hr;
+        return prv;
+    }
+
+    /* day抵扣 */
+    if (ts->day > 1) {
+        prv.day--;
+        prv.hour = ts->hour + MAX_HOUR_NUM - hr;
+        return prv;
+    }
+
+    /* 回到原点 */
+    prv.hour = 0;
+    return prv;
+}
+
+// 增加x小时
+Time SimSql::addHour(const Time* ts, int hr)
+{
+    Time next = *ts;
+
+    /* 不进位 */
+    next.hour = ts->hour + hr;
+    if (next.hour < MAX_HOUR_NUM) {
+        return next;
+    }
+    next.hour -= MAX_HOUR_NUM;
+    next.day++;
+
+    /* day进位 */
+    int md = ts->mdays();
+    if (next.day <= md) {
+        return next;
+    }
+
+    /* 年月不进位 */
+    next.day -= md;
+    return next;
+
 }
 
 // 筛选数据

@@ -26,6 +26,12 @@ private:
     char* regMin(int tab, const Time* ts, int min);
     char* regHour(int tab, const Time* ts, int hr);
 
+    /*! @brief 增加或减少x分钟 */
+    Time subMin(const Time* ts, int min);
+    Time addMin(const Time* ts, int min);
+    Time subHour(const Time* ts, int hr);
+    Time addHour(const Time* ts, int hr);
+
 private:
     sqlite3* m_handle;
 };
