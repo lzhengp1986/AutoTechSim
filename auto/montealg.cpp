@@ -141,31 +141,48 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
     m_cluster->clear();
     int n = m_sqlList.size();
 
-    int i, maxMin, maxHr;
-    int minMin = ts->min;
-    int minHr = ts->hour;
+    int i, minMin, minHr, maxMin, maxHr;
     if (stage >= (MAX_STAGE_NUM >> 1)) {
         /* case1:30min */
-        if (minMin < 30) {
-            /* 当前小时 */
-            maxMin = minMin + 30;
-            for (int i = 0; i < n; i++) {
-                FreqInfo& info = m_sqlList[i];
-                if (info.isNew == false) {
-                    continue;
+        if (ts->min >= 15) {
+            minHr = ts->hour;
+            minMin = ts->min - 15;
+            maxMin = ts->min + 15;
+            if (maxMin < 60) { /* 当前小时 */
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if ((info.hour == minHr)
+                        && (info.min >= minMin)
+                        && (info.min <= maxMin)) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
                 }
-                if ((info.hour == minHr)
-                    && (info.min >= minMin)
-                    && (info.min <= maxMin)) {
-                    m_cluster->push(info);
-                    info.isNew = false;
+            } else { /* 当前+后1小时 */
+                maxMin -= 60;
+                maxHr = (minHr + 1) % MAX_HOUR_NUM;
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if (((info.hour == minHr) && (info.min >= minMin))
+                        || ((info.hour == maxHr) && (info.min <= maxMin))) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
                 }
             }
         } else {
-            /* 当前小时+后1小时 */
-            maxMin = (minMin + 30) % 60;
-            maxHr = (minHr + 1) % MAX_HOUR_NUM;
-            for (int i = 0; i < n; i++) {
+            /* 前1小时+当前小时 */
+            minHr = (ts->hour + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+            minMin = ts->min + 60 - 15;
+            maxMin = ts->min + 15;
+            maxHr = ts->hour;
+            for (i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
                 if (info.isNew == false) {
                     continue;
@@ -187,16 +204,54 @@ bool MonteAlg::kmean(SqlIn& in, int stage)
 
     if (stage >= (MAX_STAGE_NUM >> 2)) {
         /* case2: 1hour */
-        maxHr = (minHr + 1) % MAX_HOUR_NUM;
-        for (i = 0; i < n; i++) {
-            FreqInfo& info = m_sqlList[i];
-            if (info.isNew == false) {
-                continue;
+        if (ts->min >= 30) {
+            minHr = ts->hour;
+            minMin = ts->min - 30;
+            maxMin = ts->min + 29;
+            if (maxMin < 60) { /* 当前小时 */
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if ((info.hour == minHr)
+                        && (info.min >= minMin)
+                        && (info.min <= maxMin)) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
+                }
+            } else { /* 当前+后1小时 */
+                maxMin -= 60;
+                maxHr = (minHr + 1) % MAX_HOUR_NUM;
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if (((info.hour == minHr) && (info.min >= minMin))
+                        || ((info.hour == maxHr) && (info.min <= maxMin))) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
+                }
             }
-            if (((info.hour == minHr) && (info.min >= minMin))
-                || ((info.hour == maxHr) && (info.min <= minMin))) {
-                m_cluster->push(info);
-                info.isNew = false;
+        } else {
+            /* 前1小时+当前小时 */
+            minHr = (ts->hour + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+            minMin = ts->min + 60 - 30;
+            maxMin = ts->min + 29;
+            maxHr = ts->hour;
+            for (i = 0; i < n; i++) {
+                FreqInfo& info = m_sqlList[i];
+                if (info.isNew == false) {
+                    continue;
+                }
+                if (((info.hour == minHr) && (info.min >= minMin))
+                    || ((info.hour == maxHr) && (info.min <= maxMin))) {
+                    m_cluster->push(info);
+                    info.isNew = false;
+                }
             }
         }
 

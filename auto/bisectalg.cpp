@@ -163,31 +163,48 @@ bool BisectPlus::best(SqlIn& in, int& optChId)
     int n = m_sqlList.size();
 
     if (m_firstStage == false) {
-        int minMin = ts->min;
-        int minHr = ts->hour;
-        int maxMin, maxHr;
+        int i, minMin, minHr, maxMin, maxHr;
 
         /* case1:30min */
-        if (minMin < 30) {
-            /* 当前小时 */
-            maxMin = minMin + 30;
-            for (int i = 0; i < n; i++) {
-                FreqInfo& info = m_sqlList[i];
-                if (info.isNew == false) {
-                    continue;
+        if (ts->min >= 15) {
+            minHr = ts->hour;
+            minMin = ts->min - 15;
+            maxMin = ts->min + 15;
+            if (maxMin < 60) { /* 当前小时 */
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if ((info.hour == minHr)
+                        && (info.min >= minMin)
+                        && (info.min <= maxMin)) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
                 }
-                if ((info.hour == minHr)
-                    && (info.min >= minMin)
-                    && (info.min <= maxMin)) {
-                    m_cluster->push(info);
-                    info.isNew = false;
+            } else { /* 当前+后1小时 */
+                maxMin -= 60;
+                maxHr = (minHr + 1) % MAX_HOUR_NUM;
+                for (i = 0; i < n; i++) {
+                    FreqInfo& info = m_sqlList[i];
+                    if (info.isNew == false) {
+                        continue;
+                    }
+                    if (((info.hour == minHr) && (info.min >= minMin))
+                        || ((info.hour == maxHr) && (info.min <= maxMin))) {
+                        m_cluster->push(info);
+                        info.isNew = false;
+                    }
                 }
             }
         } else {
-            /* 当前小时+后1小时 */
-            maxMin = (minMin + 30) % 60;
-            maxHr = (minHr + 1) % MAX_HOUR_NUM;
-            for (int i = 0; i < n; i++) {
+            /* 前1小时+当前小时 */
+            minHr = (ts->hour + MAX_HOUR_NUM - 1) % MAX_HOUR_NUM;
+            minMin = ts->min + 60 - 15;
+            maxMin = ts->min + 15;
+            maxHr = ts->hour;
+            for (i = 0; i < n; i++) {
                 FreqInfo& info = m_sqlList[i];
                 if (info.isNew == false) {
                     continue;
