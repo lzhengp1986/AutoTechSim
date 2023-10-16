@@ -51,7 +51,7 @@ int SimSql::insert(int tab, const Time* ts, int valid, int glbChId, int snr, int
     return SQLITE_OK;
 }
 
-char* SimSql::fwdMin(int tab, const Time* ts, int min)
+char* SimSql::regMin(int tab, const Time* ts, int min)
 {
     char* sql;
     int minHr = ts->hour;
@@ -78,7 +78,7 @@ char* SimSql::fwdMin(int tab, const Time* ts, int min)
     return sql;
 }
 
-char* SimSql::fwdHour(int tab, const Time* ts, int hr)
+char* SimSql::regHour(int tab, const Time* ts, int hr)
 {
     char* sql;
     int minHr = ts->hour;
@@ -108,11 +108,11 @@ char* SimSql::regular(int tab, const Time* ts, int rule)
 {
     char* sql;
     switch (rule) {
-    case FORWARD_30MIN: sql = fwdMin(tab, ts, 30); break;
-    case FORWARD_1HOUR: sql = fwdHour(tab, ts, 1); break;
-    case FORWARD_2HOUR: sql = fwdHour(tab, ts, 2); break;
-    case FORWARD_4HOUR: sql = fwdHour(tab, ts, 4); break;
-    default: sql = fwdHour(tab, ts, 2); break;
+    case SQL_WIN_30MIN: sql = regMin(tab, ts, 30); break;
+    case SQL_WIN_1HOUR: sql = regHour(tab, ts, 1); break;
+    case SQL_WIN_2HOUR: sql = regHour(tab, ts, 2); break;
+    case SQL_WIN_4HOUR: sql = regHour(tab, ts, 4); break;
+    default: sql = regHour(tab, ts, 2); break;
     }
 
     return sql;

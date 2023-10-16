@@ -23,8 +23,8 @@ public:
 private:
     /*! @brief 根据类型生成selec规则 */
     char* regular(int tab, const Time* ts, int rule);
-    char* fwdMin(int tab, const Time* ts, int min);
-    char* fwdHour(int tab, const Time* ts, int hr);
+    char* regMin(int tab, const Time* ts, int min);
+    char* regHour(int tab, const Time* ts, int hr);
 
 private:
     sqlite3* m_handle;

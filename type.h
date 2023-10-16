@@ -33,10 +33,10 @@ typedef enum {
 
 /* SQL样本规则 */
 typedef enum {
-    FORWARD_30MIN = 0,
-    FORWARD_1HOUR,
-    FORWARD_2HOUR,
-    FORWARD_4HOUR,
+    SQL_WIN_30MIN = 0,
+    SQL_WIN_1HOUR,
+    SQL_WIN_2HOUR,
+    SQL_WIN_4HOUR,
 } SqlRule;
 
 // 状态机
