@@ -32,7 +32,7 @@ MainWin::~MainWin()
 
 void MainWin::keyPressEvent(QKeyEvent* evt)
 {
-    if (event->modifiers() == Qt::ShiftModifier) {
+    if (evt->modifiers() == Qt::ShiftModifier) {
         int k = evt->key();
         LinkCfg *cfg = m_sim->m_link;
         int& index = cfg->tmrSpeedIndex;
