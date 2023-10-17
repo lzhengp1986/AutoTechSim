@@ -35,9 +35,9 @@ void MainWin::keyPressEvent(QKeyEvent* evt)
     int k = evt->key();
     LinkCfg *cfg = m_sim->m_link;
     int& index = cfg->tmrSpeedIndex;
-    if (k == Qt::Key_Equal) {
+    if (k == Qt::Key_PageUp) {
         index = MIN(index + 1, 6);
-    } else if (k == Qt::Key_Minus) {
+    } else if (k == Qt::Key_PageDown) {
         index = MAX(index - 1, 0);
     }
 
