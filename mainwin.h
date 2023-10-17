@@ -20,6 +20,9 @@ public:
     MainWin(QWidget *parent = nullptr);
     ~MainWin();
 
+protected:
+    void keyPressEvent(QKeyEvent* e);
+
 private slots:
     void on_new_day(void);
     void on_new_time(const Time* ts);

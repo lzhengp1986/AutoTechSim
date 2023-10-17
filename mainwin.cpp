@@ -30,6 +30,23 @@ MainWin::~MainWin()
     delete ui;
 }
 
+void MainWin::keyPressEvent(QKeyEvent* evt)
+{
+    if (event->modifiers() == Qt::ShiftModifier) {
+        int k = evt->key();
+        LinkCfg *cfg = m_sim->m_link;
+        int& index = cfg->tmrSpeedIndex;
+        if (k == Qt::Key_Up) {
+            index = MIN(index + 1, 10);
+        } else if (k == Qt::Key_Down) {
+            index = MAX(index - 1, 0);
+        }
+    }
+
+    /* 调用父函数 */
+    QMainWindow::keyPressEvent(evt);
+}
+
 // 设置win
 void MainWin::setup_win(void)
 {
