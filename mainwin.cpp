@@ -32,15 +32,13 @@ MainWin::~MainWin()
 
 void MainWin::keyPressEvent(QKeyEvent* evt)
 {
-    if (evt->modifiers() == Qt::ShiftModifier) {
-        int k = evt->key();
-        LinkCfg *cfg = m_sim->m_link;
-        int& index = cfg->tmrSpeedIndex;
-        if (k == Qt::Key_Up) {
-            index = MIN(index + 1, 10);
-        } else if (k == Qt::Key_Down) {
-            index = MAX(index - 1, 0);
-        }
+    int k = evt->key();
+    LinkCfg *cfg = m_sim->m_link;
+    int& index = cfg->tmrSpeedIndex;
+    if (k == Qt::Key_Equal) {
+        index = MIN(index + 1, 6);
+    } else if (k == Qt::Key_Minus) {
+        index = MAX(index - 1, 0);
     }
 
     /* 调用父函数 */
