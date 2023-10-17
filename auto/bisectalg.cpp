@@ -134,17 +134,8 @@ const FreqRsp& BisectPlus::bandit(SqlIn& in, const FreqReq& req)
         m_prvGlbChId = optChId;
     }
 
-    /* 先调用基础二分算法 */
+    /* 基础二分算法 */
     m_rsp = BisectAlg::bandit(in, req);
-
-    /* 50%将二分频点提前 */
-    UnifIntDist dist(0, 99);
-    int rnd = dist(*m_gen[RSV]);
-    if (rnd < 50) {
-        swap(0, 2);
-        swap(1, 3);
-    }
-
     return m_rsp;
 }
 
