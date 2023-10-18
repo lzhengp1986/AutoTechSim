@@ -230,7 +230,7 @@ void MainWin::on_new_chan(int type, int index, int glbChId, int snr, int n0, int
     float reg = regret / 1000.0f;
     QString text = QString("%1 %2 %3 %4 %5 %6")
             .arg(hr, 4, 'f', 2)
-            .arg(index, 2, 10, QLatin1Char(' '))
+            .arg(index, 1)
             .arg(glbChId, 4, 10, QLatin1Char(' '))
             .arg(snr, 3, 10, QLatin1Char(' '))
             .arg(n0, 4, 10, QLatin1Char(' '))
