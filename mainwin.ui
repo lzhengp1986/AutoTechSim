@@ -86,10 +86,16 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>150</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>148</width>
-          <height>200</height>
+          <height>150</height>
          </size>
         </property>
         <property name="title">
@@ -97,16 +103,16 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">
-          <number>3</number>
+          <number>0</number>
          </property>
          <property name="topMargin">
-          <number>3</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>3</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>3</number>
+          <number>0</number>
          </property>
          <item row="0" column="0">
           <widget class="QPlainTextEdit" name="infoText">
@@ -125,7 +131,7 @@
            <property name="maximumSize">
             <size>
              <width>160</width>
-             <height>40</height>
+             <height>100</height>
             </size>
            </property>
            <property name="font">
@@ -137,7 +143,7 @@
            <property name="styleSheet">
             <string notr="true">background-color:transparent;
 border-color:gray;
-color:black;</string>
+color:blue;</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
