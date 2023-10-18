@@ -54,7 +54,7 @@ protected:
     QList<int> m_kmList; /* KMean列表 */
     QList<FreqInfo> m_sqlList; /* SQL列表 */
 
-    enum {INIT = 0, K300, ALG, RSV, NUM};
+    enum {INIT, K300, RAND, BETA, WIN, NUM};
     RandGen *m_gen[NUM]; /* 随机数生成器 */
 };
 

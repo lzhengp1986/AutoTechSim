@@ -46,7 +46,7 @@ const FreqRsp& BaseAlg::bandit(SqlIn& in, const FreqReq& req)
     int i, j;
     UnifIntDist dist(0, MAX_GLB_CHN - 1);
     for (i = 0; i < n; i++) {
-        j = dist(*m_gen[ALG]);
+        j = dist(*m_gen[RAND]);
         rsp->glb[i] = align(j);
     }
 

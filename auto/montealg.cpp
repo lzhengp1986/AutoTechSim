@@ -4,19 +4,16 @@
 MonteAlg::MonteAlg(void)
     : m_bisect(new Bisecting)
     , m_cluster(new KBeta)
-    , m_beta(new RandGen(1987))
 {
     reset();
 }
 
 MonteAlg::~MonteAlg(void)
 {
-    delete m_beta;
     delete m_bisect;
     delete m_cluster;
     m_cluster = nullptr;
     m_bisect = nullptr;
-    m_beta = nullptr;
 }
 
 void MonteAlg::reset(void)
@@ -51,7 +48,7 @@ inline int MonteAlg::schWin(void)
     int stage = m_stage;
     if (m_stage <= (MAX_STAGE_NUM >> 2)) {
         UnifIntDist dist(0, 99);
-        int rnd = dist(*m_gen[RSV]);
+        int rnd = dist(*m_gen[WIN]);
         int stageX2 = MIN(m_stage << 1, MAX_STAGE_NUM);
         stage = (rnd < 50) ? m_stage : stageX2;
     }
@@ -304,7 +301,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
     /* 初始化边界+随机 */
     bool used[MAX_GLB_CHN + 1] = {0};
     UnifIntDist dist(0, MAX_GLB_CHN - 1);
-    int rnd = dist(*m_gen[RSV]);
+    int rnd = dist(*m_gen[RAND]);
     used[maxGlbId] = true;
     used[minGlbId] = true;
     used[rnd] = true;
@@ -334,7 +331,7 @@ void MonteAlg::tree(int minGlbId, int maxGlbId)
             int half = maxLen >> 1;
             int quart = half >> 1;
             UnifIntDist dist(0, half);
-            rnd = dist(*m_gen[RSV]);
+            rnd = dist(*m_gen[RAND]);
             k = start + rnd + quart;
         } else {
             k = (start + stop) >> 1;
@@ -379,10 +376,10 @@ int MonteAlg::thomp(void)
     int k = 0;
     /* 取最大概率对应信道 */
     BetaDist beta(m_vldNum[k] + 1, m_invNum[k] + 1);
-    double pi, pm = beta(*m_beta);
+    double pi, pm = beta(*m_gen[BETA]);
     for (int i = 1; i < MAX_TREE_LEN; i++) {
         BetaDist beta(m_vldNum[i] + 1, m_invNum[i] + 1);
-        pi = beta(*m_beta);
+        pi = beta(*m_gen[BETA]);
         if (pi > pm) {
             pm = pi;
             k = i;

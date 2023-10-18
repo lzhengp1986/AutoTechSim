@@ -42,7 +42,6 @@ private:
     unsigned m_stage;
     Bisecting *m_bisect;
     KMean *m_cluster;
-    RandGen *m_beta;
 
     /* 搜索树 */
     int m_vldNum[MAX_TREE_LEN];
