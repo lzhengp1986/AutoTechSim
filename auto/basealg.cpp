@@ -128,17 +128,15 @@ int BaseAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
 Bisecting::Bisecting(void)
 {
-    m_gen[DIR] = new RandGen(1987);
-    m_gen[ALG] = new RandGen(1987);
+    m_gen = new RandGen(1987);
+    m_dir = true;
     clear();
 }
 
 Bisecting::~Bisecting(void)
 {
-    delete m_gen[DIR];
-    delete m_gen[ALG];
-    m_gen[DIR] = nullptr;
-    m_gen[ALG] = nullptr;
+    delete m_gen;
+    m_gen = nullptr;
 }
 
 // 二分随机推荐算法
@@ -153,8 +151,7 @@ bool Bisecting::sche(int min, int max, int& glbChId)
 
     /* 二分搜索 */
     BernDist dist;
-    int dir = dist(*m_gen[DIR]);
-    if (dir == 0) {
+    if (m_dir == true) {
         start = stop = min;
         for (i = min, j = min + 1; j <= max; j++) {
             if (m_valid[j] == true) {
@@ -193,7 +190,7 @@ bool Bisecting::sche(int min, int max, int& glbChId)
         int half = maxLen >> 1;
         int quart = half >> 1;
         UnifIntDist dist(0, half);
-        int rnd = dist(*m_gen[ALG]);
+        int rnd = dist(*m_gen);
         median = start + rnd + quart;
     } else {
         median = (start + stop) >> 1;

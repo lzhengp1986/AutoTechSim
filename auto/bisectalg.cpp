@@ -88,6 +88,7 @@ int BisectAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
 
     /* 捕获成功切状态 */
     if (out.isValid == true) {
+        m_bisect->setDir(glbChId > m_prvGlbChId);
         m_prvGlbChId = glbChId;
         m_firstStage = false;
         m_bisect->clear();

@@ -237,7 +237,7 @@ int KMean::state(void)
         /* 信息计算 */
         k = smpCnt - vldNum;
         BetaDist beta(vldNum + 1, k + 1);
-        inf->beta = (float)beta(*m_gen);
+        inf->beta = beta(*m_gen);
         inf->avgSnr = snrSum / smpCnt;
         inf->sumSnr = snrSum;
     }

@@ -286,6 +286,7 @@ int MonteAlg::notify(SqlIn& in, int glbChId, const EnvOut& out)
     bool flag = out.isValid;
     if (flag == true) {
         m_stage = MAX(m_stage >> 1, 1);
+        m_bisect->setDir(glbChId > m_prvGlbChId);
         m_prvGlbChId = glbChId;
         m_bisect->clear();
     }

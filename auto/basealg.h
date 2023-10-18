@@ -83,6 +83,8 @@ public:
     void clear(void);
     /*! @brief 置标志 */
     void setValid(int glbChId);
+    /*! @brief 置方向 */
+    void setDir(bool dir);
 
     /*!
      * @brief 二分随机推荐算法
@@ -95,8 +97,8 @@ public:
 
 private:
     bool m_valid[MAX_GLB_CHN];
-    enum {DIR = 0, ALG, NUM};
-    RandGen *m_gen[NUM];
+    RandGen *m_gen;
+    bool m_dir;
 };
 
 inline void Bisecting::clear(void)
@@ -107,6 +109,11 @@ inline void Bisecting::clear(void)
 inline void Bisecting::setValid(int glbChId)
 {
     m_valid[glbChId] = true;
+}
+
+inline void Bisecting::setDir(bool dir)
+{
+    m_dir = dir;
 }
 
 #endif // BASEALG_H
