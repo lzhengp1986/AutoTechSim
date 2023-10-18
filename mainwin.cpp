@@ -234,7 +234,7 @@ void MainWin::on_new_chan(int type, int index, int glbChId, int snr, int n0, int
             .arg(glbChId, 4, 10, QLatin1Char(' '))
             .arg(snr, 3, 10, QLatin1Char(' '))
             .arg(n0, 4, 10, QLatin1Char(' '))
-            .arg(reg, 4, 'f', 2);
+            .arg(reg, 4, 'f', 1);
     ui->logText->appendPlainText(text);
 
     /* 状态栏显示 */
