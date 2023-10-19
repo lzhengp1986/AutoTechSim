@@ -122,7 +122,7 @@ void LinkSim::set_time(int year, int month)
 void LinkSim::free_time(void)
 {
     m_subthr->quit();
-    m_subthr->wait();
+    m_subthr->wait(1000);
     delete m_timer;
     delete m_subthr;
     delete m_expire;

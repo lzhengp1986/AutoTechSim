@@ -150,8 +150,7 @@ void MainWin::setup_sim(void)
 void MainWin::free_sim(void)
 {
     m_sim->quit();
-    m_sim->deactive();
-    m_sim->wait();
+    m_sim->wait(1000);
     delete m_time;
     delete m_sim;
     m_sim = nullptr;
