@@ -36,9 +36,9 @@ void MainWin::keyPressEvent(QKeyEvent* evt)
     LinkCfg *cfg = m_sim->m_link;
     int& index = cfg->tmrSpeedIndex;
     if (k == Qt::Key_PageUp) {
-        index = MIN(index + 1, 6);
-    } else if (k == Qt::Key_PageDown) {
         index = MAX(index - 1, 0);
+    } else if (k == Qt::Key_PageDown) {
+        index = MIN(index + 1, 6);
     }
 
     /* 调用父函数 */
@@ -102,8 +102,8 @@ int MainWin::update_model(const ModelCfg* cfg)
     QList<int> hr, up, low;
     for (int i = 0; i < MAX_HOUR_NUM; i++) {
         int muf = m_sim->m_env->muf(i);
-        low << WEnv::lower(muf);
-        up << WEnv::upper(muf);
+        low << m_sim->m_env->lower(muf);
+        up << m_sim->m_env->upper(muf);
         hr << i;
     }
     m_chart->plot(hr, low, up);
@@ -229,8 +229,7 @@ void MainWin::on_new_chan(int type, int index, int glbChId, int snr, int n0, int
     /* 日志 */
     float reg = regret / 1000.0f;
     QString text = QString("%1 %2 %3 %4 %5 %6")
-            .arg(hr, 4, 'f', 2)
-            .arg(index, 1)
+            .arg(hr, 4, 'f', 2) .arg(index, 1)
             .arg(glbChId, 4, 10, QLatin1Char(' '))
             .arg(snr, 3, 10, QLatin1Char(' '))
             .arg(n0, 4, 10, QLatin1Char(' '))

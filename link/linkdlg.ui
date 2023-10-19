@@ -84,27 +84,7 @@
        <widget class="QComboBox" name="tmrSpeed">
         <item>
          <property name="text">
-          <string>x1</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>x4</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>x8</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>x16</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>x32</string>
+          <string>x128</string>
          </property>
         </item>
         <item>
@@ -114,7 +94,27 @@
         </item>
         <item>
          <property name="text">
-          <string>x128</string>
+          <string>x32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x16</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>x1</string>
          </property>
         </item>
        </widget>

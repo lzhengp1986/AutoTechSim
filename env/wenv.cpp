@@ -133,10 +133,8 @@ int WEnv::est(const EnvIn& in, EnvOut& out)
 
     /* step1.计算可通频段 */
     int muf = dh->fc[0].freq;
-    int maxFc = upper(muf);
-    int minFc = lower(muf);
-    int max = MIN(maxFc, MAX_CHN_FREQ);
-    int min = MAX(MAX(max - m_maxband, minFc), MIN_CHN_FREQ);
+    int max = upper(muf);
+    int min = lower(muf);
 
     /* 是否在可通频带 */
     int fc = GLB2FREQ(glbChId);
@@ -243,7 +241,9 @@ int WEnv::upper(int muf)
 // 频率下限KHz
 int WEnv::lower(int muf)
 {
-    return (int)MAX(muf * LUF_COEF, MIN_CHN_FREQ);
+    int minFc = muf * LUF_COEF;
+    int maxFc = MIN(muf * MUF_COEF, MAX_CHN_FREQ);
+    return (int)MAX(MAX(minFc, maxFc - m_maxband), MIN_CHN_FREQ);
 }
 
 // 根据信道号获取底噪

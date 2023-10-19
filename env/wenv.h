@@ -96,9 +96,9 @@ public:
     /*! @brief 获取MUF值KHz */
     int muf(int hour) const;
     /*! @brief 频率上限KHz */
-    static int upper(int muf);
+    int upper(int muf);
     /*! @brief 频率下限KHz */
-    static int lower(int muf);
+    int lower(int muf);
 
     /*! @brief 根据信道号获取底噪 */
     static int noise(int glbChId);

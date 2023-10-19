@@ -52,14 +52,14 @@ inline int LinkCfg::timerSpeed(void) const
 {
     int speed = 0;
     switch (tmrSpeedIndex) {
-    case 0: speed = 1; break;
-    case 1: speed = 4; break;
-    case 2: speed = 8; break;
+    case 0: speed = 128; break;
+    case 1: speed = 64; break;
+    case 2: speed = 32; break;
     case 3: speed = 16; break;
-    case 4: speed = 32; break;
-    case 5: speed = 64; break;
-    case 6: speed = 128; break;
-    default: speed = 1; break;
+    case 4: speed = 8; break;
+    case 5: speed = 4; break;
+    case 6: speed = 1; break;
+    default: speed = 128; break;
     }
     return speed;
 }
