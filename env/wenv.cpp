@@ -241,9 +241,9 @@ int WEnv::upper(int muf)
 // 频率下限KHz
 int WEnv::lower(int muf)
 {
-    int minFc = muf * LUF_COEF;
-    int maxFc = MIN(muf * MUF_COEF, MAX_CHN_FREQ);
-    return (int)MAX(MAX(minFc, maxFc - m_maxband), MIN_CHN_FREQ);
+    int minFc1 = muf * LUF_COEF;
+    int minFc2 = upper(muf) - m_maxband;
+    return (int)MAX(MAX(minFc1, minFc2), MIN_CHN_FREQ);
 }
 
 // 根据信道号获取底噪
